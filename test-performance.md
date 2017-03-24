@@ -7,14 +7,14 @@ pip install django
 django-admin startproject benchmark && cd benchmark
 
 # my mac installed python in a strange place
-PYTHONPATH=/opt/intel/intelpython35/lib/python3.5/site-packages/ python manage.py runserver
+PYTHONPATH=/opt/intel/intelpython35/lib/python3.5/site-packages/ python manage.py runserver 13579
 
 ```
 
 ```
 
 # on another terminal
-ab -n 1000 -c 1 http://127.0.0.1:8000/
+ab -n 1000 -c 1 http://127.0.0.1:13579/
 # 1000 requests with no concurrency
 
 This is ApacheBench, Version 2.3 <$Revision: 1706008 $>
@@ -26,7 +26,7 @@ Benchmarking 127.0.0.1 (be patient)
 
 Server Software:        WSGIServer/0.1
 Server Hostname:        127.0.0.1
-Server Port:            8000
+Server Port:            13579
 
 Document Path:          /
 Document Length:        1767 bytes
@@ -64,7 +64,7 @@ Percentage of the requests served within a certain time (ms)
 ```
 
 # on another terminal
-ab -n 1000 -c 10 http://127.0.0.1:8000/
+ab -n 1000 -c 10 http://127.0.0.1:13579/
 # 1000 requests with 10 concurrent requests
 
 This is ApacheBench, Version 2.3 <$Revision: 1706008 $>
@@ -76,7 +76,7 @@ Benchmarking 127.0.0.1 (be patient)
 
 Server Software:        WSGIServer/0.1
 Server Hostname:        127.0.0.1
-Server Port:            8000
+Server Port:            13579
 
 Document Path:          /
 Document Length:        1767 bytes
