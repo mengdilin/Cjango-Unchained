@@ -29,6 +29,7 @@ class Router {
       }
       // "calls add_route to populate pattern_to_callback and patterns_list"
     };
+    Router() {};
     void add_route(std::string url_pattern, functor f);
     // Note: register() should be renamed from add_route() for django mimicking,
     // but "register" is a reserved word in C++.
