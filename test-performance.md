@@ -1,4 +1,4 @@
-## Baseline
+## Baseline (django handles 1 HttpRequest by ~2.5ms)
 
 ```
 # On Mac OS 10.11 (El Capitan)
