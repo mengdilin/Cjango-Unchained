@@ -19,7 +19,6 @@ public:
 typedef std::function<HttpResponse(HttpRequest)> functor;
 typedef std::map<std::string, functor> URLmap;
 
-
 class Router {
   public:
     URLmap pattern_to_callback;
