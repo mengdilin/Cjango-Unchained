@@ -5,6 +5,7 @@
 #include <map>
 #include <functional>
 #include <string>
+#include "../routing/router.hpp"
 
 using std::string;
 
@@ -29,18 +30,6 @@ inline void _log(Head && h, Rest && ...r)
 #define _DEBUG(...) do{} while(0)
 #endif
 
-class HttpRequest {
-public:
-    string data;
-    HttpRequest(string str) : data(str) {}
-};
-
-class HttpResponse {
-public:
-    string content;
-    HttpResponse(string str) : content(str) {}
-};
-
 inline HttpResponse get_phony_response(HttpRequest req)
 {
     string text = "<html>\r\n<body>\r\n"
@@ -50,13 +39,5 @@ inline HttpResponse get_phony_response(HttpRequest req)
     HttpResponse resp(text);
     return resp;
 }
-
-typedef std::function<HttpResponse(HttpRequest)> functor;
-typedef std::map<std::string, functor> URLmap;
-
-class Router {
-public:
-    URLmap pattern_to_callback;
-};
 
 #endif

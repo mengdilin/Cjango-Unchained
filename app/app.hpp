@@ -9,6 +9,9 @@ using namespace std;
 class App {
     Router router;
 public:
+    void add_route(std::string url_pattern, functor f) {
+      router.add_route(url_pattern, f);
+    }
     App() {}
     App(Router& rt): router(rt) {}
     void print_routes();

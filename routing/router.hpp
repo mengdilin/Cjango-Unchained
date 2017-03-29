@@ -1,3 +1,6 @@
+#ifndef _ROUTER_HPP
+#define _ROUTER_HPP
+
 #include <stdio.h>
 #include <functional>
 #include <map>
@@ -13,13 +16,16 @@ namespace cjango {
 class HttpRequest {
 public:
   int some_data_member;
+  std::string data;
   std::string path; // # "/music/bands/the_beatles/"
-  HttpRequest(std::string path) : some_data_member(3), path(path) { };
+  HttpRequest(std::string str) : data(str) { path = "/abc"; }
+  // HttpRequest(std::string path) : some_data_member(3), path(path) { };
 };
 class HttpResponse {
 public:
-  int some_data_member;
-  HttpResponse() : some_data_member(3) {};
+    std::string content;
+    HttpResponse(std::string str) : content(str) {}
+    HttpResponse() {}
 };
 
 typedef std::function<HttpResponse(HttpRequest)> functor;
@@ -42,3 +48,5 @@ class Router {
     std::string resolve(HttpRequest);
     HttpResponse get_http_response(HttpRequest);
 };
+
+#endif
