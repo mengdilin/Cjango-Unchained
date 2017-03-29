@@ -3,12 +3,18 @@
 #include <map>
 #include <vector>
 #include <string>
+#include <stdexcept>
+
+namespace cjango {
+  const std::string INVALIDURL = "__INVALIDURL";
+}
 
 // FIXME mock
 class HttpRequest {
 public:
   int some_data_member;
-  HttpRequest() : some_data_member(3) {};
+  std::string path; // # "/music/bands/the_beatles/"
+  HttpRequest(std::string path) : some_data_member(3), path(path) { };
 };
 class HttpResponse {
 public:
