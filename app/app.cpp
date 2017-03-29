@@ -23,7 +23,7 @@ void error_exit(string msg)
     exit(1);
 }
 
-static void worker(int clntSock)
+static void worker(int clntSock, Router router)
 {
     char buff[BUFFER_MAXSIZE];
     memset(buff, 0, BUFFER_MAXSIZE);
@@ -36,7 +36,8 @@ static void worker(int clntSock)
     // _DEBUG("Received request from client:\n", string(buff));
 
     HttpRequest request(buff);
-    HttpResponse response = get_phony_response(request);
+    // HttpResponse response = get_phony_response(request);
+    HttpResponse response = router.get_http_response(request);
 
     string resp = "HTTP/1.1 200 OK\r\n"
                   "Content-Type: text/html\r\n\r\n";
@@ -50,7 +51,7 @@ static void worker(int clntSock)
 
 void App::handle_request(int clntSock)
 {
-    thread t(worker, clntSock);
+    thread t(worker, clntSock, this->router);
     auto id = t.get_id();
     t.detach();
     _DEBUG("Created and detached new thread ", id, " for socket ", clntSock);

@@ -9,8 +9,13 @@ using namespace std;
 class App {
     Router router;
 public:
-    App() {}
     App(Router& rt): router(rt) {}
+    App(URLmap routes)
+    {
+        Router tmp(routes);
+        this->router = tmp;
+    }
+    
     void print_routes();
     void run(int port);
     void handle_request(int socket);

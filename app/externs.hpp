@@ -57,6 +57,11 @@ typedef std::map<std::string, functor> URLmap;
 class Router {
 public:
     URLmap pattern_to_callback;
+    Router(URLmap routes): pattern_to_callback(routes) {}
+    Router() {};
+    HttpResponse get_http_response(HttpRequest req) {
+        return get_phony_response(req);
+    }
 };
 
 #endif

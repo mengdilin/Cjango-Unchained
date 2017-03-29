@@ -2,7 +2,8 @@
 
 int main(int argc, char* argv[])
 {
-    App app;
+    URLmap um;
+    App app(um);
     app.run(8080);
 
     return 0;
