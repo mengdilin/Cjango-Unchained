@@ -6,6 +6,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include "app.hpp"
+#include "../http_parser/http_request_parser.hpp"
 
 using namespace std;
 
@@ -36,6 +37,7 @@ void App::worker(int clntSock)
     // _DEBUG("Received request from client:\n", string(buff));
 
     HttpRequest request(buff);
+    http::HttpRequestParser parser;
     request.path = "/abc"; // FIXME set path
     // HttpResponse response = get_phony_response(request);
     HttpResponse response = router.get_http_response(request);

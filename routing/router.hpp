@@ -7,6 +7,7 @@
 #include <vector>
 #include <string>
 #include <stdexcept>
+#include <algorithm>
 
 namespace cjango {
   const std::string INVALIDURL = "__INVALIDURL";

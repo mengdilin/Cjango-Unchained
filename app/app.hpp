@@ -2,6 +2,7 @@
 #define _APP_HPP
 
 #include <string>
+#include <cstring>
 #include "externs.hpp"
 
 using namespace std;

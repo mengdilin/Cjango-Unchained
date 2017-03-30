@@ -6,7 +6,6 @@
 #include <functional>
 #include <string>
 #include "../routing/router.hpp"
-
 using std::string;
 
 /* print debug messages if -DDEBUG specified */
