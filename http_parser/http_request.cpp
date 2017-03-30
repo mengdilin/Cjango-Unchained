@@ -20,6 +20,7 @@ std::ostream& http::operator<<(std::ostream& Str, const http::HttpRequest& v) {
   for (auto& entry : v.request_headers) {
     result  += entry.first + ":" + entry.second + "\n";
   }
+  result += "parameters: \n";
   for (auto& entry : v.parameters) {
     result  += entry.first + ":" + entry.second + "\n";
   }

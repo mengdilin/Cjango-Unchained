@@ -3,10 +3,10 @@
 #include <unordered_map>
 int main() {
   std::string header = "POST /cgi-bin/process.cgi HTTP/1.1\r\nUser-Agent: Mozilla/4.0 (compatible; MSIE5.01; Windows NT)\r\nHost: www.tutorialspoint.com\r\nContent-Type: text/xml; charset=utf-8\r\nContent-Length: length\r\nAccept-Language: en-us\r\nAccept-Encoding: gzip, deflate\r\nConnection: Keep-Alive\r\n\r\nlicenseID=string&content=string&/paramsXML=string\r\n";
-
+  std::string get_test = "GET /path/file.html HTTP/1.0\r\nFrom: someuser@jmarshall.com\r\nUser-Agent: HTTPTool/1.0\r\n\r\n";
   try {
     http::HttpRequestParser parser;
-  std::istringstream ss(header);
+  std::istringstream ss(get_test);
   //std::cout << ss << std::endl;
   http::HttpRequest headers = parser.parse_request_line_and_headers(ss);
   std::cout << "left over leng: " << ss.str().length() << std::endl;
