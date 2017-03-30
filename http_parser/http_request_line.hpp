@@ -1,4 +1,6 @@
 #include <unordered_map>
+#include <string>
+
 namespace http {
 class HttpRequestLine {
   public:

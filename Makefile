@@ -4,9 +4,16 @@ PROG = run
 CC = g++
 CPPFLAGS = -std=c++1z -Wall -DDEBUG -pthread
 # CPPFLAGS = -std=c++1z -Wall
-OBJS = app/app.o app/main.o routing/router.o http_parser/http_request_parser.o
-TESTOBJS = app/app.o test/testrun.cpp routing/router.o http_parser/http_request_parser.o
-HTTPPARSEROBJS =
+OBJS = app/app.o app/main.o routing/router.o
+TESTOBJS = app/app.o test/testrun.cpp routing/router.o
+HTTPPARSERCPP = http_parser/http_request_parser.o\
+	http_parser/http_request.o \
+	http_parser/http_request_body_parser.o \
+	http_parser/url_encoded_form_parser.o \
+	http_parser/http_request_line.o \
+	http_parser/http_stream_reader.o
+TESTOBJS += $(HTTPPARSERCPP)
+
 
 testrun : $(TESTOBJS)
 	$(CC) $(CPPFLAGS) -o testrun $(TESTOBJS)
@@ -22,6 +29,13 @@ http_request_parser.o:
 	$(CC) $(CPPFLAGS) -c http_parser/http_request_parser.cpp
 http_request.o:
 	$(CC) $(CPPFLAGS) -c http_parser/http_request.cpp
-
+http_request_line.o:
+	$(CC) $(CPPFLAGS) -c http_parser/http_request_line.cpp
+http_request_body_parser.o:
+	$(CC) $(CPPFLAGS) -c http_parser/http_request_body_parser.cpp
+url_encoded_form_parser.o:
+	$(CC) $(CPPFLAGS) -c http_parser/url_encoded_form_parser.cpp
+http_stream_reader.o:
+	$(CC) $(CPPFLAGS) -c http_parser/http_stream_reader.cpp
 clean:
-	rm -f core $(PROG) $(OBJS)
+	rm -f core $(PROG) $(OBJS) $(HTTPPARSERCPP)

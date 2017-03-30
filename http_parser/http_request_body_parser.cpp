@@ -15,7 +15,7 @@ std::unordered_map<std::string, std::string> http::HttpRequestBodyParser::parse(
       return parser.get_parameter(input_stream, content_leng);
     } else {
       std::cout << "cannot parse content type: " + content_type << std::endl;
-      throw "cannot parse content type: " + content_type;
     }
   }
+  throw "cannot parse content type: " + content_type;
 }

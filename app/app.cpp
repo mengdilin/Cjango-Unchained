@@ -7,6 +7,8 @@
 #include <netinet/in.h>
 #include "app.hpp"
 #include "../http_parser/http_request_parser.hpp"
+#include <sstream>
+#include <unordered_map>
 
 using namespace std;
 
@@ -37,7 +39,24 @@ void App::worker(int clntSock)
     // _DEBUG("Received request from client:\n", string(buff));
 
     HttpRequest request(buff);
-    http::HttpRequestParser parser;
+    try {
+        http::HttpRequestParser parser;
+        std::stringstream ss;
+        ss << buff;
+        //std::cout << ss << std::endl;
+        http::HttpRequest headers = parser.parse_request_line_and_headers(ss);
+        std::unordered_map<std::string, std::string> map = parser.parse_body(ss, "application/x-www-form-urlencoded", ss.str().length());
+
+        //std::unordered_map<std::string, std::string> body = parser.parse_body(ss, );
+        std::cout << headers << std::endl;
+        std::cout << "finished headers" << std::endl;
+        for (auto entry : map) {
+            std::cout << entry.first << ":" << entry.second << std::endl;
+        }
+    } catch (char *e) {
+
+    std::cout << e << std::endl;
+    }
     request.path = "/abc"; // FIXME set path
     // HttpResponse response = get_phony_response(request);
     HttpResponse response = router.get_http_response(request);
