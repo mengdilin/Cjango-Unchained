@@ -19,7 +19,7 @@ int main() {
     for (auto entry : map) {
     std::cout << entry.first << ":" << entry.second << std::endl;
   }
-} catch (char *e) {
+} catch (const char *e) {
 
   std::cout << e << std::endl;
 }

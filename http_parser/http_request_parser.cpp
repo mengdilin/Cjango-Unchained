@@ -28,9 +28,11 @@ http::HttpRequestLine http::HttpRequestParser::parse_line(std::istream& input_st
     result.push_back(s);
   }
   if (result.size() != 3) {
-   // std::cout << request_line << std::endl;
-    std::cout << "malformed request line: request has more than 3 items on the first line" << std::endl;
-    throw "malformed request line: request has more than 3 items on the first line";
+    // std::cout << request_line << std::endl;
+    std::cout << "malformed request line: request has != 3 items on the first line" << std::endl;
+    throw "malformed request line: request has != 3 items on the first line";
+    // if you access localhost:8080 by browser and leave it for a few seconds,
+    // A request(s?) comes with 0 item on the first line
   }
   //std::cout << "reached get_http_request_line" << std::endl;
   return get_http_request_line(result);

@@ -53,9 +53,9 @@ void App::worker(int clntSock)
         for (auto entry : map) {
             std::cout << entry.first << ":" << entry.second << std::endl;
         }
-    } catch (char *e) {
-
-    std::cout << e << std::endl;
+    } catch (const char *e) {
+    // if you throw a char* instead of exception class, that comes as const char*
+        std::cout << e << std::endl;
     }
     request.path = "/abc"; // FIXME set path
     // HttpResponse response = get_phony_response(request);
