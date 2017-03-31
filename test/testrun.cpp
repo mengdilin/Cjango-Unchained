@@ -1,4 +1,5 @@
 #include "../app/app.hpp"
+#include <sstream>
 
 HttpResponse callback_1 (HttpRequest req) {
   _DEBUG("callback1 called");
@@ -13,11 +14,19 @@ HttpResponse callback_1 (HttpRequest req) {
 
 int main(int argc, char* argv[])
 {
-    App app;
-    app.add_route("/abc", callback_1);
-    //app.add_route("/efg", callback_2);
-    app.run(8080);
+  if (argc != 2) {
+    printf("usage: ./testrun 8081\n");
+    return -1;
+  }
+  std::istringstream iss(argv[1]);
+  int port_number;
+  iss >> port_number;
 
-    return 0;
+  App app;
+  app.add_route("/abc", callback_1);
+  //app.add_route("/efg", callback_2);
+  app.run(port_number);
+
+  return 0;
 }
 

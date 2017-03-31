@@ -1,4 +1,4 @@
-## Our program (handling 1 HttpRequest by <0.5ms)
+## Our program (handling 1 HttpRequest by <0.3ms)
 
 ```
 git checkout merge-router-and-app
@@ -8,8 +8,7 @@ make testrun
 #  [ app/app.cpp -> run -> 63 ] Invoked for port: 8080
 #
 # on another terminal
-ab -n 1000 -c 1 http://127.0.0.1:8080/
-
+ab -n 1000 -c 1 http://127.0.0.1:8081/
 This is ApacheBench, Version 2.3 <$Revision: 1706008 $>
 Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
 Licensed to The Apache Software Foundation, http://www.apache.org/
@@ -30,39 +29,39 @@ Finished 1000 requests
 
 Server Software:
 Server Hostname:        127.0.0.1
-Server Port:            8080
+Server Port:            8081
 
 Document Path:          /
 Document Length:        96 bytes
 
 Concurrency Level:      1
-Time taken for tests:   0.464 seconds
+Time taken for tests:   0.267 seconds
 Complete requests:      1000
 Failed requests:        0
 Total transferred:      140000 bytes
 HTML transferred:       96000 bytes
-Requests per second:    2154.52 [#/sec] (mean)
-Time per request:       0.464 [ms] (mean)
-Time per request:       0.464 [ms] (mean, across all concurrent requests)
-Transfer rate:          294.56 [Kbytes/sec] received
+Requests per second:    3743.87 [#/sec] (mean)
+Time per request:       0.267 [ms] (mean)
+Time per request:       0.267 [ms] (mean, across all concurrent requests)
+Transfer rate:          511.86 [Kbytes/sec] received
 
 Connection Times (ms)
               min  mean[+/-sd] median   max
-Connect:        0    0   0.0      0       1
-Processing:     0    0   0.3      0       6
-Waiting:        0    0   0.3      0       6
-Total:          0    0   0.3      0       6
+Connect:        0    0   0.1      0       1
+Processing:     0    0   0.0      0       1
+Waiting:        0    0   0.0      0       1
+Total:          0    0   0.1      0       1
 
 Percentage of the requests served within a certain time (ms)
   50%      0
   66%      0
-  75%      1
-  80%      1
-  90%      1
-  95%      1
-  98%      1
+  75%      0
+  80%      0
+  90%      0
+  95%      0
+  98%      0
   99%      1
- 100%      6 (longest request)
+ 100%      1 (longest request)
 ```
 
 ## Baseline (django handles 1 HttpRequest by ~2.5ms)

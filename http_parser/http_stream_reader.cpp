@@ -1,4 +1,5 @@
 #include "http_stream_reader.hpp"
+#include "../app/externs.hpp"
 
 bool http::HttpStreamReader::is_end_of_line(int next, std::istream& input_stream) {
   /*
@@ -39,7 +40,7 @@ std::string http::HttpStreamReader::get_next_line(std::istream& input_stream) {
     //std::cout << "Next: " << next << std::endl;
     line += (char)next;
   }
-  std::cout << line << std::endl;
+  _DEBUG(line);
   //std::cout << "return from get_next_line" << std::endl;
 
   return line;

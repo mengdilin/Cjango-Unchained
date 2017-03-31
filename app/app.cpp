@@ -48,10 +48,10 @@ void App::worker(int clntSock)
         std::unordered_map<std::string, std::string> map = parser.parse_body(ss, "application/x-www-form-urlencoded", ss.str().length());
 
         //std::unordered_map<std::string, std::string> body = parser.parse_body(ss, );
-        std::cout << headers << std::endl;
-        std::cout << "finished headers" << std::endl;
+        _DEBUG(headers); // FIXME _DEBUG for multi lines
+        _DEBUG("finished headers");
         for (auto entry : map) {
-            std::cout << entry.first << ":" << entry.second << std::endl;
+            _DEBUG(entry.first, ":", entry.second);
         }
     } catch (const char *e) {
     // if you throw a char* instead of exception class, that comes as const char*

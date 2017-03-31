@@ -23,7 +23,7 @@ inline void _log(Head && h, Rest && ...r)
     std::cout << " -> " << __FUNCTION__;\
     std::cout << " -> " << __LINE__ << " ] ";\
     _log(__VA_ARGS__);\
-    std::cout << endl;\
+    std::cout << std::endl;\
 } while(0)
 #else
 #define _DEBUG(...) do{} while(0)

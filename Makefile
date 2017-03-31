@@ -2,10 +2,16 @@
 
 PROG = run
 CC = g++
-CPPFLAGS = -std=c++1z -Wall -DDEBUG -pthread
+CPPFLAGS = -std=c++1z -Wall -pthread
+DEBUG ?= 1
+ifeq ($(DEBUG), 1)
+    CPPFLAGS += -DDEBUG
+else
+    #CPPFLAGS=-DNDEBUG
+endif
 # CPPFLAGS = -std=c++1z -Wall
 OBJS = app/app.o app/main.o routing/router.o
-TESTOBJS = app/app.o test/testrun.cpp routing/router.o
+TESTOBJS = app/app.o routing/router.o
 HTTPPARSERCPP = http_parser/http_request_parser.o\
 	http_parser/http_request.o \
 	http_parser/http_request_body_parser.o \
@@ -15,15 +21,15 @@ HTTPPARSERCPP = http_parser/http_request_parser.o\
 TESTOBJS += $(HTTPPARSERCPP)
 
 
-testrun : $(TESTOBJS)
-	$(CC) $(CPPFLAGS) -o testrun $(TESTOBJS)
+testrun : $(TESTOBJS) test/testrun.cpp
+	$(CC) $(CPPFLAGS) -o testrun $(TESTOBJS) test/testrun.cpp
 $(PROG) : $(OBJS)
 	$(CC) $(CPPFLAGS) -o $(PROG) $(OBJS)
 main.o :
 	$(CC) $(CPPFLAGS) -c app/main.cpp
 app.o :
 	$(CC) $(CPPFLAGS) -c app/app.cpp
-router.o :
+router.o : routing/router.cpp routing/router.hpp
 	$(CC) $(CPPFLAGS) -c routing/router.cpp
 http_request_parser.o:
 	$(CC) $(CPPFLAGS) -c http_parser/http_request_parser.cpp

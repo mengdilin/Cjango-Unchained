@@ -1,4 +1,5 @@
 #include "url_encoded_form_parser.hpp"
+#include "../app/externs.hpp"
 
 http::UrlEncodedFormParser::UrlEncodedFormParser() {}
 bool http::UrlEncodedFormParser::can_parse_content_type(std::string content_type) {
@@ -54,12 +55,12 @@ std::unordered_map<std::string, std::string> http::UrlEncodedFormParser::get_par
     std::string url_decoded_query = uri_decode(content);
 
 
-    std::cout << "url decoded query: " << url_decoded_query << std::endl;
+    _DEBUG("url decoded query: ", url_decoded_query);
     std::vector<std::string> params_for_content = split(url_decoded_query, '&');
     for (auto key_value_string : params_for_content) {
       auto loc = key_value_string.find("=", 0);
       if (loc == std::string::npos || loc == 0) {
-        std::cout << "malformed url query string: " << key_value_string << std::endl;
+        _DEBUG("malformed url query string: ", key_value_string);
         throw "malformed url query string";
       } else {
         std::string key = key_value_string.substr(0, loc);

@@ -3,7 +3,7 @@
 
 #include <stdio.h>
 #include <functional>
-#include <map>
+#include <unordered_map>
 #include <vector>
 #include <string>
 #include <stdexcept>
@@ -30,7 +30,7 @@ public:
 };
 
 typedef std::function<HttpResponse(HttpRequest)> functor;
-typedef std::map<std::string, functor> URLmap;
+typedef std::unordered_map<std::string, functor> URLmap;
 
 class Router {
   public:

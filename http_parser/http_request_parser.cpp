@@ -1,4 +1,5 @@
 #include "http_request_parser.hpp"
+#include "../app/externs.hpp"
 
 http::HttpRequestParser::HttpRequestParser() {}
 
@@ -19,17 +20,18 @@ std::unordered_map<std::string, std::string> http::HttpRequestParser::parse_body
 
 http::HttpRequestLine http::HttpRequestParser::parse_line(std::istream& input_stream) {
   std::string request_line = this->reader.get_next_line(input_stream);
-  std::cout << request_line << std::endl;
+  _DEBUG("vector: ", request_line); // e.g. "GET /favicon.ico HTTP/1.1"
   //split request_line by white spaces
   std::vector<std::string> result;
   std::istringstream iss(request_line);
   for(std::string s; iss >> s;) {
+    _DEBUG("vector: ", s);
     //std::cout << "vector: " << s << std::endl;
     result.push_back(s);
   }
   if (result.size() != 3) {
     // std::cout << request_line << std::endl;
-    std::cout << "malformed request line: request has != 3 items on the first line" << std::endl;
+    _DEBUG("malformed request line: request has != 3 items on the first line");
     throw "malformed request line: request has != 3 items on the first line";
     // if you access localhost:8080 by browser and leave it for a few seconds,
     // A request(s?) comes with 0 item on the first line
@@ -70,7 +72,7 @@ std::unordered_map<std::string, std::string> http::HttpRequestParser::parse_head
   while((next = this->reader.get_next_line(input_stream)) != "") {
     auto colon_loc = next.find(":", 0);
     if (colon_loc == std::string::npos || colon_loc == 0 || colon_loc == next.length()) {
-      std::cout << "malformed header format " << next << std::endl;
+      _DEBUG("malformed header format ", next);
       throw "malformed header format " + next;
     } else {
       request_headers.insert({next.substr(0, colon_loc), next.substr(colon_loc+1, next.length())});
