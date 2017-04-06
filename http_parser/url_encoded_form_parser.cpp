@@ -48,15 +48,16 @@ std::string http::UrlEncodedFormParser::uri_decode(const std::string & sSrc) {
  return sResult;
 }
 
+/* end of using url_encoding use from source*/
+
 std::unordered_map<std::string, std::string> http::UrlEncodedFormParser::get_parameter(std::istream& input_stream, int content_leng) {
   std::unordered_map<std::string, std::string> parameters_map;
   if (content_leng != 0) {
     std::string content = this->input_stream_reader.read(input_stream, content_leng);
     std::string url_decoded_query = uri_decode(content);
-
-
     _DEBUG("url decoded query: ", url_decoded_query);
     std::vector<std::string> params_for_content = split(url_decoded_query, '&');
+
     for (auto key_value_string : params_for_content) {
       auto loc = key_value_string.find("=", 0);
       if (loc == std::string::npos || loc == 0) {

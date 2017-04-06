@@ -7,6 +7,7 @@
 #include <netinet/in.h>
 #include "app.hpp"
 #include "../http_parser/http_request_parser.hpp"
+#include "../http_parser/http_response.hpp"
 #include <sstream>
 #include <unordered_map>
 
@@ -61,9 +62,19 @@ void App::worker(int clntSock)
     // HttpResponse response = get_phony_response(request);
     HttpResponse response = router.get_http_response(request);
 
+    /*
     string resp = "HTTP/1.1 200 OK\r\n"
                   "Content-Type: text/html\r\n\r\n";
     resp += response.content + "\r\n\r\n";
+    */
+
+
+    string resp = http::HttpResponse(response.content).to_string();
+    _DEBUG(resp);
+    _DEBUG(resp.length());
+    //_DEBUG(resp.c_str());
+
+
     // _DEBUG("Response:\n", resp);
     // if (write(clntSock, resp.c_str(), resp.length()) < 0)
     if (::send(clntSock, resp.c_str(), resp.length(), 0) < 0)

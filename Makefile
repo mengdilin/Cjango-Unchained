@@ -17,7 +17,8 @@ HTTPPARSERCPP = http_parser/http_request_parser.o\
 	http_parser/http_request_body_parser.o \
 	http_parser/url_encoded_form_parser.o \
 	http_parser/http_request_line.o \
-	http_parser/http_stream_reader.o
+	http_parser/http_stream_reader.o \
+	http_parser/http_response.o
 TESTOBJS += $(HTTPPARSERCPP)
 
 
@@ -43,5 +44,7 @@ url_encoded_form_parser.o:
 	$(CC) $(CPPFLAGS) -c http_parser/url_encoded_form_parser.cpp
 http_stream_reader.o:
 	$(CC) $(CPPFLAGS) -c http_parser/http_stream_reader.cpp
+http_response.o:
+	$(CC) $(CPPFLAGS) -c http_parser/http_response.cpp
 clean:
 	rm -f core $(PROG) $(OBJS) $(HTTPPARSERCPP)

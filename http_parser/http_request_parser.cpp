@@ -45,6 +45,7 @@ http::HttpRequestLine http::HttpRequestParser::get_http_request_line(std::vector
 
   std::vector<std::string> uri_fields;
   auto q_loc = uri.find("?", 0);
+  auto true_uri = uri.substr(0, q_loc); //true uri path without parameters
   if (q_loc != std::string::npos) {
     uri_fields.push_back(uri.substr(0, q_loc));
     uri_fields.push_back(uri.substr(q_loc+1, uri.length()));
@@ -63,7 +64,8 @@ http::HttpRequestLine http::HttpRequestParser::get_http_request_line(std::vector
   std::istringstream str(uri_fields[1]);
   auto params = this->url_encoded_form_parser.get_parameter(str, uri_fields[1].length());
   //std::cout << "request line fields 2: " << request_line_fields[2] << std::endl;
-  return http::HttpRequestLine(request_line_fields[0], uri, request_line_fields[2], params);
+
+  return http::HttpRequestLine(request_line_fields[0], true_uri, request_line_fields[2], params);
 }
 
 std::unordered_map<std::string, std::string> http::HttpRequestParser::parse_head(std::istream& input_stream) {
