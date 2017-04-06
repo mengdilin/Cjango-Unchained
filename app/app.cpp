@@ -112,7 +112,7 @@ void App::worker(int clntSock, std::string strRequest)
         // if you throw a char* instead of exception class, that comes as const char*
             std::cout << e << std::endl;
         }
-        request.path = "/abc"; // FIXME set path
+        request.path = "/efg/2017/04"; // FIXME set path
         // HttpResponse response = get_phony_response(request);
         HttpResponse response = router.get_http_response(request);
 

@@ -24,7 +24,7 @@ int main(int argc, char* argv[])
 
   App app;
   app.add_route("/abc", callback_1);
-  //app.add_route("/efg", callback_2);
+  app.add_route("/efg/[0-9]{4}/[0-9]{2}", callback_1);
   app.run(port_number);
 
   return 0;
