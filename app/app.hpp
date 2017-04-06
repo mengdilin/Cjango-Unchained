@@ -8,17 +8,24 @@
 using namespace std;
 
 class App {
+    int servSock; /* server socket id */
 public:
     Router router; // FIXME how router can be private?
     void add_route(std::string url_pattern, functor f) {
       router.add_route(url_pattern, f);
     }
-    App() {}
-    // App(Router& rt): router(rt) {}
-    void worker(int clntSock);
+    App(): servSock{-1} {}
+    //App(Router& rt): router(rt), servSock{-1} {}
+    App(URLmap routes): servSock{-1}
+    {
+        Router tmp(routes);
+        this->router = tmp;
+    }
+    void worker(int clntSock, string strRequest);
     void print_routes();
     void run(int port);
-    void handle_request(int socket);
+    void run_accept(int port);
+    int handle_request(int socket);
 };
 
 #endif
