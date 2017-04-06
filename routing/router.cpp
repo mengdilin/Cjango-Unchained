@@ -53,7 +53,29 @@ void *load_callback(void *lib, const std::string& func_name) {
     dlclose(lib);
     // exit(EXIT_FAILURE);
   }
+   // FIXME where should we invoke dlclise()?
   return func;
+}
+
+#include "../lib/json.hpp"
+#include <fstream>
+// third-party library for json parsing. Usage: just loading this file
+// usage: github nlohmann/json
+void Router::load_url_pattern_from_file() {
+  std::ifstream i("url-pattern.json");
+  nlohmann::json j;
+  i >> j;
+  _DEBUG("loaded url-pattern.json");
+  for (nlohmann::json::iterator it = j.begin(); it != j.end(); ++it) {
+    const auto cinfo = it.value(); // callback info
+    const auto mylib = load_shared_object_file(cinfo["file"]);
+    HttpResponse (*myfun)(HttpRequest) =
+    (HttpResponse (*)(HttpRequest)) load_callback(mylib, cinfo["funcname"]);
+    functor callback = myfun;
+    _DEBUG(it.key(), " : ", it.value(), "\n",
+           "cinfo['file']", cinfo["file"], "cinfo['funcname']", cinfo["funcname"]);
+    add_route(it.key(), callback);
+  }
 }
 #endif
 
@@ -64,22 +86,7 @@ HttpResponse Router::get_http_response(HttpRequest request) {
     return HttpResponse();
   }
 
-#ifdef DYNLOAD_CJANGO
-  // FIXME read shared object names from config file
-  const auto mylib = load_shared_object_file("callbacks/mycallback.so");
-  // Note: the file path is from an executable, not from this source file
-
-  //const auto get_view = static_cast<HttpResponseCreateFunc*>(load_callback(mylib, "get_view"));
-  //const auto& view_class = get_view();
-  typedef HttpResponse (*callback_t)(HttpRequest);
-   // FIXME STUPIDLY UGLY
-  HttpResponse (*myfun)(HttpRequest) =
-    (HttpResponse (*)(HttpRequest)) load_callback(mylib, "callback_mine");
-  // return view_class->callback(request);
-  return (*myfun)(request);
-#else
   functor callback = pattern_to_callback[url_path];
   _DEBUG("Router::get_http_response(): return callback");
   return callback(request);
-#endif
 }

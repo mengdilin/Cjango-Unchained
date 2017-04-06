@@ -21,6 +21,7 @@
 // }
 
 extern "C" HttpResponse callback_mine(HttpRequest request) {
+  _DEBUG("Hi, I'm dynamic callback");
   string text = "<html>\r\n<body>\r\n"
                 "<h1>Hi there!</h1>\r\n"
                 "<p>This is just a DYNAMIC response :P</p>\r\n"

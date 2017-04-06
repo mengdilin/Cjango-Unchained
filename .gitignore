@@ -1,4 +1,5 @@
 *.o
+*.so
 run
 testrun
 test_router

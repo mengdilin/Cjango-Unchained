@@ -58,6 +58,9 @@ class Router {
     };
     Router() {};
     void add_route(std::string url_pattern, functor f);
+#ifdef DYNLOAD_CJANGO
+    void load_url_pattern_from_file();
+#endif
     // Note: register() should be renamed from add_route() for django mimicking,
     // but "register" is a reserved word in C++.
     std::string resolve(HttpRequest);

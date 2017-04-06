@@ -13,7 +13,11 @@ public:
     void add_route(std::string url_pattern, functor f) {
       router.add_route(url_pattern, f);
     }
-    App() {}
+    App() {
+#ifdef DYNLOAD_CJANGO
+        router.load_url_pattern_from_file();
+#endif
+    }
     // App(Router& rt): router(rt) {}
     void worker(int clntSock);
     void print_routes();
