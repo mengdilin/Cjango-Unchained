@@ -8,17 +8,19 @@ using namespace std;
 
 class App {
     Router router;
+    int servSock; /* server socket id */
 public:
-    App(Router& rt): router(rt) {}
-    App(URLmap routes)
+    App(Router& rt): router(rt), servSock{-1} {}
+    App(URLmap routes): servSock{-1}
     {
         Router tmp(routes);
         this->router = tmp;
     }
-    
+
     void print_routes();
     void run(int port);
-    void handle_request(int socket);
+    void run_accept(int port);
+    int handle_request(int socket);
 };
 
 #endif
