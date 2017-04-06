@@ -33,6 +33,17 @@ http::HttpResponse::HttpResponse(std::string content) {
   //headers.insert({"Content-Length", std::to_string(content_type.length())});
 
 }
+void http::HttpResponse::set_cookie(std::string key, std::string value) {
+  auto result = headers.find("Set-Cookie");
+  if (result != headers.end()) {
+    result->second += "; "+key+"="+value;
+    headers.insert({"Set-Cookie", result->second});
+
+  } else {
+    headers.insert({"Set-Cookie", key+"="+value});
+  }
+
+}
 
 //default good http response
 http::HttpResponse::HttpResponse(std::string content, std::string content_type) {

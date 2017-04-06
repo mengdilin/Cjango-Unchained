@@ -5,12 +5,14 @@ http::HttpRequest::HttpRequest(
   std::string path,
   std::string scheme,
   std::unordered_map<std::string, std::string> meta,
-  std::unordered_map<std::string, std::string> params) {
+  std::unordered_map<std::string, std::string> params,
+  std::unordered_map<std::string, std::string> cookie) {
   this->method = method;
   this->path = path;
   this->scheme = scheme;
   this->meta = meta;
   this->parameters = params;
+  this->cookie = cookie;
 }
 std::ostream& http::operator<<(std::ostream& Str, const http::HttpRequest& v) {
   std::string result = "method: " + v.get_method() + "\n"
@@ -43,4 +45,7 @@ std::unordered_map<std::string, std::string> const & http::HttpRequest::get_meta
 }
 std::unordered_map<std::string, std::string> const & http::HttpRequest::get_parameters() const {
   return this->parameters;
+}
+std::unordered_map<std::string, std::string> const & http::HttpRequest::get_cookie() const {
+  return this->cookie;
 }

@@ -14,12 +14,13 @@ namespace http {
     std::string content_type = "text/html"; //default
     std::unordered_map<std::string, std::string> headers;
   private:
-    std::unordered_map<int, std::string> code_to_reason_init();
+    void set_cookie(std::string, std::string);
   public:
     HttpResponse(std::string);
     HttpResponse(std::string, std::string);
     HttpResponse(int); //meant for bad requests
     std::string to_string();
+
   };
   std::ostream& operator<<(std::ostream& Str, HttpResponse const & v);
 

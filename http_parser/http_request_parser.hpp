@@ -23,6 +23,7 @@ namespace http {
     HttpRequestLine get_http_request_line(std::vector<std::string> request_line_fields) ;
     std::unordered_map<std::string, std::string> parse_head(std::istream& input_stream);
     HttpRequestLine parse_line(std::istream& input_stream);
+    std::unordered_map<std::string, std::string> get_http_cookie(std::unordered_map<std::string, std::string>&);
 
   };
 }

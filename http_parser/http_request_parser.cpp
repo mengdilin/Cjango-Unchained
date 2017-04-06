@@ -1,6 +1,5 @@
 #include "http_request_parser.hpp"
 #include "../app/externs.hpp"
-
 http::HttpRequestParser::HttpRequestParser() {}
 
 
@@ -12,8 +11,28 @@ http::HttpRequestParser::HttpRequestParser(
 http::HttpRequest http::HttpRequestParser::parse_request_line_and_headers(std::istream& input_stream) {
   HttpRequestLine request_line = parse_line(input_stream); //line_parser
   std::unordered_map<std::string, std::string> request_headers = parse_head(input_stream); //header_parser
-  return HttpRequest(request_line.action, request_line.uri, request_line.protocolVersion, request_headers, request_line.parameters);
+
+  return HttpRequest(request_line.action, request_line.uri, request_line.protocolVersion, request_headers, request_line.parameters, get_http_cookie(request_headers));
 }
+std::unordered_map<std::string, std::string> http::HttpRequestParser::get_http_cookie(std::unordered_map<std::string, std::string>& params) {
+  std::unordered_map<std::string, std::string> cookies;
+  auto result = params.find("Cookie");
+  if (result != params.end()) {
+    auto value = result->second;
+      std::cout << "value: " << value << std::endl;
+      std::vector<std::string> cookie_pairs = url_encoded_form_parser.split(value, ';');
+      for (auto pair : cookie_pairs) {
+        std::cout << pair << std::endl;
+         auto q_loc = pair.find("=", 0);
+         if (q_loc != std::string::npos) {
+          cookies.insert({pair.substr(0, q_loc), pair.substr(q_loc+1, pair.length())});
+       }
+      }
+  }
+  return cookies;
+
+}
+
 std::unordered_map<std::string, std::string> http::HttpRequestParser::parse_body(std::istream& input_stream, std::string content_type, int content_leng) {
   return body_parser.parse(input_stream, content_type, content_leng);
 }
