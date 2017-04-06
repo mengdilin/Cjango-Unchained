@@ -51,22 +51,28 @@ static void worker1(int clntSock, Router router)
 
 static void worker(int clntSock, Router router, std::string strRequest)
 {
-    _DEBUG("Worker thread invoked for socket ", clntSock);
-    HttpRequest request(strRequest);
-    HttpResponse response = router.get_http_response(request);
+    try {
+        _DEBUG("Worker thread invoked for socket ", clntSock);
+        HttpRequest request(strRequest);
+        HttpResponse response = router.get_http_response(request);
 
-    std::string resp = "HTTP/1.1 200 OK\r\n"
-                       "Content-Type: text/html\r\n\r\n";
-    resp += response.content + "\r\n\r\n";
+        std::string resp = "HTTP/1.1 200 OK\r\n"
+                           "Content-Type: text/html\r\n\r\n";
+        resp += response.content + "\r\n\r\n";
 
-    if (send(clntSock, resp.c_str(), resp.length(), 0) < 0) {
-        _DEBUG("Failed to send response on socket: ", clntSock);
+        if (send(clntSock, resp.c_str(), resp.length(), 0) < 0) {
+            _DEBUG("Failed to send response on socket: ", clntSock);
+        }
+
+        /* It is assumed that at this point the server has done its job,
+         * so it is closing the client socket */
+        _DEBUG("Worker thread has done its job, closing socket ", clntSock);
+        close(clntSock);
+    } catch (const std::exception& e) {
+        _DEBUG("Exceptions caught in worker thread: ", e.what(), ". Closing socket anyway");
+        if (clntSock)
+            close(clntSock);
     }
-
-    /* It is assumed that at this point the server has done its job,
-     * so it is closing the client socket */
-    _DEBUG("Worker thread has done its job, closing socket ", clntSock);
-    close(clntSock);
 }
 
 int App::handle_request(int clntSock)
