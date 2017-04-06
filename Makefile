@@ -2,7 +2,7 @@
 
 PROG = run
 CC = g++
-CPPFLAGS = -std=c++1z -Wall -pthread
+CPPFLAGS = -std=c++1z -Wall -pthread -DDYNLOAD_CJANGO
 DEBUG ?= 1
 ifeq ($(DEBUG), 1)
     CPPFLAGS += -DDEBUG

@@ -36,13 +36,50 @@ std::string Router::resolve(HttpRequest request) {
   // "resolver_match: a resolved url. This attribute is only set after URL resolving took place"
 }
 
+#ifdef DYNLOAD_CJANGO
+void *load_shared_object_file(const std::string& path) {
+  const auto lib = dlopen(path.c_str(), RTLD_LAZY);
+  if (!lib) {
+    _DEBUG("Cannot load library: ", dlerror());
+    // exit(EXIT_FAILURE);
+  }
+  return lib;
+}
+void *load_callback(void *lib, const std::string& func_name) {
+  const auto func = dlsym(lib, func_name.c_str());
+  const auto dlsym_error = dlerror();
+  if (dlsym_error) {
+    _DEBUG("Cannot load symbol callback()");
+    dlclose(lib);
+    // exit(EXIT_FAILURE);
+  }
+  return func;
+}
+#endif
+
 HttpResponse Router::get_http_response(HttpRequest request) {
   std::string url_path = resolve(request);
   if (url_path == cjango::INVALIDURL) {
     _DEBUG("Router::get_http_response(): this HttpRequest.path is invalid");
     return HttpResponse();
   }
+
+#ifdef DYNLOAD_CJANGO
+  // FIXME read shared object names from config file
+  const auto mylib = load_shared_object_file("callbacks/mycallback.so");
+  // Note: the file path is from an executable, not from this source file
+
+  //const auto get_view = static_cast<HttpResponseCreateFunc*>(load_callback(mylib, "get_view"));
+  //const auto& view_class = get_view();
+  typedef HttpResponse (*callback_t)(HttpRequest);
+   // FIXME STUPIDLY UGLY
+  HttpResponse (*myfun)(HttpRequest) =
+    (HttpResponse (*)(HttpRequest)) load_callback(mylib, "callback_mine");
+  // return view_class->callback(request);
+  return (*myfun)(request);
+#else
   functor callback = pattern_to_callback[url_path];
   _DEBUG("Router::get_http_response(): return callback");
   return callback(request);
+#endif
 }

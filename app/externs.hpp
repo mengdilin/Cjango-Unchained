@@ -39,4 +39,11 @@ inline HttpResponse get_phony_response(HttpRequest req)
     return resp;
 }
 
+#ifdef DYNLOAD_CJANGO
+// If you see "duplicated symbol" error when linking (not when compiling),
+// that's because you put definitions in your .hpp file... like me
+void *load_shared_object_file(const std::string& path);
+void *load_callback(void *lib, const std::string& func_name);
+#endif
+
 #endif

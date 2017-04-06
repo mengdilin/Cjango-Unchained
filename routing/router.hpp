@@ -13,6 +13,20 @@ namespace cjango {
   const std::string INVALIDURL = "__INVALIDURL";
 }
 
+#ifdef DYNLOAD_CJANGO
+#include <memory>
+#include <dlfcn.h>
+// FIXME not optimal
+// class View {
+// public:
+//   virtual ~View() {};
+//   virtual void callback() const = 0; // pure virtual function
+// };
+
+// typedef std::shared_ptr<View> HttpResponseCreateFunc();
+
+#endif
+
 // FIXME mock
 class HttpRequest {
 public:
