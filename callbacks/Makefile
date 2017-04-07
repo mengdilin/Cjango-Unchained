@@ -11,7 +11,7 @@ OBJS = mycallback.o mycallback.so
 all: $(OBJS)
 mycallback.o : mycallback.cpp
 	$(CC) $(CPPFLAGS) -fpic -c mycallback.cpp
-mycallback.so :
+mycallback.so : mycallback.o
 	$(CC) $(CPPFLAGS) -shared -o mycallback.so mycallback.o
 	# pic (position-independent code)
 clean:

@@ -9,6 +9,7 @@
 #include "../http_parser/http_request_parser.hpp"
 #include <sstream>
 #include <unordered_map>
+#include <FileWatcher.h>
 
 using namespace std;
 
@@ -79,6 +80,10 @@ void App::handle_request(int clntSock)
     _DEBUG("Created and detached new thread ", id, " for socket ", clntSock);
 }
 
+#ifdef DYNLOAD_CJANGO
+bool global_is_file_updated = false;
+#endif
+
 void App::run(int port)
 {
     _DEBUG("Invoked for port: ", port);
@@ -104,6 +109,15 @@ void App::run(int port)
         int clntSock = ::accept(servSock, (struct sockaddr*)&clntAddr, &clntLen);
         if (clntSock < 0)
             error_exit("Failed to accept");
+#ifdef DYNLOAD_CJANGO
+        this->fileWatcher.update(); //FIXME thread
+        std::cout << "before" << std::endl;
+        if(global_is_file_updated) {
+            router.load_url_pattern_from_file();
+            std::cout << "updated\n\n\n\n\n" << std::endl;
+            global_is_file_updated = false;
+        }
+#endif
 
         _DEBUG("Call handling request for socket: ", clntSock);
         this->handle_request(clntSock);

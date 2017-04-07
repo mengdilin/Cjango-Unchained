@@ -9,6 +9,14 @@ inline bool registered(std::vector<std::string> patterns_list, std::string url_p
 
 void Router::add_route(std::string url_pattern, functor f) {
   // Note: url_pattern may be a regex pattern or an actual url_path
+#ifdef DYNLOAD_CJANGO
+
+  if (! registered(patterns_list, url_pattern))
+    patterns_list.push_back(url_pattern);
+  pattern_to_callback[url_pattern] = f;
+  std::cout << "updated route: " << url_pattern << std::endl;
+
+#else
   try {
     if (registered(patterns_list, url_pattern))
       throw 1;
@@ -19,6 +27,7 @@ void Router::add_route(std::string url_pattern, functor f) {
   }
   patterns_list.push_back(url_pattern);
   pattern_to_callback[url_pattern] = f;
+#endif
   _DEBUG("add a new rule: ", url_pattern.c_str());
 }
 
@@ -41,6 +50,7 @@ void *load_shared_object_file(const std::string& path) {
   const auto lib = dlopen(path.c_str(), RTLD_LAZY);
   if (!lib) {
     _DEBUG("Cannot load library: ", dlerror());
+    std::cout <<  "Cannot load library: " << dlerror() << std::endl;
     // exit(EXIT_FAILURE);
   }
   return lib;
@@ -50,6 +60,7 @@ void *load_callback(void *lib, const std::string& func_name) {
   const auto dlsym_error = dlerror();
   if (dlsym_error) {
     _DEBUG("Cannot load symbol callback()");
+    std::cout <<  "Cannot load symbol: " << dlerror() << std::endl;
     dlclose(lib);
     // exit(EXIT_FAILURE);
   }
@@ -62,7 +73,7 @@ void *load_callback(void *lib, const std::string& func_name) {
 // third-party library for json parsing. Usage: just loading this file
 // usage: github nlohmann/json
 void Router::load_url_pattern_from_file() {
-  std::ifstream i("url-pattern.json");
+  std::ifstream i("callbacks/url-pattern.json");
   nlohmann::json j;
   i >> j;
   _DEBUG("loaded url-pattern.json");
@@ -75,6 +86,7 @@ void Router::load_url_pattern_from_file() {
     _DEBUG(it.key(), " : ", it.value(), "\n",
            "cinfo['file']", cinfo["file"], "cinfo['funcname']", cinfo["funcname"]);
     add_route(it.key(), callback);
+    // cannot dlclose here because callbacks will be used later
   }
 }
 #endif

@@ -3,6 +3,7 @@
 PROG = run
 CC = g++
 CPPFLAGS = -std=c++1z -Wall -pthread -DDYNLOAD_CJANGO
+CPPFLAGS += -I./lib/simplefilewatcher/include/FileWatcher
 DEBUG ?= 1
 ifeq ($(DEBUG), 1)
     CPPFLAGS += -DDEBUG
@@ -10,8 +11,13 @@ else
     #CPPFLAGS=-DNDEBUG
 endif
 # CPPFLAGS = -std=c++1z -Wall
+SFCDIR=lib/simplefilewatcher/build/intermediate/Debug
 OBJS = app/app.o app/main.o routing/router.o
-TESTOBJS = app/app.o routing/router.o
+TESTOBJS = app/app.o routing/router.o \
+  $(SFCDIR)/FileWatcher.o \
+  $(SFCDIR)/FileWatcherOSX.o \
+  $(SFCDIR)/FileWatcherLinux.o
+
 HTTPPARSERCPP = http_parser/http_request_parser.o\
 	http_parser/http_request.o \
 	http_parser/http_request_body_parser.o \

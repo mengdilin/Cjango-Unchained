@@ -1,0 +1,6 @@
+{
+  "/abc" : {
+        "file": "callbacks/mycallback2.so",
+    "funcname": "callback_mine2"
+  }
+}

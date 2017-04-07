@@ -40,6 +40,7 @@ inline HttpResponse get_phony_response(HttpRequest req)
 }
 
 #ifdef DYNLOAD_CJANGO
+extern bool global_is_file_updated;
 // If you see "duplicated symbol" error when linking (not when compiling),
 // that's because you put definitions in your .hpp file... like me
 void *load_shared_object_file(const std::string& path);
