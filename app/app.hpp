@@ -35,7 +35,7 @@ public:
 
         // Currently only a single file but might be expanded to other files.
         // Thus using regex instead of fixed pattern matching
-        std::regex rgx("^url-pattern.json$");
+        std::regex rgx("url-pattern.json");
         std::smatch match;
 
         if (std::regex_search(filename.begin(), filename.end(), match, rgx)) {

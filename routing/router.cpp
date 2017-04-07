@@ -51,6 +51,7 @@ void *load_shared_object_file(const std::string& path) {
   if (!lib) {
     _DEBUG("Cannot load library: ", dlerror());
     std::cout <<  "Cannot load library: " << dlerror() << std::endl;
+    throw "no such a object file";
     // exit(EXIT_FAILURE);
   }
   return lib;
@@ -61,7 +62,7 @@ void *load_callback(void *lib, const std::string& func_name) {
   if (dlsym_error) {
     _DEBUG("Cannot load symbol callback()");
     std::cout <<  "Cannot load symbol: " << dlerror() << std::endl;
-    dlclose(lib);
+    throw "no such a callback name";
     // exit(EXIT_FAILURE);
   }
    // FIXME where should we invoke dlclise()?
@@ -79,9 +80,17 @@ void Router::load_url_pattern_from_file() {
   _DEBUG("loaded url-pattern.json");
   for (nlohmann::json::iterator it = j.begin(); it != j.end(); ++it) {
     const auto cinfo = it.value(); // callback info
-    const auto mylib = load_shared_object_file(cinfo["file"]);
-    HttpResponse (*myfun)(HttpRequest) =
-    (HttpResponse (*)(HttpRequest)) load_callback(mylib, cinfo["funcname"]);
+
+    HttpResponse (*myfun)(HttpRequest); // function pointer
+
+    try {
+      auto mylib = load_shared_object_file(cinfo["file"]);
+      myfun =
+        (HttpResponse (*)(HttpRequest)) load_callback(mylib, cinfo["funcname"]);
+    } catch (const char *e) {
+      _DEBUG("aaaa\n\n\n\n\n\n\n\n");
+      continue;
+    }
     functor callback = myfun;
     _DEBUG(it.key(), " : ", it.value(), "\n",
            "cinfo['file']", cinfo["file"], "cinfo['funcname']", cinfo["funcname"]);
