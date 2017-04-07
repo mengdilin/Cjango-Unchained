@@ -9,7 +9,9 @@ class HttpRequestLine {
     std::unordered_map<std::string, std::string> parameters;
     std::string protocolVersion;
 
-    HttpRequestLine(std::string action, std::string uri, std::string protocolVersion, std::unordered_map<std::string, std::string>& parameters);
+    HttpRequestLine(std::string action, std::string uri, std::string protocolVersion, std::unordered_map<std::string, std::string> parameters);
+    HttpRequestLine(std::string action, std::string uri, std::string protocolVersion);
+
 };
 }
 

@@ -93,19 +93,18 @@ void App::worker(int clntSock, std::string strRequest)
     try {
         _DEBUG("Worker thread invoked for socket ", clntSock);
         HttpRequest request(strRequest);
-
+        _DEBUG("request: ", strRequest);
         try {
             http::HttpRequestParser parser;
             std::stringstream ss;
             ss << strRequest;
             //std::cout << ss << std::endl;
-            http::HttpRequest headers = parser.parse_request_line_and_headers(ss);
-            std::unordered_map<std::string, std::string> map = parser.parse_body(ss, "application/x-www-form-urlencoded", ss.str().length());
+            http::HttpRequest request = parser.parse(ss);
 
             //std::unordered_map<std::string, std::string> body = parser.parse_body(ss, );
-            _DEBUG(headers); // FIXME _DEBUG for multi lines
-            _DEBUG("finished headers");
-            for (auto entry : map) {
+            _DEBUG(request); // FIXME _DEBUG for multi lines
+            _DEBUG("finished request");
+            for (auto entry : request.get_parameters()) {
                 _DEBUG(entry.first, ":", entry.second);
             }
         } catch (const char *e) {
@@ -187,7 +186,7 @@ int App::handle_request(int clntSock)
         }
     } /* END: while(1) */
 
-    /* At this point, if there is no need to close socket, 
+    /* At this point, if there is no need to close socket,
      * there might be data for us to process, start a new
      * thread to do the job if necessary */
     if (ret != CLOSE_SOCK && contents.size() > 0) {
@@ -196,7 +195,7 @@ int App::handle_request(int clntSock)
         t.detach();
         _DEBUG("Created and detached new thread ", id, " for socket ", clntSock);
 
-        /* a new thread is started to handle the request, 
+        /* a new thread is started to handle the request,
          * it will eventually CLOSE the client socket, so
          * we must inform the server process to update the
          * fd_set so it won't need to select() on it */

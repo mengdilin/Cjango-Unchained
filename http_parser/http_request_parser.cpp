@@ -1,5 +1,6 @@
 #include "http_request_parser.hpp"
 #include "../app/externs.hpp"
+
 http::HttpRequestParser::HttpRequestParser() {}
 
 
@@ -14,12 +15,54 @@ http::HttpRequest http::HttpRequestParser::parse_request_line_and_headers(std::i
 
   return HttpRequest(request_line.action, request_line.uri, request_line.protocolVersion, request_headers, request_line.parameters, get_http_cookie(request_headers));
 }
+http::HttpRequest http::HttpRequestParser::parse(std::istream& input_stream) {
+
+  HttpRequestLine request_line = parse_line(input_stream); //line_parser
+  std::unordered_map<std::string, std::string> request_headers = parse_head(input_stream); //header_parser
+  if (request_line.action == "GET") {
+    return HttpRequest(request_line.action, request_line.uri, request_line.protocolVersion, request_headers, request_line.parameters, get_http_cookie(request_headers));
+  } else if (request_line.action=="POST") {
+    auto content_type_result = request_headers.find("Content-Type");
+    //if we cannot find content-type specified or content-type does not contain
+    //the form type we support, we skip body parsing
+    if ((content_type_result == request_headers.end()) ||
+      (content_type_result->second).find("application/x-www-form-urlencoded") == std::string::npos) {
+      std::unordered_map<std::string, std::string> body_params;
+      return HttpRequest(
+      request_line.action,
+      request_line.uri,
+      request_line.protocolVersion,
+      request_headers,
+      body_params,
+       get_http_cookie(request_headers)
+      );
+    }
+    std::stringstream ss;
+    ss << input_stream.rdbuf();
+    return HttpRequest(
+      request_line.action,
+      request_line.uri,
+      request_line.protocolVersion,
+      request_headers,
+      parse_body(ss, "application/x-www-form-urlencoded", ss.str().length()),
+      get_http_cookie(request_headers)
+      );
+
+  } else {
+    //TODO: handle http HEAD
+    return HttpRequest(request_line.action, request_line.uri, request_line.protocolVersion, request_headers, request_line.parameters, get_http_cookie(request_headers));
+
+  }
+
+
+}
+
 std::unordered_map<std::string, std::string> http::HttpRequestParser::get_http_cookie(std::unordered_map<std::string, std::string>& params) {
   std::unordered_map<std::string, std::string> cookies;
   auto result = params.find("Cookie");
   if (result != params.end()) {
     auto value = result->second;
-      std::cout << "value: " << value << std::endl;
+      //std::cout << "value: " << value << std::endl;
       std::vector<std::string> cookie_pairs = url_encoded_form_parser.split(value, ';');
       for (auto pair : cookie_pairs) {
         std::cout << pair << std::endl;
@@ -39,12 +82,12 @@ std::unordered_map<std::string, std::string> http::HttpRequestParser::parse_body
 
 http::HttpRequestLine http::HttpRequestParser::parse_line(std::istream& input_stream) {
   std::string request_line = this->reader.get_next_line(input_stream);
-  _DEBUG("vector: ", request_line); // e.g. "GET /favicon.ico HTTP/1.1"
+  //_DEBUG("vector: ", request_line); // e.g. "GET /favicon.ico HTTP/1.1"
   //split request_line by white spaces
   std::vector<std::string> result;
   std::istringstream iss(request_line);
   for(std::string s; iss >> s;) {
-    _DEBUG("vector: ", s);
+    //_DEBUG("vector: ", s);
     //std::cout << "vector: " << s << std::endl;
     result.push_back(s);
   }
@@ -81,10 +124,18 @@ http::HttpRequestLine http::HttpRequestParser::get_http_request_line(std::vector
   }
   */
   std::istringstream str(uri_fields[1]);
-  auto params = this->url_encoded_form_parser.get_parameter(str, uri_fields[1].length());
+  _DEBUG("uri fields: ", uri_fields[1]);
+  if (request_line_fields[0] == "GET") {
+    auto params = this->url_encoded_form_parser.get_parameter(str, uri_fields[1].length());
+      return http::HttpRequestLine(request_line_fields[0], true_uri, request_line_fields[2], params);
+
+
+  } else {
+  return http::HttpRequestLine(request_line_fields[0], uri, request_line_fields[2]);
+
+  }
   //std::cout << "request line fields 2: " << request_line_fields[2] << std::endl;
 
-  return http::HttpRequestLine(request_line_fields[0], true_uri, request_line_fields[2], params);
 }
 
 std::unordered_map<std::string, std::string> http::HttpRequestParser::parse_head(std::istream& input_stream) {
