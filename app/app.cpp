@@ -81,7 +81,20 @@ void App::handle_request(int clntSock)
 }
 
 #ifdef DYNLOAD_CJANGO
-bool global_is_file_updated = false;
+#include <chrono>
+void App::monitor_file_change() {
+    for (;;) {
+        this->fileWatcher.update(is_file_updated);
+        if(is_file_updated) {
+            router.load_url_pattern_from_file();
+            _DEBUG("url-pattern.json is updated\n\n");
+            is_file_updated = false;
+        }
+        // prevent busy looping -- should take a rest for a while
+        // This would reduce CPU usage of ./testrun from 100% to 0.1%
+        std::this_thread::sleep_for(1s);
+    }
+}
 #endif
 
 void App::run(int port)
@@ -103,21 +116,20 @@ void App::run(int port)
     if (listen(servSock, 5) < 0)
         error_exit("Failed to listen");
 
+#ifdef DYNLOAD_CJANGO
+    // run a thread for checking file changes by every 1 second independently
+    thread t(&App::monitor_file_change, this);
+    auto monitor_id = t.get_id();
+    t.detach();
+    _DEBUG("Created and detached new thread with monitor_id: ", monitor_id);
+#endif
+
     for (;;) {
         struct sockaddr_in clntAddr;
         unsigned int clntLen;
         int clntSock = ::accept(servSock, (struct sockaddr*)&clntAddr, &clntLen);
         if (clntSock < 0)
             error_exit("Failed to accept");
-#ifdef DYNLOAD_CJANGO
-        this->fileWatcher.update(); //FIXME thread
-        std::cout << "before" << std::endl;
-        if(global_is_file_updated) {
-            router.load_url_pattern_from_file();
-            std::cout << "updated\n\n\n\n\n" << std::endl;
-            global_is_file_updated = false;
-        }
-#endif
 
         _DEBUG("Call handling request for socket: ", clntSock);
         this->handle_request(clntSock);

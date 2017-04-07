@@ -130,7 +130,7 @@ namespace FW
 	}
 
 	//--------
-	void FileWatcherLinux::update()
+	void FileWatcherLinux::update(bool& is_updated)
 	{
 		FD_SET(mFD, &mDescriptorSet);
 
@@ -152,14 +152,14 @@ namespace FW
 				struct inotify_event *pevent = (struct inotify_event *)&buff[i];
 
 				WatchStruct* watch = mWatches[pevent->wd];
-				handleAction(watch, pevent->name, pevent->mask);
+				handleAction(watch, pevent->name, pevent->mask, is_updated);
 				i += sizeof(struct inotify_event) + pevent->len;
 			}
 		}
 	}
 
 	//--------
-	void FileWatcherLinux::handleAction(WatchStruct* watch, const String& filename, unsigned long action)
+	void FileWatcherLinux::handleAction(WatchStruct* watch, const String& filename, unsigned long action, bool& is_updated)
 	{
 		if(!watch->mListener)
 			return;
@@ -167,17 +167,17 @@ namespace FW
 		if(IN_CLOSE_WRITE & action)
 		{
 			watch->mListener->handleFileAction(watch->mWatchID, watch->mDirName, filename,
-								Actions::Modified);
+								Actions::Modified, is_updated);
 		}
 		if(IN_MOVED_TO & action || IN_CREATE & action)
 		{
 			watch->mListener->handleFileAction(watch->mWatchID, watch->mDirName, filename,
-								Actions::Add);
+								Actions::Add, is_updated);
 		}
 		if(IN_MOVED_FROM & action || IN_DELETE & action)
 		{
 			watch->mListener->handleFileAction(watch->mWatchID, watch->mDirName, filename,
-								Actions::Delete);
+								Actions::Delete, is_updated);
 		}
 	}
 

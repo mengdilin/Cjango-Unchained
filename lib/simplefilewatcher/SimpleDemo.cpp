@@ -36,7 +36,7 @@ class UpdateListener : public FW::FileWatchListener
 public:
 	UpdateListener() {}
 	void handleFileAction(FW::WatchID watchid, const FW::String& dir, const FW::String& filename,
-		FW::Action action)
+		FW::Action action, bool& is_updated)
 	{
 		std::cout << "DIR (" << dir + ") FILE (" + filename + ") has event " << action << std::endl;
 	}
@@ -63,9 +63,8 @@ int main(int argc, char **argv)
 		// loop until a key is pressed
 		while(1)
 		{
-			fileWatcher.update();
-			if (global_is_file_updated)
-				_DEBUG("FILEUPDATED\n\n\n");
+			bool is_updated_dummy = false;
+			fileWatcher.update(is_updated_dummy);
 		}
 	} 
 	catch( std::exception& e ) 

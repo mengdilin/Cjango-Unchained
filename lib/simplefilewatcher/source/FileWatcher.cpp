@@ -75,9 +75,9 @@ namespace FW
 	}
 
 	//--------
-	void FileWatcher::update()
+	void FileWatcher::update(bool& is_updated)
 	{
-		mImpl->update();
+		mImpl->update(is_updated);
 	}
 
 };//namespace FW

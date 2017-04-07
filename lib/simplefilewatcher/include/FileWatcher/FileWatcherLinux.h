@@ -68,7 +68,7 @@ namespace FW
 		void update();
 
 		/// Handles the action
-		void handleAction(WatchStruct* watch, const String& filename, unsigned long action);
+		void handleAction(WatchStruct* watch, const String& filename, unsigned long action, bool& is_updated);
 
 	private:
 		/// Map of WatchID to WatchStruct pointers

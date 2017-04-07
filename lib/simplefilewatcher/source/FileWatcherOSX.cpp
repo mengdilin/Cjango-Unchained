@@ -118,8 +118,9 @@ namespace FW
 			qsort(mChangeList + 1, mChangeListCount, sizeof(KEvent), comparator);
 			
 			// handle action
+			bool is_updated_dummy = false;
 			if(imitEvents)
-				handleAction(name, Actions::Add);
+				handleAction(name, Actions::Add, is_updated_dummy);
 		}
 		
 		void removeFile(const String& name, bool imitEvents = true)
@@ -148,8 +149,9 @@ namespace FW
 			qsort(mChangeList + 1, mChangeListCount, sizeof(KEvent), comparator);
 			
 			// handle action
+			bool is_updated = false;
 			if(imitEvents)
-				handleAction(name, Actions::Delete);
+				handleAction(name, Actions::Delete, is_updated);
 		}
 		
 		// called when the directory is actually changed
@@ -189,7 +191,8 @@ namespace FW
 						if(entry->mModifiedTime != timestamp)
 						{
 							entry->mModifiedTime = timestamp;
-							handleAction(entry->mFilename, Actions::Modified);
+							bool is_updated_dummy = false;
+							handleAction(entry->mFilename, Actions::Modified, is_updated_dummy);
 						}
 						ke++;
 					}
@@ -217,9 +220,9 @@ namespace FW
 			closedir(dir);
 		};
 		
-		void handleAction(const String& filename, FW::Action action)
+		void handleAction(const String& filename, FW::Action action, bool& is_updated)
 		{
-			mListener->handleFileAction(mWatchID, mDirName, filename, action);
+			mListener->handleFileAction(mWatchID, mDirName, filename, action, is_updated);
 		}
 		
 		void addAll()
@@ -265,7 +268,8 @@ namespace FW
 				//handleAction(name, Action::Delete);
 				EntryStruct* entry = (EntryStruct*)ke->udata;
 				
-				handleAction(entry->mFilename, Actions::Delete);
+				bool is_updated_dummy = false;
+				handleAction(entry->mFilename, Actions::Delete, is_updated_dummy);
 				
 				// delete
 				close(ke->ident);
@@ -274,7 +278,7 @@ namespace FW
 		}
 	};
 	
-	void FileWatcherOSX::update()
+	void FileWatcherOSX::update(bool& is_updated)
 	{
 		int nev = 0;
 		struct kevent event;
@@ -323,7 +327,7 @@ namespace FW
 								struct stat attrib;
 								stat(entry->mFilename, &attrib);
 								entry->mModifiedTime = attrib.st_mtime;
-								watch->handleAction(entry->mFilename, FW::Actions::Modified);
+								watch->handleAction(entry->mFilename, FW::Actions::Modified, is_updated);
 							}
 						}
 					}
@@ -410,7 +414,7 @@ namespace FW
 	}
 	
 	//--------
-	void FileWatcherOSX::handleAction(WatchStruct* watch, const String& filename, unsigned long action)
+	void FileWatcherOSX::handleAction(WatchStruct* watch, const String& filename, unsigned long action, bool& is_updated)
 	{
 	}
 

@@ -68,10 +68,10 @@ namespace FW
 		virtual void removeWatch(WatchID watchid) = 0;
 
 		/// Updates the watcher. Must be called often.
-		virtual void update() = 0;
+		virtual void update(bool& is_updated) = 0;
 
 		/// Handles the action
-		virtual void handleAction(WatchStruct* watch, const String& filename, unsigned long action) = 0;
+		virtual void handleAction(WatchStruct* watch, const String& filename, unsigned long action, bool& is_updated) = 0;
 
 	};//end FileWatcherImpl
 };//namespace FW

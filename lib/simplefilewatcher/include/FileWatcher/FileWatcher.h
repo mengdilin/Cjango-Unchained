@@ -115,7 +115,7 @@ namespace FW
 		void removeWatch(WatchID watchid);
 
 		/// Updates the watcher. Must be called often.
-		void update();
+		void update(bool& is_updated);
 
 	private:
 		/// The implementation
@@ -137,7 +137,7 @@ namespace FW
 		/// @param dir The directory
 		/// @param filename The filename that was accessed (not full path)
 		/// @param action Action that was performed
-		virtual void handleFileAction(WatchID watchid, const String& dir, const String& filename, Action action) = 0;
+		virtual void handleFileAction(WatchID watchid, const String& dir, const String& filename, Action action, bool& is_updated) = 0;
 
 	};//class FileWatchListener
 

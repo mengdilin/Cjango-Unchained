@@ -91,7 +91,8 @@ namespace FW
 				}
 #			endif
 
-				pWatch->mFileWatcher->handleAction(pWatch, szFile, pNotify->Action);
+				bool is_updated_dummy = false;
+				pWatch->mFileWatcher->handleAction(pWatch, szFile, pNotify->Action, is_updated_dummy);
 
 			} while (pNotify->NextEntryOffset != 0);
 		}
@@ -237,13 +238,13 @@ namespace FW
 	}
 
 	//--------
-	void FileWatcherWin32::update()
+	void FileWatcherWin32::update(bool& is_updated)
 	{
 		MsgWaitForMultipleObjectsEx(0, NULL, 0, QS_ALLINPUT, MWMO_ALERTABLE);
 	}
 
 	//--------
-	void FileWatcherWin32::handleAction(WatchStruct* watch, const String& filename, unsigned long action)
+	void FileWatcherWin32::handleAction(WatchStruct* watch, const String& filename, unsigned long action, bool& is_updated)
 	{
 		Action fwAction;
 
@@ -262,7 +263,7 @@ namespace FW
 			break;
 		};
 
-		watch->mFileWatchListener->handleFileAction(watch->mWatchid, watch->mDirName, filename, fwAction);
+		watch->mFileWatchListener->handleFileAction(watch->mWatchid, watch->mDirName, filename, fwAction, is_updated);
 	}
 
 };//namespace FW
