@@ -40,7 +40,7 @@ std::string http::HttpStreamReader::get_next_line(std::istream& input_stream) {
     //std::cout << "Next: " << next << std::endl;
     line += (char)next;
   }
-  _DEBUG(line);
+  //_DEBUG(line);
   //std::cout << "return from get_next_line" << std::endl;
 
   return line;
@@ -62,8 +62,8 @@ std::string http::HttpStreamReader::read_util(std::istream& input_stream, int ch
 }
 
 std::string http::HttpStreamReader::read(std::istream& input_stream, int length) {
-  char buffer[length];
-  input_stream.get(buffer, length);
+  char buffer[length+1];
+  input_stream.get(buffer, length+1);
   std::string str;
   str = buffer;
   return buffer;

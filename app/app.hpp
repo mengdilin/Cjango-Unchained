@@ -47,18 +47,23 @@ public:
 #endif
 
 class App {
+    int servSock; /* server socket id */
 public:
     Router router; // FIXME how router can be private?
 #ifdef DYNLOAD_CJANGO
     UpdateListener listener;
     FW::FileWatcher fileWatcher;
     bool is_file_updated;
+    void monitor_file_change();
+    void spawn_monitor_thread();
 #endif
     void add_route(std::string url_pattern, functor f) {
       router.add_route(url_pattern, f);
     }
-    void monitor_file_change();
-    App() : is_file_updated(false) {
+    // App(Router& rt): router(rt) {}
+    void worker(int clntSock, string strRequest);
+    // void worker(int clntSock);
+    App() : servSock{-1}, is_file_updated(false) {
 #ifdef DYNLOAD_CJANGO
         router.load_url_pattern_from_file();
         // create the listener (before the file watcher - so it gets destroyed after the file watcher)
@@ -70,11 +75,16 @@ public:
         fileWatcher.addWatch("./callbacks", &listener, true);
 #endif
     }
-    // App(Router& rt): router(rt) {}
-    void worker(int clntSock);
+    //App(Router& rt): router(rt), servSock{-1} {}
+    App(URLmap routes): servSock{-1}
+    {
+        Router tmp(routes);
+        this->router = tmp;
+    }
     void print_routes();
     void run(int port);
-    void handle_request(int socket);
+    void run_accept(int port);
+    int handle_request(int socket);
 };
 
 #endif

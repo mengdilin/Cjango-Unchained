@@ -19,10 +19,12 @@ namespace http {
     HttpRequestParser(HttpRequestBodyParser);
     HttpRequest parse_request_line_and_headers(std::istream& input_stream);
     std::unordered_map<std::string, std::string> parse_body(std::istream&, std::string, int);
+    HttpRequest parse(std::istream& input_stream);
   private:
     HttpRequestLine get_http_request_line(std::vector<std::string> request_line_fields) ;
     std::unordered_map<std::string, std::string> parse_head(std::istream& input_stream);
     HttpRequestLine parse_line(std::istream& input_stream);
+    std::unordered_map<std::string, std::string> get_http_cookie(std::unordered_map<std::string, std::string>&);
 
   };
 }

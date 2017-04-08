@@ -48,20 +48,31 @@ std::string http::UrlEncodedFormParser::uri_decode(const std::string & sSrc) {
  return sResult;
 }
 
+/* end of using url_encoding use from source*/
+
 std::unordered_map<std::string, std::string> http::UrlEncodedFormParser::get_parameter(std::istream& input_stream, int content_leng) {
   std::unordered_map<std::string, std::string> parameters_map;
   if (content_leng != 0) {
     std::string content = this->input_stream_reader.read(input_stream, content_leng);
+    std::istringstream ss(content);
+    ss >> std::ws;
+    if (content.length() == 0) {
+      return parameters_map;
+    }
+    //_DEBUG("content: ", content);
     std::string url_decoded_query = uri_decode(content);
-
-
-    _DEBUG("url decoded query: ", url_decoded_query);
+    //_DEBUG("url decoded query: ", url_decoded_query);
     std::vector<std::string> params_for_content = split(url_decoded_query, '&');
+
     for (auto key_value_string : params_for_content) {
+      //_DEBUG("key_value_string: ", key_value_string);
       auto loc = key_value_string.find("=", 0);
       if (loc == std::string::npos || loc == 0) {
         _DEBUG("malformed url query string: ", key_value_string);
-        throw "malformed url query string";
+        continue;
+        //soft failure: skip current parameter
+        //throw "malformed url query string";
+
       } else {
         std::string key = key_value_string.substr(0, loc);
         std::string value = key_value_string.substr(loc+1, key_value_string.length());

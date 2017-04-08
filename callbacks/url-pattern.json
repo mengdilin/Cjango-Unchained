@@ -2,5 +2,9 @@
   "/abc" : {
         "file": "callbacks/mycallback2.so",
     "funcname": "callback_mine2"
+  },
+  "/efg/[0-9]{4}/[0-9]{2}" : {
+        "file": "callbacks/mycallback.so",
+    "funcname": "callback_mine3"
   }
 }
