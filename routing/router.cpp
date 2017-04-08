@@ -46,7 +46,7 @@ std::string Router::resolve(HttpRequest request) {
 }
 
 #ifdef DYNLOAD_CJANGO
-void *load_shared_object_file(const std::string& path) {
+void *Router::load_shared_object_file(const std::string& path) {
   const auto lib = dlopen(path.c_str(), RTLD_LAZY);
   if (!lib) {
     _DEBUG("Cannot load library: ", dlerror());
@@ -56,7 +56,9 @@ void *load_shared_object_file(const std::string& path) {
   }
   return lib;
 }
-void *load_callback(void *lib, const std::string& func_name) {
+
+void *Router::load_callback(const std::string& path, const std::string& func_name) {
+  const auto lib = load_shared_object_file(path);
   const auto func = dlsym(lib, func_name.c_str());
   const auto dlsym_error = dlerror();
   if (dlsym_error) {
@@ -84,9 +86,8 @@ void Router::load_url_pattern_from_file() {
     HttpResponse (*myfun)(HttpRequest); // function pointer
 
     try {
-      auto mylib = load_shared_object_file(cinfo["file"]);
       myfun =
-        (HttpResponse (*)(HttpRequest)) load_callback(mylib, cinfo["funcname"]);
+        (HttpResponse (*)(HttpRequest)) load_callback(cinfo["file"], cinfo["funcname"]);
     } catch (const char *e) {
       _DEBUG("aaaa\n\n\n\n\n\n\n\n");
       continue;

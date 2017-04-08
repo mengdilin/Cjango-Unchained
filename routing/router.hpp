@@ -59,6 +59,8 @@ class Router {
     Router() {};
     void add_route(std::string url_pattern, functor f);
 #ifdef DYNLOAD_CJANGO
+    void *load_shared_object_file(const std::string& path);
+    void *load_callback(const std::string& path, const std::string& func_name);
     void load_url_pattern_from_file();
 #endif
     // Note: register() should be renamed from add_route() for django mimicking,
