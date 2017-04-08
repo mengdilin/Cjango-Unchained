@@ -1,5 +1,3 @@
-#include <iostream> 
-#include <memory>
 #include "../app/externs.hpp"
 #include "../routing/router.hpp"
 

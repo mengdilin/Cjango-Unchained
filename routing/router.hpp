@@ -24,7 +24,7 @@ namespace cjango {
 // };
 
 // typedef std::shared_ptr<View> HttpResponseCreateFunc();
-
+using dlib_handler = void *;
 #endif
 
 // FIXME mock
@@ -59,6 +59,8 @@ class Router {
     Router() {};
     void add_route(std::string url_pattern, functor f);
 #ifdef DYNLOAD_CJANGO
+    std::unordered_map<std::string, int> ref_count;
+    std::vector<dlib_handler> dlib_handlers;
     void *load_shared_object_file(const std::string& path);
     void *load_callback(const std::string& path, const std::string& func_name);
     void load_url_pattern_from_file();

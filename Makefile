@@ -6,7 +6,7 @@ CPPFLAGS = -std=c++1z -Wall -pthread -DDYNLOAD_CJANGO
 CPPFLAGS += -I./lib/simplefilewatcher/include/FileWatcher
 DEBUG ?= 1
 ifeq ($(DEBUG), 1)
-    CPPFLAGS += -DDEBUG
+    CPPFLAGS += -g -DDEBUG
 else
     #CPPFLAGS=-DNDEBUG
 endif
