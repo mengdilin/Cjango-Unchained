@@ -3,6 +3,8 @@
 # PROG = run
 CC = g++
 CPPFLAGS = -std=c++1z -Wall -DDEBUG -DDYNLOAD_CJANGO -Wno-return-type-c-linkage
+CPPFLAGS += -I./../app/
+CPPFLAGS += -ferror-limit=5
 # CPPFLAGS = -std=c++1z -Wall
 OBJS = mycallback.o mycallback2.o mycallback2.so mycallback.so
 

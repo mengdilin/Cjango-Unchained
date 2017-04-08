@@ -93,7 +93,7 @@ void App::worker(int clntSock, std::string strRequest)
 {
     try {
         _DEBUG("Worker thread invoked for socket ", clntSock);
-        HttpRequest request(strRequest);
+        http::HttpRequest request("/efg/2017/04");
         _DEBUG("request: ", strRequest);
         try {
             http::HttpRequestParser parser;
@@ -112,9 +112,8 @@ void App::worker(int clntSock, std::string strRequest)
         // if you throw a char* instead of exception class, that comes as const char*
             std::cout << e << std::endl;
         }
-        request.path = "/efg/2017/04"; // FIXME set path
         // HttpResponse response = get_phony_response(request);
-        HttpResponse response = router.get_http_response(request);
+        http::HttpResponse response = router.get_http_response(request);
 
         /*
         string resp = "HTTP/1.1 200 OK\r\n"

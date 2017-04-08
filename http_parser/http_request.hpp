@@ -14,6 +14,7 @@ namespace http {
     std::unordered_map<std::string, std::string> parameters;
     std::unordered_map<std::string, std::string> cookie;
   public:
+    HttpRequest(std::string path) : path(path) {}; // for easy testing
     HttpRequest(std::string,
       std::string, std::string,
       std::unordered_map<std::string, std::string>,

@@ -4,6 +4,9 @@ PROG = run
 CC = g++
 CPPFLAGS = -std=c++1z -Wall -pthread -DDYNLOAD_CJANGO
 CPPFLAGS += -I./lib/simplefilewatcher/include/FileWatcher
+# FIXME: user only need to include <cjango.hpp>
+CPPFLAGS += -I./app/
+CPPFLAGS += -ferror-limit=5
 DEBUG ?= 1
 ifeq ($(DEBUG), 1)
     CPPFLAGS += -g -DDEBUG

@@ -29,13 +29,13 @@ inline void _log(Head && h, Rest && ...r)
 #define _DEBUG(...) do{} while(0)
 #endif
 
-inline HttpResponse get_phony_response(HttpRequest req)
+inline http::HttpResponse get_phony_response(http::HttpRequest req)
 {
     string text = "<html>\r\n<body>\r\n"
                  "<h1>Hi there!</h1>\r\n"
                  "<p>This is just a phony response :P</p>\r\n"
                  "</body>\r\n</html>";
-    HttpResponse resp(text);
+    http::HttpResponse resp(text);
     return resp;
 }
 

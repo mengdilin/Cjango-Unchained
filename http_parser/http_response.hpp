@@ -16,7 +16,14 @@ namespace http {
   private:
     void set_cookie(std::string, std::string);
   public:
-    HttpResponse(std::string);
+    //default good http response
+    HttpResponse(std::string content) {
+      this->content = content;
+      headers.insert({"Content-Type", content_type});
+      //_DEBUG("content_length: ", content_type.length());
+      headers.insert({"Content-Length", std::to_string(content.length())});
+      //headers.insert({"Content-Length", std::to_string(content_type.length())});
+    }
     HttpResponse(std::string, std::string);
     HttpResponse(int); //meant for bad requests
     std::string to_string();

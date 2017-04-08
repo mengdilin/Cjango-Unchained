@@ -8,10 +8,7 @@
 #include <string>
 #include <stdexcept>
 #include <algorithm>
-
-namespace cjango {
-  const std::string INVALIDURL = "__INVALIDURL";
-}
+#include <cjango>
 
 #ifdef DYNLOAD_CJANGO
 #include <memory>
@@ -23,27 +20,15 @@ namespace cjango {
 //   virtual void callback() const = 0; // pure virtual function
 // };
 
-// typedef std::shared_ptr<View> HttpResponseCreateFunc();
+// typedef std::shared_ptr<View> http::HttpResponseCreateFunc();
 using dlib_handler = void *;
 #endif
 
-// FIXME mock
-class HttpRequest {
-public:
-  int some_data_member;
-  std::string data;
-  std::string path; // # "/music/bands/the_beatles/"
-  HttpRequest(std::string str) : data(str) { path = "/abc"; }
-  // HttpRequest(std::string path) : some_data_member(3), path(path) { };
-};
-class HttpResponse {
-public:
-    std::string content;
-    HttpResponse(std::string str) : content(str) {}
-    HttpResponse() {}
-};
+namespace cjango {
+  const std::string INVALIDURL = "__INVALIDURL";
+}
 
-typedef std::function<HttpResponse(HttpRequest)> functor;
+using functor = std::function<http::HttpResponse(http::HttpRequest)>;
 typedef std::unordered_map<std::string, functor> URLmap;
 
 class Router {
@@ -67,8 +52,8 @@ class Router {
 #endif
     // Note: register() should be renamed from add_route() for django mimicking,
     // but "register" is a reserved word in C++.
-    std::string resolve(HttpRequest);
-    HttpResponse get_http_response(HttpRequest);
+    std::string resolve(http::HttpRequest);
+    http::HttpResponse get_http_response(http::HttpRequest);
 };
 
 #endif

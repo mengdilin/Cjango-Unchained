@@ -21,18 +21,9 @@ std::unordered_map<std::string, std::string> http::HttpResponse::code_to_reason_
 }
 */
 
+// caprice-j moved HttpResponse constructor in http_response.hpp
+// in order to instantiate in callback files easily
 
-//default good http response
-http::HttpResponse::HttpResponse(std::string content) {
-  this->content = content;
-  headers.insert({"Content-Type", content_type});
-  //_DEBUG("content_length: ", content_type.length());
-  headers.insert({"Content-Length", std::to_string(content.length())});
-
-
-  //headers.insert({"Content-Length", std::to_string(content_type.length())});
-
-}
 void http::HttpResponse::set_cookie(std::string key, std::string value) {
   auto result = headers.find("Set-Cookie");
   if (result != headers.end()) {

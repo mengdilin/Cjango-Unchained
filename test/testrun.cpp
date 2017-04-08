@@ -1,13 +1,13 @@
 #include "../app/app.hpp"
 #include <sstream>
 
-HttpResponse callback_1 (HttpRequest req) {
+http::HttpResponse callback_1 (http::HttpRequest req) {
   _DEBUG("callback1 called");
   string text = "<html>\r\n<body>\r\n"
                 "<h1>Hi there!</h1>\r\n"
                 "<p>This is just a MOCK response :P</p>\r\n"
                 "</body>\r\n</html>";
-  HttpResponse resp(text);
+  http::HttpResponse resp(text);
 
   return resp;
 }

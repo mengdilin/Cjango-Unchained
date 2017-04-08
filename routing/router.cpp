@@ -33,10 +33,10 @@ void Router::add_route(std::string url_pattern, functor f) {
   _DEBUG("add a new rule: ", url_pattern.c_str());
 }
 
-std::string Router::resolve(HttpRequest request) {
+std::string Router::resolve(http::HttpRequest request) {
   // return its corresponding url_pattern
   // MAYBE-LATER map request.path -> url_pattern
-  std::string url_pattern = request.path;
+  std::string url_pattern = request.get_path();
   if (registered(patterns_list, url_pattern)) {
     _DEBUG("resolve(): registered");
     return url_pattern;
@@ -115,11 +115,11 @@ void Router::load_url_pattern_from_file() {
   for (nlohmann::json::iterator it = j.begin(); it != j.end(); ++it) {
     const auto cinfo = it.value(); // callback info
 
-    HttpResponse (*myfun)(HttpRequest); // function pointer
+    http::HttpResponse (*myfun)(http::HttpRequest); // function pointer
 
     try {
       myfun =
-        (HttpResponse (*)(HttpRequest)) load_callback(cinfo["file"], cinfo["funcname"]);
+        (http::HttpResponse (*)(http::HttpRequest)) load_callback(cinfo["file"], cinfo["funcname"]);
     } catch (const char *e) {
       _DEBUG("aaaa\n\n\n\n\n\n\n\n");
       continue;
@@ -133,11 +133,11 @@ void Router::load_url_pattern_from_file() {
 }
 #endif
 
-HttpResponse Router::get_http_response(HttpRequest request) {
+http::HttpResponse Router::get_http_response(http::HttpRequest request) {
   std::string url_path = resolve(request);
   if (url_path == cjango::INVALIDURL) {
-    _DEBUG("Router::get_http_response(): this HttpRequest.path is invalid");
-    return HttpResponse();
+    _DEBUG("Router::get_http_response(): this http::HttpRequest.path is invalid");
+    return http::HttpResponse("nothing");
   }
 
   functor callback = pattern_to_callback[url_path];
