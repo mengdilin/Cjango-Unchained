@@ -115,16 +115,23 @@ void Router::load_url_pattern_from_file() {
   for (nlohmann::json::iterator it = j.begin(); it != j.end(); ++it) {
     const auto cinfo = it.value(); // callback info
 
-    http::HttpResponse (*myfun)(http::HttpRequest); // function pointer
+    using callback_type = http::HttpResponse (*)(http::HttpRequest);
+    // A pointer type of a function
+    // receiving http::HttpRequest as an argument and returns http::HttpResponse
+    // Item 9 in "Effective Modern C++" prefers alias (using) to typedef
+    // because of readability and easiness to use with template
+    functor callback;
 
     try {
-      myfun =
-        (http::HttpResponse (*)(http::HttpRequest)) load_callback(cinfo["file"], cinfo["funcname"]);
+      // Aviding "no matching conversion for C-style cast from 'void *' to
+      // 'functor' (aka 'function<http::HttpResponse (http::HttpRequest)>')" error,
+      // here we first cast to callback_type, and then the callback_type is
+      // implicitly casted into std::function<callback_type>
+      callback = (callback_type) load_callback(cinfo["file"], cinfo["funcname"]);
     } catch (const char *e) {
       _DEBUG("aaaa\n\n\n\n\n\n\n\n");
       continue;
     }
-    functor callback = myfun;
     _DEBUG(it.key(), " : ", it.value(), "\n",
            "cinfo['file']", cinfo["file"], "cinfo['funcname']", cinfo["funcname"]);
     add_route(it.key(), callback);
