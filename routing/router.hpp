@@ -13,14 +13,7 @@
 #ifdef DYNLOAD_CJANGO
 #include <memory>
 #include <dlfcn.h>
-// FIXME not optimal
-// class View {
-// public:
-//   virtual ~View() {};
-//   virtual void callback() const = 0; // pure virtual function
-// };
 
-// typedef std::shared_ptr<View> http::HttpResponseCreateFunc();
 using dlib_handler = void *;
 #endif
 
@@ -29,7 +22,7 @@ namespace cjango {
 }
 
 using functor = std::function<http::HttpResponse(http::HttpRequest)>;
-typedef std::unordered_map<std::string, functor> URLmap;
+using URLmap = std::unordered_map<std::string, functor>;
 
 class Router {
   public:
