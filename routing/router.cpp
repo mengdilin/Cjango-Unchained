@@ -59,8 +59,10 @@ std::string Router::resolve(http::HttpRequest request) {
 void *Router::load_shared_object_file(const std::string& path) {
   const auto lib = dlopen(path.c_str(), RTLD_LAZY);
   if (!lib) {
-    _DEBUG("Cannot load library: ", dlerror());
-    std::cout <<  "Cannot load library: " << dlerror() << std::endl;
+    // Note: two successive dlerror() calls result in segfault
+    const auto human_readable_str = dlerror();
+    _DEBUG("Cannot load library: ", human_readable_str);
+    std::cout <<  "Cannot load library: " << human_readable_str << std::endl;
     throw "no such a object file";
     // exit(EXIT_FAILURE);
   }
@@ -94,8 +96,8 @@ void *Router::load_callback(const std::string& path, const std::string& func_nam
   const auto func = dlsym(lib, func_name.c_str());
   const auto dlsym_error = dlerror();
   if (dlsym_error) {
-    _DEBUG("Cannot load symbol callback()");
-    std::cout <<  "Cannot load symbol: " << dlerror() << std::endl;
+    _DEBUG("Cannot load symbol callback()\n\n\n\n\n\n");
+    std::cout <<  "Cannot load symbol: " << dlsym_error << std::endl;
     throw "no such a callback name";
     // exit(EXIT_FAILURE);
   }
@@ -129,8 +131,9 @@ void Router::load_url_pattern_from_file() {
       // implicitly casted into std::function<callback_type>
       callback = (callback_type) load_callback(cinfo["file"], cinfo["funcname"]);
     } catch (const char *e) {
+      callback = [](http::HttpRequest h){ return http::HttpResponse("invalid callback specified"); };
       _DEBUG("aaaa\n\n\n\n\n\n\n\n");
-      continue;
+      // continue;
     }
     _DEBUG(it.key(), " : ", it.value(), "\n",
            "cinfo['file']", cinfo["file"], "cinfo['funcname']", cinfo["funcname"]);
