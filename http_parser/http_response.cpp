@@ -1,5 +1,7 @@
 #include "http_response.hpp"
 #include "../app/externs.hpp"
+#include <fstream>
+#include <streambuf>
 
 /*
 std::unordered_map<std::string, std::string> http::HttpResponse::code_to_reason_init() {
@@ -35,7 +37,9 @@ void http::HttpResponse::set_cookie(std::string key, std::string value) {
   }
 
 }
+http::HttpResponse http::HttpResponse::render_to_response(std::string path) {
 
+}
 //default good http response
 http::HttpResponse::HttpResponse(std::string content, std::string content_type) {
   this->content = content;

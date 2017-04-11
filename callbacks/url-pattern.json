@@ -1,10 +1,14 @@
 {
   "/abc" : {
         "file": "callbacks/mycallback.so",
-    "funcname": "callback_mine3"
+    "funcname": "callback_mine1"
   },
   "/efg/[0-9]{4}/[0-9]{2}" : {
         "file": "callbacks/mycallback2.so",
     "funcname": "current_datetime"
+  },
+  "/aaa" : {
+    "file" : "callbacks/mycallback.so",
+    "funcname": "callback_mine2"
   }
 }
