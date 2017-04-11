@@ -93,14 +93,14 @@ void App::worker(int clntSock, std::string strRequest)
 {
     try {
         _DEBUG("Worker thread invoked for socket ", clntSock);
-        http::HttpRequest request("/efg/2017/04");
+        http::HttpRequest request("");
         _DEBUG("request: ", strRequest);
         try {
             http::HttpRequestParser parser;
             std::stringstream ss;
             ss << strRequest;
             //std::cout << ss << std::endl;
-            http::HttpRequest request = parser.parse(ss);
+            request = parser.parse(ss);
 
             //std::unordered_map<std::string, std::string> body = parser.parse_body(ss, );
             _DEBUG(request); // FIXME _DEBUG for multi lines
