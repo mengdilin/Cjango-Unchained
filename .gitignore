@@ -5,4 +5,5 @@ testrun
 test_router
 baseline/
 *.dSYM/
+*.d
 *.exe

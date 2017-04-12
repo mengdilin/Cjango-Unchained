@@ -2,7 +2,7 @@
 
 PROG = run
 CC = g++
-CPPFLAGS = -std=c++1z -Wall -pthread
+CPPFLAGS = -std=c++1z -Wall -pthread -MMD -MP
 CPPFLAGS += -I./app/
 CPPFLAGS += -ferror-limit=5
 DEBUG ?= 1
@@ -42,6 +42,9 @@ HTTPPARSERLIB = app/libhttp_response.so \
 
 TESTOBJS += $(HTTPPARSEROBJ)
 OBJS += $(HTTPPARSEROBJ)
+# substitute .o suffix with .d
+DEPENDS   = $(TESTOBJS:.o=.d)
+
 testrun : $(TESTOBJS) $(HTTPPARSERLIB) test/testrun.cpp
 	$(CC) $(CPPFLAGS) -o testrun $(TESTOBJS) test/testrun.cpp
 $(PROG) : $(OBJS) $(HTTPPARSERLIB)
@@ -60,4 +63,8 @@ app/libhttp_request.so: http_parser/http_request.o
 	$(CC) $(CPPFLAGS) -shared -o app/libhttp_request.so http_parser/http_request.o
 
 clean:
-	rm -f core $(PROG) $(OBJS) $(HTTPPARSERCPP)
+	rm -f core $(PROG) $(OBJS) $(HTTPPARSERCPP) $(DEPENDS)
+
+# By -MMD -MP flags, dependency between source files are written in *.d files
+# These *.d files are included here in order to auto-recompile when header files change
+-include $(DEPENDS)
