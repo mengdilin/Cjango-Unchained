@@ -132,6 +132,7 @@ void Router::load_url_pattern_from_file() {
       callback = (callback_type) load_callback(cinfo["file"], cinfo["funcname"]);
     } catch (const char *e) {
       callback = [](http::HttpRequest h){ return http::HttpResponse("invalid callback specified"); };
+      std::cout << "callbackInvalid " << cinfo["file"] << " " << cinfo["funcname"] << std::endl;
       _DEBUG("aaaa\n\n\n\n\n\n\n\n");
       // continue;
     }
