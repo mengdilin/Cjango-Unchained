@@ -7,10 +7,12 @@
 void http::HttpResponse::set_cookie(std::string key, std::string value) {
   auto result = headers.find("Set-Cookie");
   if (result != headers.end()) {
+    _DEBUG("inside first");
     result->second += "; "+key+"="+value;
     headers.insert({"Set-Cookie", result->second});
 
   } else {
+    _DEBUG("inside second");
     headers.insert({"Set-Cookie", key+"="+value});
   }
 
@@ -43,6 +45,17 @@ http::HttpResponse::HttpResponse(std::string content) {
   headers.insert({"Content-Type", content_type});
   //_DEBUG("content_length: ", content_type.length());
   headers.insert({"Content-Length", std::to_string(content.length())});
+}
+
+//default good http response
+http::HttpResponse::HttpResponse(std::string content, http::HttpRequest& request) {
+  this->content = content;
+  headers.insert({"Content-Type", content_type});
+  //_DEBUG("content_length: ", content_type.length());
+  headers.insert({"Content-Length", std::to_string(content.length())});
+  if (request.has_session_id()) {
+    this->set_cookie(HttpRequest::session_cookie_key, std::to_string(request.get_session_id()));
+  }
 }
 
 
@@ -95,8 +108,12 @@ std::string http::HttpResponse::to_string() {
   std::string crfl = "\r\n";
   std::string sp = " ";
   result += http_version + sp + std::to_string(status_code) + sp + reason_phrase + crfl;
+  result+= "Content-Type: " + this->content_type + crfl;
   for (auto& header_pair : headers) {
-    result += header_pair.first + ": " + header_pair.second + crfl;
+    if (header_pair.first != "Content-Type") {
+      result += header_pair.first + ": " + header_pair.second + crfl;
+    }
+
   }
   result += crfl;
   result += content;

@@ -19,6 +19,7 @@ namespace http {
   public:
     //default good http response
     HttpResponse(std::string);
+    HttpResponse(std::string, HttpRequest&);
     HttpResponse(std::string, std::string);
     HttpResponse(int); //meant for bad requests
     std::string to_string();

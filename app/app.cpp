@@ -124,7 +124,7 @@ void App::worker(int clntSock, std::string strRequest)
         */
 
 
-        string resp = http::HttpResponse(response.content).to_string();
+        string resp = response.to_string();
         _DEBUG(resp);
         _DEBUG(resp.length());
         //_DEBUG(resp.c_str());
@@ -165,7 +165,12 @@ int App::handle_request(int clntSock)
         if (rc > 0) {
             /* recv() returns > 0, some data is read */
             // _DEBUG("Appending contents: ", std::string(std::begin(buff), std::begin(buff) + rc - 1));
-            contents += std::string(std::begin(buff), std::begin(buff) + rc - 1);
+
+            /*
+             mengdi: fix off by 1 error for content materials by changing
+             std::begin(buff)+rc-1 to std::begin(buff)+rc
+             */
+            contents += std::string(std::begin(buff), std::begin(buff) + rc);
             continue; /* continue recv-ing till all data is read */
         }
         else if (rc == 0) {

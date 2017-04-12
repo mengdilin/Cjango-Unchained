@@ -7,7 +7,7 @@ unsigned long http::HttpRequest::x=123456789;
   unsigned long http::HttpRequest::y=362436069;
   unsigned long http::HttpRequest::z=521288629;
   std::string http::HttpRequest::session_cookie_key="session";
-  std::unordered_map<unsigned long, std::unordered_map<std::string, std::string>*> http::HttpRequest::sessions;
+  std::unordered_map<std::string, std::unordered_map<std::string, std::string>*> http::HttpRequest::sessions;
 http::HttpRequest::HttpRequest(
   std::string method,
   std::string path,
@@ -24,9 +24,7 @@ http::HttpRequest::HttpRequest(
 }
 
 http::HttpRequest::~HttpRequest() {
-  for (auto it=HttpRequest::sessions.begin(); it!=HttpRequest::sessions.end(); ++it) {
-    delete(it->second);
-  }
+
 }
 std::ostream& http::operator<<(std::ostream& Str, const http::HttpRequest& v) {
   std::string result = "method: " + v.get_method() + "\n"
@@ -83,19 +81,30 @@ unsigned long http::HttpRequest::get_session_id() {
 bool http::HttpRequest::has_session_id() {
   return this->has_set_session_id;
 }
-std::unordered_map<std::string, std::string> const * http::HttpRequest::get_session() const {
+std::unordered_map<std::string, std::string>* http::HttpRequest::get_session() {
+
+  //TODO: r/w LOCKING session map here and in callbacks
   auto result = this->cookie.find(HttpRequest::session_cookie_key);
+  for (auto it=this->cookie.begin(); it!=this->cookie.end(); ++it) {
+    _DEBUG("cookie:  ", it->first, ",", it->second);
+  }
   if (result != this->cookie.end()) {
+
     auto key = result->second;
-    unsigned long ul;
-    ul = strtoul (key.c_str(), NULL, 0);
-    auto session_result = HttpRequest::sessions.find(ul);
+    _DEBUG("found session key: ", key);
+    _DEBUG("key equals 60441451194812: ", key=="60441451194812");
+
+    auto session_result = HttpRequest::sessions.find(key);
     if (session_result != HttpRequest::sessions.end()) {
       return session_result->second;
     } else {
       _DEBUG("cannot find session id: ", key);
+      unsigned long ul;
+      ul = strtoul (key.c_str(), NULL, 0);
+      this->has_set_session_id = true;
+      this->session_id = ul;
       std::unordered_map<std::string, std::string>* map = new std::unordered_map<std::string, std::string>();
-      HttpRequest::sessions.insert({ul, map});
+      HttpRequest::sessions.insert({key, map});
       return map;
     }
 
@@ -103,8 +112,10 @@ std::unordered_map<std::string, std::string> const * http::HttpRequest::get_sess
   } else {
     this->session_id = HttpRequest::xorshf96();
     this->has_set_session_id = true;
+    _DEBUG("set session id to", std::to_string(this->session_id));
+    _DEBUG("session id equals 60441451194812", std::to_string(this->session_id)=="60441451194812");
     std::unordered_map<std::string, std::string>* map = new std::unordered_map<std::string, std::string>();
-    HttpRequest::sessions.insert({session_id, map});
+    HttpRequest::sessions.insert({std::to_string(this->session_id), map});
     return map;
   }
 }

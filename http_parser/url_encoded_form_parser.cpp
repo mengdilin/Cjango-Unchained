@@ -61,7 +61,7 @@ std::unordered_map<std::string, std::string> http::UrlEncodedFormParser::get_par
     }
     //_DEBUG("content: ", content);
     std::string url_decoded_query = uri_decode(content);
-    //_DEBUG("url decoded query: ", url_decoded_query);
+   //_DEBUG("url decoded query: ", url_decoded_query);
     std::vector<std::string> params_for_content = split(url_decoded_query, '&');
 
     for (auto key_value_string : params_for_content) {
@@ -76,6 +76,7 @@ std::unordered_map<std::string, std::string> http::UrlEncodedFormParser::get_par
       } else {
         std::string key = key_value_string.substr(0, loc);
         std::string value = key_value_string.substr(loc+1, key_value_string.length());
+        //_DEBUG("param key:",key,":",value);
         parameters_map.insert(std::make_pair(key, value));
       }
     }

@@ -1,6 +1,8 @@
 #include "http_request_parser.hpp"
 #include "../app/externs.hpp"
-
+#include <algorithm>
+#include <string>
+#include <iostream>
 http::HttpRequestParser::HttpRequestParser() {}
 
 
@@ -39,6 +41,7 @@ http::HttpRequest http::HttpRequestParser::parse(std::istream& input_stream) {
     }
     std::stringstream ss;
     ss << input_stream.rdbuf();
+    //_DEBUG("stream: " , ss.str());
     return HttpRequest(
       request_line.action,
       request_line.uri,
@@ -66,8 +69,12 @@ std::unordered_map<std::string, std::string> http::HttpRequestParser::get_http_c
       std::vector<std::string> cookie_pairs = url_encoded_form_parser.split(value, ';');
       for (auto pair : cookie_pairs) {
         std::cout << pair << std::endl;
+        pair.erase(std::remove_if(pair.begin(), pair.end(), isspace),
+              pair.end());
          auto q_loc = pair.find("=", 0);
          if (q_loc != std::string::npos) {
+
+
           cookies.insert({pair.substr(0, q_loc), pair.substr(q_loc+1, pair.length())});
        }
       }

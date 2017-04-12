@@ -17,7 +17,7 @@ namespace http {
     std::unordered_map<std::string, std::string> meta;
     std::unordered_map<std::string, std::string> parameters;
     std::unordered_map<std::string, std::string> cookie;
-    static std::unordered_map<unsigned long, std::unordered_map<std::string, std::string>*> sessions;
+    static std::unordered_map<std::string, std::unordered_map<std::string, std::string>*> sessions;
   public:
     static std::string session_cookie_key;
   public:
@@ -38,7 +38,7 @@ namespace http {
     std::unordered_map<std::string, std::string> const & get_meta() const;
     std::unordered_map<std::string, std::string> const & get_parameters() const;
     std::unordered_map<std::string, std::string> const & get_cookie() const;
-    std::unordered_map<std::string, std::string> const * get_session() const;
+    std::unordered_map<std::string, std::string>* get_session();
     static unsigned long xorshf96(); //Marsaglia's xorshf generator
 
 
