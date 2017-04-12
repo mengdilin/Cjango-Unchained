@@ -10,5 +10,13 @@
   "/aaa" : {
     "file" : "callbacks/mycallback.so",
     "funcname": "callback_mine2"
+  },
+  "/home" : {
+    "file" : "callbacks/mycallback.so",
+    "funcname": "page_home"
+  },
+  "/" : {
+    "file" : "callbacks/mycallback.so",
+    "funcname": "page_index"
   }
 }

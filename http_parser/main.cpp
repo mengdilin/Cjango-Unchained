@@ -30,7 +30,8 @@ int main() {
 
   }
   std::cout << "here" << std::endl;
-  http::HttpResponse response = http::HttpResponse("content blah");
+  http::HttpResponse response = http::HttpResponse::render_to_response("../test/index.html");
+
   std::cout << response << std::endl;
 } catch (const char *e) {
 

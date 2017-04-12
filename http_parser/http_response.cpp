@@ -3,26 +3,6 @@
 #include <fstream>
 #include <streambuf>
 
-/*
-std::unordered_map<std::string, std::string> http::HttpResponse::code_to_reason_init() {
-      code_to_reason.insert({200, "OK"});
-      code_to_reason.insert({201, "Created"});
-      code_to_reason.insert({202, "Accepted"});
-      code_to_reason.insert({204, "No Content"});
-      code_to_reason.insert({301, "Moved Permanently"});
-      code_to_reason.insert({302, "Moved Temporarily"});
-      code_to_reason.insert({304, "Not Modified"});
-      code_to_reason.insert({400, "Bad Request"});
-      code_to_reason.insert({401, "Unauthorized"});
-      code_to_reason.insert({403, "Forbidden"});
-      code_to_reason.insert({404, "Not Found"});
-      code_to_reason.insert({500, "Internal Server Error"});
-      code_to_reason.insert({501, "Not Implemented"});
-      code_to_reason.insert({502, "Bad Gateway"});
-      code_to_reason.insert({503, "Service Unavailable"});
-}
-*/
-
 // caprice-j moved HttpResponse constructor in http_response.hpp
 // in order to instantiate in callback files easily
 
@@ -38,7 +18,10 @@ void http::HttpResponse::set_cookie(std::string key, std::string value) {
 
 }
 http::HttpResponse http::HttpResponse::render_to_response(std::string path) {
-  return HttpResponse("Blah");
+  std::ifstream t(path);
+  std::string str((std::istreambuf_iterator<char>(t)),
+                 std::istreambuf_iterator<char>());
+  return HttpResponse(str);
 }
 //default good http response
 http::HttpResponse::HttpResponse(std::string content, std::string content_type) {
