@@ -3,8 +3,6 @@
 #include <fstream>
 #include <streambuf>
 
-// caprice-j moved HttpResponse constructor in http_response.hpp
-// in order to instantiate in callback files easily
 
 void http::HttpResponse::set_cookie(std::string key, std::string value) {
   auto result = headers.find("Set-Cookie");
@@ -16,6 +14,13 @@ void http::HttpResponse::set_cookie(std::string key, std::string value) {
     headers.insert({"Set-Cookie", key+"="+value});
   }
 
+}
+http::HttpResponse http::HttpResponse::render_to_response(std::string file, http::HttpRequest& request) {
+  auto response = HttpResponse::render_to_response(file);
+  if (request.has_session_id()) {
+    response.set_cookie(HttpRequest::session_cookie_key, std::to_string(request.get_session_id()));
+  }
+  return response;
 }
 http::HttpResponse http::HttpResponse::render_to_response(std::string path) {
   std::ifstream t(path);

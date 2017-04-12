@@ -2,9 +2,10 @@
 #define MyHttpResponseHeader
 #include <unordered_map>
 #include <string>
-
+#include "http_request.hpp"
 namespace http {
   class HttpResponse {
+
   public:
     std::string content;
     int status_code = 200;//default
@@ -17,14 +18,16 @@ namespace http {
     void set_cookie(std::string, std::string);
   public:
     //default good http response
-    HttpResponse(std::string content);
+    HttpResponse(std::string);
     HttpResponse(std::string, std::string);
     HttpResponse(int); //meant for bad requests
     std::string to_string();
     static HttpResponse render_to_response(std::string);
+    static HttpResponse render_to_response(std::string, HttpRequest&);
 
   };
   std::ostream& operator<<(std::ostream& Str, HttpResponse const & v);
+
 
 }
 #endif
