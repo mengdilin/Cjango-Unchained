@@ -38,7 +38,7 @@ void http::HttpResponse::set_cookie(std::string key, std::string value) {
 
 }
 http::HttpResponse http::HttpResponse::render_to_response(std::string path) {
-
+  return HttpResponse("Blah");
 }
 //default good http response
 http::HttpResponse::HttpResponse(std::string content, std::string content_type) {
@@ -48,6 +48,15 @@ http::HttpResponse::HttpResponse(std::string content, std::string content_type) 
   //_DEBUG("content_length: ", content_type.length());
   headers.insert({"Content-Length", std::to_string(content.length())});
 }
+
+//default good http response
+http::HttpResponse::HttpResponse(std::string content) {
+  this->content = content;
+  headers.insert({"Content-Type", content_type});
+  //_DEBUG("content_length: ", content_type.length());
+  headers.insert({"Content-Length", std::to_string(content.length())});
+}
+
 
 std::string get_reason_phrase(int status_code) {
   switch(status_code) {
