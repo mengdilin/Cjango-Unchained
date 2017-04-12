@@ -14,23 +14,27 @@ http::HttpResponse callback_1 (http::HttpRequest req) {
 
 int main(int argc, char* argv[])
 {
-  if (argc != 2) {
-    printf("usage: ./testrun 8081\n");
+  if (argc != 3) {
+    printf("usage: ./manage runserver <port number>\n");
     return -1;
   }
-  std::istringstream iss(argv[1]);
+  std::istringstream iss(std::string(argv[1]) + std::string(" ") + std::string(argv[2]));
+  std::string command;
   int port_number;
+  iss >> command;
   iss >> port_number;
 
-  App app;
+  if (command == "runserver") {
+    App app;
 #ifndef CJANGO_DYNLOAD
-  // if CJANGO_DYNLOAD, load "callbacks/url-pattern.json"
-  app.add_route("/abc", callback_1);
-  app.add_route("/efg/[0-9]{4}/[0-9]{2}", callback_1);
+    // if CJANGO_DYNLOAD, load "callbacks/url-pattern.json"
+    app.add_route("/abc", callback_1);
+    app.add_route("/efg/[0-9]{4}/[0-9]{2}", callback_1);
 #endif
-  //app.add_route("/efg", callback_2);
-  app.run(port_number);
+    app.run(port_number);
+  } else {
+    printf("invalid command");
+  }
 
   return 0;
 }
-

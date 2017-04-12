@@ -1,6 +1,6 @@
 #Makefile for our library
 
-PROG = run
+PROG = runapp
 CC = g++
 CPPFLAGS = -std=c++1z -Wall -pthread -MMD -MP
 CPPFLAGS += -I./app/
@@ -49,7 +49,7 @@ DEPENDS   = $(TESTOBJS:.o=.d)
 # $^ : source file names (right side of ':')
 # Note: $< is only the first source file
 
-testrun : $(TESTOBJS) $(HTTPPARSERLIB) test/testrun.cpp
+$(PROG) : $(TESTOBJS) $(HTTPPARSERLIB) app/runapp.cpp
 	$(CC) $(CPPFLAGS) -o $@ $^
 main.o : app/main.cpp
 	$(CC) $(CPPFLAGS) -c $^

@@ -1,6 +1,7 @@
 *.o
 *.so
 run
+runapp
 testrun
 test_router
 baseline/
