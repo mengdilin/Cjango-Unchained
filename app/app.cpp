@@ -205,7 +205,7 @@ int App::handle_request(int clntSock)
     return ret;
 }
 
-#ifdef DYNLOAD_CJANGO
+#ifdef CJANGO_DYNLOAD
 #include <chrono>
 void App::monitor_file_change() {
     for (;;) {
@@ -250,7 +250,7 @@ void App::run_accept(int port)
     if (listen(servSock, 5) < 0)
         error_exit("Failed to listen");
 
-#ifdef DYNLOAD_CJANGO
+#ifdef CJANGO_DYNLOAD
     spawn_monitor_thread();
 #endif
 
@@ -317,7 +317,7 @@ void App::run(int port)
     timeout.tv_sec = 1; /* check select() every 1 second */
     timeout.tv_usec = 0;
 
-#ifdef DYNLOAD_CJANGO
+#ifdef CJANGO_DYNLOAD
     spawn_monitor_thread();
 #endif
 

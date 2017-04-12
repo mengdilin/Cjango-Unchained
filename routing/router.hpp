@@ -10,7 +10,7 @@
 #include <algorithm>
 #include <cjango>
 
-#ifdef DYNLOAD_CJANGO
+#ifdef CJANGO_DYNLOAD
 #include <memory>
 #include <dlfcn.h>
 
@@ -36,7 +36,7 @@ class Router {
     };
     Router() {};
     void add_route(std::string url_pattern, functor f);
-#ifdef DYNLOAD_CJANGO
+#ifdef CJANGO_DYNLOAD
     std::unordered_map<std::string, int> ref_count;
     std::vector<dlib_handler> dlib_handlers;
     void *load_shared_object_file(const std::string& path);
