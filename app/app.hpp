@@ -5,14 +5,14 @@
 #include <cstring>
 #include "externs.hpp"
 
-#ifdef DYNLOAD_CJANGO
+#ifdef CJANGO_DYNLOAD
 #include <regex>
 #include <FileWatcher.h>
 #endif
 
 using namespace std;
 
-#ifdef DYNLOAD_CJANGO
+#ifdef CJANGO_DYNLOAD
 /// Processes a file action
 class UpdateListener : public FW::FileWatchListener
 {
@@ -50,7 +50,7 @@ class App {
     int servSock; /* server socket id */
 public:
     Router router; // FIXME how router can be private?
-#ifdef DYNLOAD_CJANGO
+#ifdef CJANGO_DYNLOAD
     UpdateListener listener;
     FW::FileWatcher fileWatcher;
     bool is_file_updated;
@@ -63,8 +63,10 @@ public:
     // App(Router& rt): router(rt) {}
     void worker(int clntSock, string strRequest);
     // void worker(int clntSock);
+#ifndef CJANGO_DYNLOAD
+    App() : servSock{-1} {
+#else
     App() : servSock{-1}, is_file_updated(false) {
-#ifdef DYNLOAD_CJANGO
         router.load_url_pattern_from_file();
         // create the listener (before the file watcher - so it gets destroyed after the file watcher)
 

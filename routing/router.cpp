@@ -10,7 +10,7 @@ inline bool registered(std::vector<std::string> patterns_list, std::string url_p
 
 void Router::add_route(std::string url_pattern, functor f) {
   // Note: url_pattern may be a regex pattern or an actual url_path
-#ifdef DYNLOAD_CJANGO
+#ifdef CJANGO_DYNLOAD
 #include <algorithm>
 
   if (! registered(patterns_list, url_pattern))
@@ -55,7 +55,7 @@ std::string Router::resolve(http::HttpRequest request) {
   // "resolver_match: a resolved url. This attribute is only set after URL resolving took place"
 }
 
-#ifdef DYNLOAD_CJANGO
+#ifdef CJANGO_DYNLOAD
 void *Router::load_shared_object_file(const std::string& path) {
   const auto lib = dlopen(path.c_str(), RTLD_LAZY);
   if (!lib) {

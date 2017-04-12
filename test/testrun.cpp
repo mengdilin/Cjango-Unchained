@@ -23,8 +23,8 @@ int main(int argc, char* argv[])
   iss >> port_number;
 
   App app;
-#ifndef DYNLOAD_CJANGO
-  // if DYNLOAD_CJANGO, load "url-pattern.json" in the same directory of an executable
+#ifndef CJANGO_DYNLOAD
+  // if CJANGO_DYNLOAD, load "callbacks/url-pattern.json"
   app.add_route("/abc", callback_1);
   app.add_route("/efg/[0-9]{4}/[0-9]{2}", callback_1);
 #endif

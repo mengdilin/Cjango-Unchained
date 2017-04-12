@@ -2,7 +2,7 @@
 
 # PROG = run
 CC = g++
-CPPFLAGS = -std=c++1z -Wall -DDEBUG -DDYNLOAD_CJANGO -Wno-return-type-c-linkage
+CPPFLAGS = -std=c++1z -Wall -DDEBUG -DCJANGO_DYNLOAD -Wno-return-type-c-linkage
 CPPFLAGS += -I./../app/
 CPPFLAGS += -L./../app/
 CPPFLAGS += -lhttp_response -lhttp_request
