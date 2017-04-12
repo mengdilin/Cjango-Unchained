@@ -14,9 +14,9 @@ OBJS = mycallback.o mycallback2.o mycallback2.so mycallback.so
 # 	$(CC) $(CPPFLAGS) -o $(PROG) $(OBJS)
 all: $(OBJS)
 mycallback.o : mycallback.cpp
-	$(CC) $(CPPFLAGS) -fPIC   -o $@ -c $<
+	$(CC) $(CPPFLAGS) -fPIC   -o $@ -c $^
 mycallback2.o : mycallback2.cpp
-	$(CC) $(CPPFLAGS) -fPIC   -o $@ -c $<
+	$(CC) $(CPPFLAGS) -fPIC   -o $@ -c $^
 mycallback.so : mycallback.o
 	$(CC) $(CPPFLAGS) -shared -o $@ mycallback.o
 mycallback2.so : mycallback2.o

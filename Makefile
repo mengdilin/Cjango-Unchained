@@ -45,22 +45,24 @@ OBJS += $(HTTPPARSEROBJ)
 # substitute .o suffix with .d
 DEPENDS   = $(TESTOBJS:.o=.d)
 
+# $@ : target file name  ( left side of ':')
+# $^ : source file names (right side of ':')
+# Note: $< is only the first source file
+
 testrun : $(TESTOBJS) $(HTTPPARSERLIB) test/testrun.cpp
-	$(CC) $(CPPFLAGS) -o testrun $(TESTOBJS) test/testrun.cpp
-$(PROG) : $(OBJS) $(HTTPPARSERLIB)
-	$(CC) $(CPPFLAGS) -o $(PROG) $(OBJS)
-main.o :
-	$(CC) $(CPPFLAGS) -c app/main.cpp
-app.o :
-	$(CC) $(CPPFLAGS) -c app/app.cpp
-router.o : routing/router.cpp routing/router.hpp
-	$(CC) $(CPPFLAGS) -c routing/router.cpp
+	$(CC) $(CPPFLAGS) -o $@ $^
+main.o : app/main.cpp
+	$(CC) $(CPPFLAGS) -c $^
+app.o : app/app.cpp
+	$(CC) $(CPPFLAGS) -c $^
+router.o : routing/router.cpp
+	$(CC) $(CPPFLAGS) -c $^
 
 
 app/libhttp_response.so: http_parser/http_request.o http_parser/http_response.o
-	$(CC) $(CPPFLAGS) -shared -o app/libhttp_response.so http_parser/http_response.o http_parser/http_request.o
+	$(CC) $(CPPFLAGS) -shared -o $@ $^
 app/libhttp_request.so: http_parser/http_request.o
-	$(CC) $(CPPFLAGS) -shared -o app/libhttp_request.so http_parser/http_request.o
+	$(CC) $(CPPFLAGS) -shared -o $@ $^
 
 clean:
 	rm -f core $(PROG) $(OBJS) $(HTTPPARSERCPP) $(DEPENDS)
