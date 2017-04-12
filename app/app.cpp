@@ -13,7 +13,9 @@
 #include "../http_parser/http_response.hpp"
 #include <sstream>
 #include <unordered_map>
+#ifdef CJANGO_DYNLOAD
 #include <FileWatcher.h>
+#endif
 
 //using namespace std;
 
