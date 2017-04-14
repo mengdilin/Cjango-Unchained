@@ -44,6 +44,7 @@ TESTOBJS += $(HTTPPARSEROBJ)
 OBJS += $(HTTPPARSEROBJ)
 # substitute .o suffix with .d
 DEPENDS   = $(TESTOBJS:.o=.d)
+FILEWATCHERDIR := lib/simplefilewatcher/build/gmake
 
 # $@ : target file name  ( left side of ':')
 # $^ : source file names (right side of ':')
@@ -58,6 +59,10 @@ app.o : app/app.cpp
 router.o : routing/router.cpp
 	$(CC) $(CPPFLAGS) -c $^
 
+
+.PHONY: $(FILEWATCHERDIR)
+lib/simplefilewatcher/build/intermediate/Debug/FileWatcher.o:
+	make -C $(FILEWATCHERDIR)
 
 app/libhttp_response.so: http_parser/http_request.o http_parser/http_response.o
 	$(CC) $(CPPFLAGS) -shared -o $@ $^
