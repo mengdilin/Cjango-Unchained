@@ -19,6 +19,16 @@
 
 //using namespace std;
 
+#ifdef DEBUG
+// See: https://github.com/gabime/spdlog/issues/154
+#include <memory>
+#include <spdlog/spdlog.h>
+
+// std::unordered_map<std::string, std::shared_ptr<spdlog::logger>> loggers;
+CjangoLogger cjango_loggers;
+
+#endif
+
 constexpr unsigned int BUFFER_MAXSIZE = 4096;
 enum HandleRequestOp { NO_CHANGE, CLR_FDSET, CLOSE_SOCK };
 

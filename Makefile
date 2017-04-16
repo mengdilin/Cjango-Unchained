@@ -3,7 +3,7 @@
 PROG = runapp
 CC = g++
 CPPFLAGS = -std=c++1z -Wall -pthread -MMD -MP
-CPPFLAGS += -I./app/
+CPPFLAGS += -I./app/ -I./lib/
 CPPFLAGS += -ferror-limit=5
 DEBUG ?= 1
 CJANGO_DYNLOAD ?= 1

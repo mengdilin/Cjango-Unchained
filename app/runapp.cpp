@@ -24,6 +24,14 @@ int main(int argc, char* argv[])
   iss >> command;
   iss >> port_number;
 
+  // std::shared_ptr<spdlog::logger> parse_logger = spdlog::stdout_color_mt("html");
+  // std::shared_ptr<spdlog::logger> route_logger = spdlog::stdout_color_mt("route");
+  // loggers[parse_logger->name()] = parse_logger;
+  // loggers[route_logger->name()] = route_logger;
+
+  _SPDLOG("html", info, "Welcome to spdlog! {} {}", 1, " 23");
+  return 0;
+
   if (command == "runserver") {
     App app;
 #ifndef CJANGO_DYNLOAD
