@@ -13,6 +13,7 @@ using std::string;
 
 #include <spdlog/spdlog.h>
 #include <unordered_map>
+#include <unordered_set>
 // CjangoLogger is a wrapper class of spdlog::logger
 // This wrapper class gives spdlog the power to define a new logger if undefined
 // Then users don't have to initialize a new logger -- just use it
@@ -20,7 +21,18 @@ using std::string;
 class CjangoLogger {
     std::unordered_map<std::string, std::shared_ptr<spdlog::logger>> loggers;
 public:
+    std::unordered_set<std::string> whitelist;
     CjangoLogger(){};
+    bool isVisible(std::string logger_name){
+
+        if (whitelist.size() == 0)
+            return true; // all logs are visible
+
+        auto found = whitelist.find(logger_name) != whitelist.end();
+        if (found)
+            return true;
+        return false;
+    }
     std::shared_ptr<spdlog::logger> operator[](std::string name) {
         auto found = loggers.find(name) != loggers.end();
         if (! found) {
@@ -35,7 +47,7 @@ extern CjangoLogger cjango_loggers;
 
 
 // https://github.com/gabime/spdlog/issues/340#issuecomment-287583891
-#define _SPDLOG(logger_name, level, ...) (cjango_loggers)[logger_name]->level("[" + fmt::format(__FILE__) + ":" + std::to_string(__LINE__) + ":" + string(__FUNCTION__) + "] " + fmt::format(__VA_ARGS__))
+#define _SPDLOG(logger_name, level, ...) if( (cjango_loggers).isVisible( (logger_name)) ) { ((cjango_loggers)[logger_name]->level("[" + fmt::format(__FILE__) + ":" + std::to_string(__LINE__) + ":" + string(__FUNCTION__) + "] " + fmt::format(__VA_ARGS__))); }
 
 inline void _log() {}
 template<typename Head, typename ...Rest>

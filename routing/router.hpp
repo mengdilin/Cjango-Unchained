@@ -21,6 +21,7 @@ using dlib_handler = void *;
 namespace cjango {
   const std::string INVALIDURL = "__INVALIDURL";
   const std::string STATIC_FILE_SERVED = "__STATIC_FILE_SERVED";
+  const std::string route_logger_name = "route";
 }
 
 using functor = std::function<http::HttpResponse(http::HttpRequest)>;

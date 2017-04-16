@@ -14,7 +14,7 @@ http::HttpResponse callback_1 (http::HttpRequest req) {
 
 int main(int argc, char* argv[])
 {
-  if (argc != 3) {
+  if (argc < 3) {
     printf("usage: ./manage runserver <port number>\n");
     return -1;
   }
@@ -24,13 +24,19 @@ int main(int argc, char* argv[])
   iss >> command;
   iss >> port_number;
 
+  if (argc > 3 && std::string(argv[3]) == "--whitelist") {
+    for (int i = 4; i < argc; ++i)
+      cjango_loggers.whitelist.insert(argv[i]);
+    for (int i = 4; i < argc; ++i) // should be after inserting all
+      _SPDLOG("init", info, "whitelist is specified: {}", argv[i]);
+  }
+
   // std::shared_ptr<spdlog::logger> parse_logger = spdlog::stdout_color_mt("html");
   // std::shared_ptr<spdlog::logger> route_logger = spdlog::stdout_color_mt("route");
   // loggers[parse_logger->name()] = parse_logger;
   // loggers[route_logger->name()] = route_logger;
 
   _SPDLOG("html", info, "Welcome to spdlog! {} {}", 1, " 23");
-  return 0;
 
   if (command == "runserver") {
     App app;

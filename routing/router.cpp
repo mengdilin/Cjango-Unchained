@@ -16,7 +16,7 @@ void Router::add_route(std::string url_pattern, functor f) {
   if (! registered(patterns_list, url_pattern))
     patterns_list.push_back(url_pattern);
   pattern_to_callback[url_pattern] = f;
-  _DEBUG("updated route: ", url_pattern);
+  _SPDLOG(cjango::route_logger_name, info, "updated route: {}", url_pattern);
 
 #else
   try {
@@ -24,13 +24,13 @@ void Router::add_route(std::string url_pattern, functor f) {
       throw 1;
   }
   catch (int e) {
-    _DEBUG("catched: url pattern is already registered");
+    _SPDLOG(cjango::route_logger_name, warn, "catched: url pattern is already registered");
     return;
   }
   patterns_list.push_back(url_pattern);
   pattern_to_callback[url_pattern] = f;
+  _SPDLOG(cjango::route_logger_name, info, "added a new rule: {}", url_pattern);
 #endif
-  _DEBUG("add a new rule: ", url_pattern.c_str());
 }
 
 std::string Router::resolve(http::HttpRequest request) {
@@ -47,7 +47,8 @@ std::string Router::resolve(http::HttpRequest request) {
     return cjango::STATIC_FILE_SERVED;
   }
 
-  _DEBUG("resolve(): this url_pattern isn't registered: ", request.get_path());
+  _SPDLOG(cjango::route_logger_name, error,
+          "resolve(): this url_pattern isn't registered: {}", request.get_path());
   return cjango::INVALIDURL;
   // "resolver_match: a resolved url. This attribute is only set after URL resolving took place"
 }
@@ -58,8 +59,7 @@ void *Router::load_shared_object_file(const std::string& path) {
   if (!lib) {
     // Note: two successive dlerror() calls result in segfault
     const auto human_readable_str = dlerror();
-    _DEBUG("Cannot load library: ", human_readable_str);
-    std::cout <<  "Cannot load library: " << human_readable_str << std::endl;
+    _SPDLOG(cjango::route_logger_name, error, "Cannot load library: {}", human_readable_str);
     throw "no such a object file";
     // exit(EXIT_FAILURE);
   }
@@ -73,7 +73,7 @@ void *Router::load_shared_object_file(const std::string& path) {
 
 void *Router::load_callback(const std::string& path, const std::string& func_name) {
   auto lib = (dlib_handler) load_shared_object_file(path);
-  _DEBUG("dlopen() finished for ", path);
+  _SPDLOG(cjango::route_logger_name, debug, "dlopen() finished for {}", path);
   bool found = std::find(dlib_handlers.begin(), dlib_handlers.end(), lib) != dlib_handlers.end();
   if (found) {
     // dlopen() returns the same (opaque) handler when specified twice
@@ -81,20 +81,19 @@ void *Router::load_callback(const std::string& path, const std::string& func_nam
     // unload the library, and then reload the updated function
     dlib_handlers.erase(std::remove(dlib_handlers.begin(), dlib_handlers.end(), lib),
                         dlib_handlers.end());
-    std::cout  << "removed \n\n\n" << std::endl;
     dlclose(lib); dlclose(lib);
     ref_count[path] = ref_count[path] - 2;
     // It looks strange but this is the right way to detect same file handlers are returned
     lib = (dlib_handler) load_shared_object_file(path);
   }
   dlib_handlers.push_back(lib);
-  _DEBUG("dlib_handlers.size: ", dlib_handlers.size(), "  ref_count: ", ref_count[path]);
+  _SPDLOG(cjango::route_logger_name, debug,
+          "dlib_handlers.size: {} ref_count: {}", dlib_handlers.size(), ref_count[path]);
 
   const auto func = dlsym(lib, func_name.c_str());
   const auto dlsym_error = dlerror();
   if (dlsym_error) {
-    _DEBUG("Cannot load symbol callback()\n\n\n\n\n\n");
-    std::cout <<  "Cannot load symbol: " << dlsym_error << std::endl;
+    _SPDLOG(cjango::route_logger_name, error, "Cannot load symbol {}", dlsym_error);
     throw "no such a callback name";
     // exit(EXIT_FAILURE);
   }
@@ -110,7 +109,7 @@ void Router::load_url_pattern_from_file() {
   std::ifstream i("callbacks/url-pattern.json");
   nlohmann::json j;
   i >> j;
-  _DEBUG("loaded url-pattern.json");
+  _SPDLOG(cjango::route_logger_name, info, "loaded url-pattern.json");
   for (nlohmann::json::iterator it = j.begin(); it != j.end(); ++it) {
     const auto cinfo = it.value(); // callback info
 
@@ -129,12 +128,9 @@ void Router::load_url_pattern_from_file() {
       callback = (callback_type) load_callback(cinfo["file"], cinfo["funcname"]);
     } catch (const char *e) {
       callback = [](http::HttpRequest h){ return http::HttpResponse("invalid callback specified"); };
-      std::cout << "callbackInvalid " << cinfo["file"] << " " << cinfo["funcname"] << std::endl;
-      _DEBUG("aaaa\n\n\n\n\n\n\n\n");
+      _SPDLOG(cjango::route_logger_name, info, "Invalid callback: {} {}", cinfo["file"], cinfo["funcname"]);
       // continue;
     }
-    _DEBUG(it.key(), " : ", it.value(), "\n",
-           "cinfo['file']", cinfo["file"], "cinfo['funcname']", cinfo["funcname"]);
     add_route(it.key(), callback);
     // cannot dlclose here because callbacks will be used later
   }
@@ -144,7 +140,7 @@ void Router::load_url_pattern_from_file() {
 http::HttpResponse Router::get_http_response(http::HttpRequest request) {
   std::string url_path = resolve(request);
   if (url_path == cjango::INVALIDURL) {
-    _DEBUG("this http::HttpRequest.path is invalid:", request.get_path().c_str());
+    _SPDLOG(cjango::route_logger_name, warn, "this HttpRequest.path is invalid: {}", request.get_path());
     return http::HttpResponse("Cjango: 404 Page Not Found");
   } else if (url_path == cjango::STATIC_FILE_SERVED) {
     const std::regex r("((png|gif|jpeg|bmp|webp))$");
@@ -155,11 +151,11 @@ http::HttpResponse Router::get_http_response(http::HttpRequest request) {
     if (std::regex_search(path, sm, r))
       suffix = sm[0];
     // MAYBE-LATER other than image
-    _DEBUG("imageSuffix: ", suffix);
+    _SPDLOG(cjango::route_logger_name, info, "imageSuffix: {}", suffix);
     return http::HttpResponse::render_to_response("callbacks" + request.get_path(), "image/" + suffix, request);
   }
 
   functor callback = pattern_to_callback[url_path];
-  _DEBUG("Router::get_http_response(): return callback corresponding to: ", url_path);
+  _SPDLOG(cjango::route_logger_name, info, "return callback for: ", url_path);
   return callback(request);
 }
