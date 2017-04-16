@@ -4,15 +4,15 @@
 
 Cjango is a high-speed C++ Web framework that provides blazingly fast server responses and [Django](https://github.com/django/django)-like usability.
 
-![](performance.png)
+<!-- ![](performance.png) -->
 
 ## Features
 
 ### Asyncronous request handling
 
-Cjango handles client requests asyncronously by `select` system calls. Compared to Django, Our benchmark shows 3-5x performance benefits on basic http request handling. Cjango has comparably fast performance with famous C++ web framework projects such as [Crow](https://github.com/ipkn/crow) or [Silicon](https://github.com/matt-42/silicon).
+<!-- Cjango handles client requests asyncronously by `select` system calls. Compared to Django, Our benchmark shows 3-5x performance benefits on basic http request handling. Cjango has comparably fast performance with famous C++ web framework projects such as [Crow](https://github.com/ipkn/crow) or [Silicon](https://github.com/matt-42/silicon). -->
 
-### Regular expression matching for URLs
+### Regular expression URL matching
 
 As in Django, Cjango deal with URL routing by regex matching. All matching rules are written in `url-pattern.json`, which is dynamically loaded into our routing logic and enables **each callback function to be compiled separately from main application**. This is the most notable functionality in Cjango.
 
