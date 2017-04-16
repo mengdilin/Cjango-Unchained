@@ -17,8 +17,10 @@
 using dlib_handler = void *;
 #endif
 
+// FIXME scoped enum
 namespace cjango {
   const std::string INVALIDURL = "__INVALIDURL";
+  const std::string STATIC_FILE_SERVED = "__STATIC_FILE_SERVED";
 }
 
 using functor = std::function<http::HttpResponse(http::HttpRequest)>;
@@ -43,6 +45,7 @@ class Router {
     void *load_callback(const std::string& path, const std::string& func_name);
     void load_url_pattern_from_file();
 #endif
+    void register_static_file_routing();
     // Note: register() should be renamed from add_route() for django mimicking,
     // but "register" is a reserved word in C++.
     std::string resolve(http::HttpRequest);

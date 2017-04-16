@@ -34,23 +34,20 @@ void Router::add_route(std::string url_pattern, functor f) {
 }
 
 std::string Router::resolve(http::HttpRequest request) {
-  // return its corresponding url_pattern
-  // MAYBE-LATER map request.path -> url_pattern
+
   std::string url_pattern = request.get_path();
-  if (registered(patterns_list, url_pattern)) {
-    _DEBUG("resolve(): registered");
-    return url_pattern;
-  } else {
-    // _DEBUG("resolve(): non registered");
-    // return cjango::INVALIDURL;
-    _DEBUG("resolve(): regex");
-    for (const auto &p : patterns_list) {
-      std::regex r(p);
-      if (std::regex_match(url_pattern, r))
-        return p;
-    }
+  for (const auto &p : patterns_list) {
+    std::regex r(p);
+    if (std::regex_match(url_pattern, r))
+      return p;
   }
-  _DEBUG("resolve(): non registered");
+
+  std::regex r("/static/.*");
+  if (std::regex_match(url_pattern, r)) {
+    return cjango::STATIC_FILE_SERVED;
+  }
+
+  _DEBUG("resolve(): this url_pattern isn't registered: ", request.get_path());
   return cjango::INVALIDURL;
   // "resolver_match: a resolved url. This attribute is only set after URL resolving took place"
 }
@@ -147,8 +144,10 @@ void Router::load_url_pattern_from_file() {
 http::HttpResponse Router::get_http_response(http::HttpRequest request) {
   std::string url_path = resolve(request);
   if (url_path == cjango::INVALIDURL) {
-    _DEBUG("Router::get_http_response(): this http::HttpRequest.path is invalid");
+    _DEBUG("this http::HttpRequest.path is invalid:", request.get_path().c_str());
     return http::HttpResponse("nothing");
+  } else if (url_path == cjango::STATIC_FILE_SERVED) {
+    return http::HttpResponse::render_to_response("callbacks" + request.get_path(), "image/png", request);
   }
 
   functor callback = pattern_to_callback[url_path];

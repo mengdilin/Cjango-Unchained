@@ -125,7 +125,8 @@ void App::worker(int clntSock, std::string strRequest)
 
 
         string resp = response.to_string();
-        _DEBUG(resp);
+        // If static files served, resp is gibberish
+        // _DEBUG(resp);
         _DEBUG(resp.length());
         //_DEBUG(resp.c_str());
 

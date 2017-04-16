@@ -42,3 +42,10 @@ When your main application is invoked, Cjango automatically spawns a file-monito
 
 
 Make commands for the new callback function is estimated by Make's Suffix Rules. For example, if you follow the convention of generating `mycallback.so` from a single source file `mycallback.cpp`, `make` automatically compiles your callback function file too. You only need to write your function name/file into `url-pattern.json`.
+
+
+### Credits
+
+#### Libraries
++ [nlohmann/json](https://github.com/nlohmann/json)
++ [simplefilewatcher](https://github.com/apetrone/simplefilewatcher)
