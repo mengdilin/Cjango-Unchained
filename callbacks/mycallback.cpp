@@ -24,8 +24,9 @@ extern "C" http::HttpResponse callback_mine3(http::HttpRequest request) {
                 "<h1>Hi there!</h1>\r\n"
                 "<h1>Hi there!</h1>\r\n"
                 "</body>\r\n</html>";
-  http::HttpResponse resp(text);
-  return resp;
+  //http::HttpResponse resp(text);
+  //return resp;
+  return http::HttpResponse::render_to_response("logo.png", "image/png", request);
 }
 
 extern "C" http::HttpResponse page_index(http::HttpRequest request) {

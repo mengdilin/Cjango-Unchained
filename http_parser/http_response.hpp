@@ -24,7 +24,9 @@ namespace http {
     HttpResponse(int); //meant for bad requests
     std::string to_string();
     static HttpResponse render_to_response(std::string);
+    static HttpResponse render_to_response(std::string, std::string);
     static HttpResponse render_to_response(std::string, HttpRequest&);
+    static HttpResponse render_to_response(std::string, std::string, HttpRequest&);
 
   };
   std::ostream& operator<<(std::ostream& Str, HttpResponse const & v);

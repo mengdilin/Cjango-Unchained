@@ -17,6 +17,14 @@ void http::HttpResponse::set_cookie(std::string key, std::string value) {
   }
 
 }
+
+http::HttpResponse http::HttpResponse::render_to_response(std::string path, std::string content_type, http::HttpRequest& request) {
+  auto response = HttpResponse::render_to_response(path, content_type);
+  if (request.has_session_id()) {
+    response.set_cookie(HttpRequest::session_cookie_key, std::to_string(request.get_session_id()));
+  }
+  return response;
+}
 http::HttpResponse http::HttpResponse::render_to_response(std::string file, http::HttpRequest& request) {
   auto response = HttpResponse::render_to_response(file);
   if (request.has_session_id()) {
@@ -29,6 +37,13 @@ http::HttpResponse http::HttpResponse::render_to_response(std::string path) {
   std::string str((std::istreambuf_iterator<char>(t)),
                  std::istreambuf_iterator<char>());
   return HttpResponse(str);
+}
+
+http::HttpResponse http::HttpResponse::render_to_response(std::string path, std::string content_type) {
+  std::ifstream t(path);
+  std::string str((std::istreambuf_iterator<char>(t)),
+                 std::istreambuf_iterator<char>());
+  return HttpResponse(str, content_type);
 }
 //default good http response
 http::HttpResponse::HttpResponse(std::string content, std::string content_type) {
