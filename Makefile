@@ -58,9 +58,11 @@ app.o : app/app.cpp
 router.o : routing/router.cpp
 	$(CC) $(CPPFLAGS) -c $^
 
-app/libhttp_response.so: http_parser/http_request.o http_parser/http_response.o
+# http_request.cpp uses _SPDLOG which calls cjango_logger global variable
+# Without defining that variable, linker returns error. Thus app/logger.o
+app/libhttp_response.so: http_parser/http_request.o http_parser/http_response.o app/logger.o
 	$(CC) $(CPPFLAGS) -shared -o $@ $^
-app/libhttp_request.so: http_parser/http_request.o
+app/libhttp_request.so: http_parser/http_request.o app/logger.o
 	$(CC) $(CPPFLAGS) -shared -o $@ $^
 
 lib/simplefilewatcher/build/intermediate/Debug/FileWatcher.o:

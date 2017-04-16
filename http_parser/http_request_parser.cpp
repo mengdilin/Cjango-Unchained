@@ -68,7 +68,7 @@ std::unordered_map<std::string, std::string> http::HttpRequestParser::get_http_c
       //std::cout << "value: " << value << std::endl;
       std::vector<std::string> cookie_pairs = url_encoded_form_parser.split(value, ';');
       for (auto pair : cookie_pairs) {
-        std::cout << pair << std::endl;
+        _SPDLOG(cjango_loggers.http, info, "cookie pair: {}",  pair);
         pair.erase(std::remove_if(pair.begin(), pair.end(), isspace),
               pair.end());
          auto q_loc = pair.find("=", 0);
@@ -100,7 +100,7 @@ http::HttpRequestLine http::HttpRequestParser::parse_line(std::istream& input_st
   }
   if (result.size() != 3) {
     // std::cout << request_line << std::endl;
-    _DEBUG("malformed request line: request has != 3 items on the first line");
+    _SPDLOG(cjango_loggers.http, warn, "malformed request line: request has != 3 items on the first line");
     throw "malformed request line: request has != 3 items on the first line";
     // if you access localhost:8080 by browser and leave it for a few seconds,
     // A request(s?) comes with 0 item on the first line
@@ -131,7 +131,7 @@ http::HttpRequestLine http::HttpRequestParser::get_http_request_line(std::vector
   }
   */
   std::istringstream str(uri_fields[1]);
-  _DEBUG("uri fields: ", uri_fields[1]);
+  _SPDLOG(cjango_loggers.http, info, "uri fields: {}", uri_fields[1]);
   if (request_line_fields[0] == "GET") {
     auto params = this->url_encoded_form_parser.get_parameter(str, uri_fields[1].length());
       return http::HttpRequestLine(request_line_fields[0], true_uri, request_line_fields[2], params);
@@ -151,7 +151,7 @@ std::unordered_map<std::string, std::string> http::HttpRequestParser::parse_head
   while((next = this->reader.get_next_line(input_stream)) != "") {
     auto colon_loc = next.find(":", 0);
     if (colon_loc == std::string::npos || colon_loc == 0 || colon_loc == next.length()) {
-      _DEBUG("malformed header format ", next);
+      _SPDLOG(cjango_loggers.http, info, "malformed header format {}", next);
       throw "malformed header format " + next;
     } else {
       request_headers.insert({next.substr(0, colon_loc), next.substr(colon_loc+1, next.length())});

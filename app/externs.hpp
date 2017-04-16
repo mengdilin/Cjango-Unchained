@@ -21,8 +21,9 @@ using std::string;
 class CjangoLogger {
     std::unordered_map<std::string, std::shared_ptr<spdlog::logger>> loggers;
 public:
+    std::string http;
     std::unordered_set<std::string> whitelist;
-    CjangoLogger(){};
+    CjangoLogger() : http("http") {};
     bool isVisible(std::string logger_name){
 
         if (whitelist.size() == 0)
@@ -44,10 +45,23 @@ public:
     };
 };
 extern CjangoLogger cjango_loggers;
+extern std::string http_logger_name;
 
-
+// http://stackoverflow.com/questions/31050113/how-to-extract-the-source-filename-without-path-and-suffix-at-compile-time
+constexpr const char* str_end(const char *str) {
+    return *str ? str_end(str + 1) : str;
+}
+constexpr bool str_slant(const char *str) {
+    return *str == '/' ? true : (*str ? str_slant(str + 1) : false);
+}
+constexpr const char* r_slant(const char* str) {
+    return *str == '/' ? (str + 1) : r_slant(str - 1);
+}
+constexpr const char* file_name(const char* str) {
+    return str_slant(str) ? r_slant(str_end(str)) : str;
+}
 // https://github.com/gabime/spdlog/issues/340#issuecomment-287583891
-#define _SPDLOG(logger_name, level, ...) if( (cjango_loggers).isVisible( (logger_name)) ) { ((cjango_loggers)[logger_name]->level("[" + fmt::format(__FILE__) + ":" + std::to_string(__LINE__) + ":" + string(__FUNCTION__) + "] " + fmt::format(__VA_ARGS__))); }
+#define _SPDLOG(logger_name, level, ...) if( ((cjango_loggers)).isVisible( (logger_name)) ) { (((cjango_loggers))[logger_name]->level("[" + fmt::format(file_name(__FILE__)) + ":" + std::to_string(__LINE__) + ":" + string(__FUNCTION__) + "] " + fmt::format(__VA_ARGS__))); }
 
 inline void _log() {}
 template<typename Head, typename ...Rest>

@@ -25,11 +25,11 @@
 #include <spdlog/spdlog.h>
 
 // std::unordered_map<std::string, std::shared_ptr<spdlog::logger>> loggers;
-CjangoLogger cjango_loggers;
 
 #endif
 
 constexpr unsigned int BUFFER_MAXSIZE = 4096;
+const std::string logskt = "skt";
 enum HandleRequestOp { NO_CHANGE, CLR_FDSET, CLOSE_SOCK };
 
 void App::print_routes()
@@ -104,9 +104,9 @@ void worker(int clntSock)
 void App::worker(int clntSock, std::string strRequest)
 {
     try {
-        _DEBUG("Worker thread invoked for socket ", clntSock);
+        _SPDLOG(logskt, info, "Worker thread invoked for socket {}", clntSock);
         http::HttpRequest request("");
-        _DEBUG("request: ", strRequest);
+        // _SPDLOG(logskt, info, "request: {}", strRequest); // long
         try {
             http::HttpRequestParser parser;
             std::stringstream ss;
@@ -115,10 +115,10 @@ void App::worker(int clntSock, std::string strRequest)
             request = parser.parse(ss);
 
             //std::unordered_map<std::string, std::string> body = parser.parse_body(ss, );
-            _DEBUG(request); // FIXME _DEBUG for multi lines
-            _DEBUG("finished request");
+            // _SPDLOG(logskt, info, "{}", request);  // FIXME _DEBUG for multi lines
+            _SPDLOG(logskt, info, "finished request");
             for (auto entry : request.get_parameters()) {
-                _DEBUG(entry.first, ":", entry.second);
+                _SPDLOG(logskt, info, "{}:{}", entry.first, entry.second);
             }
         } catch (const char *e) {
         // if you throw a char* instead of exception class, that comes as const char*
@@ -137,7 +137,7 @@ void App::worker(int clntSock, std::string strRequest)
         string resp = response.to_string();
         // If static files served, resp is gibberish
         // _DEBUG(resp);
-        _DEBUG(resp.length());
+        _SPDLOG(logskt, debug, "resp.length: ", resp.length());
         //_DEBUG(resp.c_str());
 
         // HttpResponse response = router.get_http_response(request);
@@ -147,15 +147,15 @@ void App::worker(int clntSock, std::string strRequest)
         // resp += response.content + "\r\n\r\n";
 
         if (send(clntSock, resp.c_str(), resp.length(), 0) < 0) {
-            _DEBUG("Failed to send response on socket: ", clntSock);
+            _SPDLOG(logskt, error, "Failed to send response on socket: {}", clntSock);
         }
 
         /* It is assumed that at this point the server has done its job,
          * so it is closing the client socket */
-        _DEBUG("Worker thread has done its job, closing socket ", clntSock);
+        _SPDLOG(logskt, info, "Worker thread has done its job, closing socket {}", clntSock);
         close(clntSock);
     } catch (const std::exception& e) {
-        _DEBUG("Exceptions caught in worker thread: ", e.what(), ". Closing socket anyway");
+        _SPDLOG(logskt, info, "Exceptions caught in worker thread: {}. Closing socket anyway", e.what());
         if (clntSock)
             close(clntSock);
     }
@@ -171,7 +171,7 @@ int App::handle_request(int clntSock)
     while (1) {
         memset(buff, 0, BUFFER_MAXSIZE);
         int rc = recv(clntSock, buff, sizeof(buff), 0);
-        _DEBUG("From socket ", clntSock, " recv returns value: ", rc);
+        _SPDLOG(logskt, info, "From socket {}  recv returns value: {}", clntSock, rc);
 
         if (rc > 0) {
             /* recv() returns > 0, some data is read */
@@ -186,19 +186,19 @@ int App::handle_request(int clntSock)
         }
         else if (rc == 0) {
             /* recv() returns 0, client has closed this connection */
-            _DEBUG("Client has closed connection on socket ", clntSock);
+            _SPDLOG(logskt, info, "Client has closed connection on socket {}", clntSock);
             ret = CLOSE_SOCK;
             break;
         }
         else if (rc < 0) {
             /* recv() returns < 0, error unless it's EWOULDBLOCK */
             if (errno != EWOULDBLOCK) {
-                _DEBUG("ERROR: Failed to receive on socket ", clntSock);
+                _SPDLOG(logskt, info, "ERROR: Failed to receive on socket {}", clntSock);
                 ret = CLOSE_SOCK;
             }
             else {
                 /* no data for now, try later... no need to close socket */
-                _DEBUG("May try again later on socket ", clntSock);
+                _SPDLOG(logskt, info, "May try again later on socket {}", clntSock);
             }
             break;
         }
@@ -211,7 +211,9 @@ int App::handle_request(int clntSock)
         std::thread t(&App::worker, this, clntSock, contents);
         auto id = t.get_id();
         t.detach();
-        _DEBUG("Created and detached new thread ", id, " for socket ", clntSock);
+        std::ostringstream ss;
+        ss << id;
+        _SPDLOG(logskt, info, "Created and detached new thread {} for socket {}", ss.str(), clntSock);
 
         /* a new thread is started to handle the request,
          * it will eventually CLOSE the client socket, so
@@ -230,7 +232,6 @@ void App::monitor_file_change() {
         this->fileWatcher.update(is_file_updated);
         if(is_file_updated) {
             router.load_url_pattern_from_file();
-            _DEBUG("url-pattern.json is updated\n\n");
             is_file_updated = false;
         }
         // prevent busy looping -- should take a rest for a while
@@ -244,14 +245,16 @@ void App::spawn_monitor_thread() {
     thread t(&App::monitor_file_change, this);
     auto monitor_id = t.get_id();
     t.detach();
-    _DEBUG("Created and detached new thread with monitor_id: ", monitor_id);
+    std::ostringstream ss;
+    ss << monitor_id;
+    _SPDLOG(logskt, info, "detached a new thread w/ monitor_id: {}", ss.str());
 }
 
 #endif
 
 void App::run_accept(int port)
 {
-    _DEBUG("Invoked for port: ", port);
+    _SPDLOG(logskt, info, "Invoked for port: {}", port);
 
     int servSock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     if (servSock < 0)
@@ -279,17 +282,17 @@ void App::run_accept(int port)
         if (clntSock < 0)
             error_exit("Failed to accept");
 
-        _DEBUG("Call handling request for socket: ", clntSock);
+        _SPDLOG(logskt, info, "Call handling request for socket: {}", clntSock);
         this->handle_request(clntSock);
     }
 }
 
 void App::run(int port)
 {
-    _DEBUG("Invoked for port: ", port);
+    _SPDLOG(logskt, info, "Invoked for port: {}", port);
 
     if (this->servSock >= 0) {
-        _DEBUG("Already running on socket: ", this->servSock);
+        _SPDLOG(logskt, info, "Already running on socket: {}", this->servSock);
         return;
     }
 
@@ -298,7 +301,7 @@ void App::run(int port)
     if (servSock < 0)
         error_exit("Failed to create server socket");
     this->servSock = servSock;
-    _DEBUG("Created server socket: ", servSock);
+    _SPDLOG(logskt, info, "Created server socket: {}", servSock);
 
     /* set socket to be reuseable */
     int reuse = 1;
@@ -357,12 +360,12 @@ void App::run(int port)
         if (rc == 0) {
             /* if heartBeat > 0, print sth to show it's alive */
             if (heartBeat == 60) {
-                std::cout << "." << std::endl;
+                // std::cout << "." << std::endl;
                 fflush(stdout);
                 heartBeat = 1;
             }
             else if (heartBeat > 0) {
-                std::cout << ".";
+                // std::cout << ".";
                 fflush(stdout);
                 heartBeat++;
             }
@@ -370,7 +373,7 @@ void App::run(int port)
         } /* END: rc==0 */
 
         int nrSocks = rc; /* number of sockets changed */
-        _DEBUG("Number of sockets readable: ", nrSocks);
+        _SPDLOG(logskt, info, "Number of sockets readable: {}", nrSocks);
         for (int sd = 0; sd <= maxSock && nrSocks > 0; ++sd) {
             if (!FD_ISSET(sd, &tmpSocks))
                 continue;
@@ -379,7 +382,7 @@ void App::run(int port)
             nrSocks--;
 
             if (sd == servSock) {
-                _DEBUG("Server socket readable");
+                _SPDLOG(logskt, info, "Server socket readable");
                 int clntSock;
                 do {
                     clntSock = accept(servSock, NULL, NULL);
@@ -390,18 +393,18 @@ void App::run(int port)
                     }
 
                     /* a new client connection accepted, add it to fd_set */
-                    _DEBUG("New client connection: ", clntSock);
+                    _SPDLOG(logskt, info, "New client connection: {}", clntSock);
                     FD_SET(clntSock, &allSocks);
                     if (clntSock > maxSock)
                         maxSock = clntSock;
                 } while(clntSock >= 0);
             } /* END: if servSock readable */
             else {
-                _DEBUG("Client socket ", sd, " readable");
+                _SPDLOG(logskt, info, "Client socket {} readable", sd);
                 int op = this->handle_request(sd);
                 if (op != NO_CHANGE) {
                     if (op == CLOSE_SOCK) {
-                        _DEBUG("Closing socket ", sd);
+                        _SPDLOG(logskt, info, "Closing socket {}", sd);
                         close(sd);
                     }
                     FD_CLR(sd, &allSocks);
@@ -414,7 +417,7 @@ void App::run(int port)
         } /* END: loop sd */
     }  /* END: main loop */
 
-    _DEBUG("Terminating server, closing socket ", servSock);
+    _SPDLOG(logskt, info, "Terminating server, closing socket {}", servSock);
     close(servSock);
 }
 

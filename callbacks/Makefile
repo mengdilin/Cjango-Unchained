@@ -1,7 +1,7 @@
 CC = g++
 CPPFLAGS = -std=c++1z -Wall -Wno-return-type-c-linkage
 CPPFLAGS += -DDEBUG -DCJANGO_DYNLOAD
-CPPFLAGS += -I./../app/
+CPPFLAGS += -I./../app/ -I./../lib/
 CPPFLAGS += -ferror-limit=5
 LDFLAGS = -L./../app/ -lhttp_response -lhttp_request
 

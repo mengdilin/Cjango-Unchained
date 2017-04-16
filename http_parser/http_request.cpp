@@ -3,6 +3,7 @@
 #include <stdlib.h>     /* strtoul */
 #include "../app/externs.hpp"
 
+std::string http_logger_name = "http"; // FIXME refactor
 unsigned long http::HttpRequest::x=123456789;
   unsigned long http::HttpRequest::y=362436069;
   unsigned long http::HttpRequest::z=521288629;
@@ -86,19 +87,19 @@ std::unordered_map<std::string, std::string>* http::HttpRequest::get_session() {
   //TODO: r/w LOCKING session map here and in callbacks
   auto result = this->cookie.find(HttpRequest::session_cookie_key);
   for (auto it=this->cookie.begin(); it!=this->cookie.end(); ++it) {
-    _DEBUG("cookie:  ", it->first, ",", it->second);
+    _SPDLOG(http_logger_name, info, "cookie:  {}, {}", it->first, it->second);
   }
   if (result != this->cookie.end()) {
 
     auto key = result->second;
-    _DEBUG("found session key: ", key);
-    _DEBUG("key equals 60441451194812: ", key=="60441451194812");
+    _SPDLOG(http_logger_name, info, "found session key: {}", key);
+    _SPDLOG(http_logger_name, info, "key equals 60441451194812: {}", key=="60441451194812");
 
     auto session_result = HttpRequest::sessions.find(key);
     if (session_result != HttpRequest::sessions.end()) {
       return session_result->second;
     } else {
-      _DEBUG("cannot find session id: ", key);
+      _SPDLOG(http_logger_name, info, "cannot find session id: {}", key);
       unsigned long ul;
       ul = strtoul (key.c_str(), NULL, 0);
       this->has_set_session_id = true;
@@ -112,8 +113,8 @@ std::unordered_map<std::string, std::string>* http::HttpRequest::get_session() {
   } else {
     this->session_id = HttpRequest::xorshf96();
     this->has_set_session_id = true;
-    _DEBUG("set session id to", std::to_string(this->session_id));
-    _DEBUG("session id equals 60441451194812", std::to_string(this->session_id)=="60441451194812");
+    _SPDLOG(http_logger_name, info, "set session id to {}", std::to_string(this->session_id));
+    _SPDLOG(http_logger_name, info, "session id equals 60441451194812 {}", std::to_string(this->session_id)=="60441451194812");
     std::unordered_map<std::string, std::string>* map = new std::unordered_map<std::string, std::string>();
     HttpRequest::sessions.insert({std::to_string(this->session_id), map});
     return map;
