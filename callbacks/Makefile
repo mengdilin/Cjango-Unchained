@@ -4,10 +4,14 @@ CPPFLAGS += -DDEBUG -DCJANGO_DYNLOAD
 CPPFLAGS += -I./../app/
 CPPFLAGS += -ferror-limit=5
 LDFLAGS = -L./../app/ -lhttp_response -lhttp_request
-OBJS = mycallback.o mycallback2.o hello.o mycallback2.so mycallback.so hello.so
 
-# $(PROG) : $(OBJS)
-# 	$(CC) $(CPPFLAGS) -o $(PROG) $(OBJS)
+# read callbacks/*.cpp files into a variable SOURCES
+SOURCES = $(wildcard *.cpp)
+# substitute .cpp by .so
+OBJS = $(SOURCES:.cpp=.so)
+
+# When you execute "make" (i.e. make with no arugment),
+# this "all" target or all *.so files will be built.
 all: $(OBJS)
 
 # Suffixes to apply Make's Suffix Rules

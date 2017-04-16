@@ -24,11 +24,11 @@
     "funcname": "page_index"
   },
   "/cjango" : {
-    "file" : "callbacks/hello.so",
+    "file" : "callbacks/official-site.so",
     "funcname": "render_official_site"
   },
   "/django-logo" : {
-        "file": "callbacks/hello.so",
+        "file": "callbacks/official-site.so",
     "funcname": "get_logo"
   }
 }
