@@ -155,6 +155,7 @@ http::HttpResponse Router::get_http_response(http::HttpRequest request) {
     if (std::regex_search(path, sm, r))
       suffix = sm[0];
     // MAYBE-LATER other than image
+    _DEBUG("imageSuffix: ", suffix);
     return http::HttpResponse::render_to_response("callbacks" + request.get_path(), "image/" + suffix, request);
   }
 
