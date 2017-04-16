@@ -1,7 +1,7 @@
 #include <cjango>
 #include <unordered_map>
 extern "C" http::HttpResponse callback_hello_world(http::HttpRequest request) {
-  return http::HttpResponse("hello world");
+  return http::HttpResponse("helloWorld");
 }
 
 extern "C" http::HttpResponse callback_mine2(http::HttpRequest request) {

@@ -4,7 +4,7 @@
 
 Cjango is a high-speed C++ Web framework that provides blazingly fast server responses and [Django](https://github.com/django/django)-like usability.
 
-<!-- ![](performance.png) -->
+<!-- ![](performance.png) --> 
 
 ## Features
 
