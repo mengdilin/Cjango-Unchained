@@ -145,9 +145,17 @@ http::HttpResponse Router::get_http_response(http::HttpRequest request) {
   std::string url_path = resolve(request);
   if (url_path == cjango::INVALIDURL) {
     _DEBUG("this http::HttpRequest.path is invalid:", request.get_path().c_str());
-    return http::HttpResponse("nothing");
+    return http::HttpResponse("Cjango: 404 Page Not Found");
   } else if (url_path == cjango::STATIC_FILE_SERVED) {
-    return http::HttpResponse::render_to_response("callbacks" + request.get_path(), "image/png", request);
+    const std::regex r("((png|gif|jpeg|bmp|webp))$");
+    std::smatch sm;
+    // std::regex_search forbids a temporary string
+    std::string path = request.get_path();
+    std::string suffix;
+    if (std::regex_search(path, sm, r))
+      suffix = sm[0];
+    // MAYBE-LATER other than image
+    return http::HttpResponse::render_to_response("callbacks" + request.get_path(), "image/" + suffix, request);
   }
 
   functor callback = pattern_to_callback[url_path];
