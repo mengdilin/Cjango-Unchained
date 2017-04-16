@@ -20,12 +20,19 @@
 
 <style type="text/css">
   body {
-    padding-top: 70px;
-    background: #E13422;
+    padding-top: 50px;
+    background: #E3E3E3;
   }
   #FrontPanel {
     background-color: #FFFFFF;
     text-align: center;
+  }
+  #explanation {
+    background-color: #FFFFFF;
+
+  }
+  #explanation p {
+    font-size: 1.5rem;
   }
 </style>
 
@@ -55,28 +62,45 @@
     </nav>
 
     <div class="jumbotron" id="FrontPanel">
-      <img src="official/logo.png" alt="">
-      <h1>Cjango Unchained</h1>
+      
+      <!-- <h1>Cjango Unchained</h1> -->
+      <img width=640px src="/django-logo" alt="">
+      <p></p>
       <p>Simple and Fast C++ Web App Framework</p>
     </div>
 
 
     <div class="container">
+      <div class="jumbotron" id="explanation">
 
-      <div class="starter-template">
-        <h1>BlahBlah</h1>
-        <p class="lead">Blah.</p>
+        <p class="lead">Cjango (Cjango-Unchained) is a C++ web App Framework inspired by Python's <a href="https://www.djangoproject.com/">Django</a>. It provides fast response with interpreter-language-like usability by C's Dynamic Loading.</p>
+        <p>Chango was designed and implemented as a class project of Modern C++ Design class with Prof. Bjarne Stroustrup. It's written in C++14.</p>
+        <h2>Team members</h2>
+        <ul>
+          <li>Mengdi Lin</li>
+          <li>Yi Qi</li>
+          <li>Yasutaka Tanaka</li>
+        </ul>
+
+        <h2>Features</h2>
+        <ul>
+          <li>Asyncronous HTTP request handling</li>
+          <li>Regular expression URL matching</li>
+          <li>Template file rendering</li>
+          <li>HTTP 1.0 GET/POST compatible</li>
+          <li>HTTP Session support</li>
+          <li><b>Dynamic Callback Loading</b></li>
+        </ul>
+
+
+
+        <h2>Frequently Asked Questions</h2>
+        <h3>Where "unchained" comes from?</h3>
+        <p>There is a movie called "Django Unchained".</p>
+
       </div>
-
     </div><!-- /.container -->
 
-
-<h1>helloworld</h1>
-  <div class="alert alert-danger" role="alert">
-  <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
-  <span class="sr-only">Error:</span>
-  Enter a valid email address
-</div>
 </body>
 
 </html>

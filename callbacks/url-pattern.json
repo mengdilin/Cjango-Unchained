@@ -26,5 +26,9 @@
   "/cjango" : {
     "file" : "callbacks/hello.so",
     "funcname": "render_official_site"
+  },
+  "/django-logo" : {
+        "file": "callbacks/hello.so",
+    "funcname": "get_logo"
   }
 }
