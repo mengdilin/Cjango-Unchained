@@ -223,7 +223,8 @@ void App::run(int port)
         error_exit("Failed to bind server address", servSock);
 
     /* listen */
-    if (listen(servSock, 5) < 0)
+    _SPDLOG(logskt, info, "Backlog of listen: {}", SOMAXCONN);
+    if (listen(servSock, SOMAXCONN) < 0)
         error_exit("Failed to listen", servSock);
 
     /* initialize fd_set for select() */
