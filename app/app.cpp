@@ -4,8 +4,8 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/socket.h>
-#include <sys/ioctl.h>
 #include <sys/time.h>
+#include <fcntl.h>
 #include <netinet/in.h>
 #include <errno.h>
 #include "app.hpp"
@@ -287,6 +287,16 @@ void App::run_accept(int port)
     }
 }
 
+static void set_nonblocking(const int sock, const int servSock=0)
+{
+    int fl = fcntl(sock, F_GETFL);
+    if (fl < 0)
+        error_exit("Failed to get socket flags", servSock);
+
+    if (fcntl(sock, F_SETFL, fl | O_NONBLOCK) < 0)
+        error_exit("Failed to set socket flags", servSock);
+}
+
 void App::run(int port)
 {
     _SPDLOG(logskt, info, "Invoked for port: {}", port);
@@ -310,9 +320,10 @@ void App::run(int port)
 
     /* set socket to non-blocking, all sockets for incoming connections
      * will also be non-blocking */
-    int nbio = 1;
-    if (ioctl(servSock, FIONBIO, (char*)&nbio) < 0)
-        error_exit("Failed to set socket non-blocking", servSock);
+    // int nbio = 1;
+    // if (ioctl(servSock, FIONBIO, (char*)&nbio) < 0)
+    //     error_exit("Failed to set socket non-blocking", servSock);
+    set_nonblocking(servSock, servSock);
 
     /* bind the socket */
     struct sockaddr_in servAddr;
@@ -391,6 +402,7 @@ void App::run(int port)
                             error_exit("Failed to accept", servSock);
                         break;
                     }
+                    set_nonblocking(clntSock, servSock);
 
                     /* a new client connection accepted, add it to fd_set */
                     _SPDLOG(logskt, info, "New client connection: {}", clntSock);
