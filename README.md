@@ -6,6 +6,13 @@ Cjango is a simple and fast C++ Web framework that provides blazingly high-speed
 
 <!-- ![](performance.png) -->
 
+## Installation
+
+```
+# -std=c++1z needs recent g++
+
+```
+
 ## Features
 
 ### Asyncronous request handling
@@ -116,9 +123,14 @@ While the above flexible log handling incurs slight runtime overhead, `make DEBU
 
 ### Dynamic Callback Loading
 
-In existing C++ web application frameworks, users have to recompile the entire application every time they change callback functions which handle coming HTTP requests.
 
-Cjango solves this issue by leveraging [Dynamic Loading](https://en.wikipedia.org/wiki/Dynamic_loading) functionality. In Cjango, users can modify/add URL-callback hashmaps and callbacks themselves **without any server downtime**. All URL-callback mappings are written in `callbacks/url-pattern.json`. When you change the `url-pattern.json` file, cjango monitors and detects the json file change and dynamically reload your new functions.
+#### Consideration
+
+At first, we thought to port Django's API as much as possible, and naively assumed that's a straightforward path. That was not the case. We soon found out there are a fairly large amount of design choices for implementing similar functionalities in different languages. One such example is callback handlings. Callback functions are the functions that handle coming HTTP requests and return appropriate HTTP responses. In Python's Django, every source file updated at runtime can be reloadable, and updating callback functitons are straightforward.
+
+In existing famous C++ web application frameworks, users have to recompile the entire application every time they change callback functions which handle coming HTTP requests. All callback functions are defined in application routing logic, and cannot be loadable to a running app as far as we researched.
+
+Cjango solves this issue by leveraging [Dynamic Loading](https://en.wikipedia.org/wiki/Dynamic_loading) functionality. In Cjango, users can modify/add URL-callback hashmaps and callbacks themselves **without any server downtime**. All URL-callback mappings are written in `callbacks/url-pattern.json`. When you change the `url-pattern.json` file, cjango monitors and detects the json file change and dynamically reload your new functions. This is inspired by a 3D C++ racing game "[HexRacer](http://elfery.net/projects/hexracer.html)" which employs text configuration files as dynamic loading triggers.
 
 ##### Example 1: Changing an existing callback to another function
 
@@ -166,6 +178,12 @@ If you're a traditional C++ programer, you can also stores old callback function
 ##### Example 2: Updating an existing callback to its newer version (with same name)
 
 Since the file-monitoring thread just checks **the url-mapping file**, it's possible that the thread doesn't notice **the shared object file** even if you updated your callback function. However, the solution is simple -- just to enable commented-out `touch url-pattern.json` command. `touch` changes the `url-pattern.json`'s recent modification time, and then Cjango can notice its change.
+
+
+##### Error Handlings
+
++ **Case 1: Typo in callback file/function name (non-existent callbacks)**. These cases are thrown as invalid function specified error in debug mode, and `500 Internal Server Error` in production mode.
++ **Case 2: No URL pattern match**. These cases are `404 Not Found` error.
 
 ### Credits
 

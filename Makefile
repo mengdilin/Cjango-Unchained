@@ -4,7 +4,7 @@ PROG = runapp
 CC = g++
 CPPFLAGS = -std=c++1z -Wall -pthread -MMD -MP
 CPPFLAGS += -I./app/ -I./lib/
-CPPFLAGS += -ferror-limit=5
+#CPPFLAGS += -ferror-limit=5   # doesn't work on Linux
 DEBUG ?= 1
 CJANGO_DYNLOAD ?= 1
 ifeq ($(DEBUG), 1)
@@ -49,14 +49,23 @@ DEPENDS   = $(TESTOBJS:.o=.d)
 # $^ : source file names (right side of ':')
 # Note: $< is only the first source file
 
+# -ldl is needed for Linux
 $(PROG) : $(TESTOBJS) $(HTTPPARSERLIB) app/runapp.cpp
-	$(CC) $(CPPFLAGS) -o $@ $^
+	$(CC) $(CPPFLAGS) -o $@ $^ -ldl
 main.o : app/main.cpp
 	$(CC) $(CPPFLAGS) -c $^
 app.o : app/app.cpp
 	$(CC) $(CPPFLAGS) -c $^
 router.o : routing/router.cpp
 	$(CC) $(CPPFLAGS) -c $^
+
+# Needed for Linux (/usr/bin/ld: http_parser/http_response.o: relocation R_X86_64_32 against `__pthread_key_create' can not be used when making a shared object; recompile with -fPIC)
+http_parser/http_request.o: http_parser/http_request.cpp
+	$(CC) $(CPPFLAGS) -fPIC -c http_parser/http_request.cpp
+http_parser/http_response.o: http_parser/http_response.cpp
+	$(CC) $(CPPFLAGS) -fPIC -c http_parser/http_response.cpp
+app/logger.o: app/logger.cpp
+	$(CC) $(CPPFLAGS) -fPIC -c app/logger.cpp
 
 # http_request.cpp uses _SPDLOG which calls cjango_logger global variable
 # Without defining that variable, linker returns error. Thus app/logger.o
