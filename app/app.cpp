@@ -181,6 +181,7 @@ int App::handle_request(int clntSock)
              mengdi: fix off by 1 error for content materials by changing
              std::begin(buff)+rc-1 to std::begin(buff)+rc
              */
+            _SPDLOG(logskt, info, "rc >0 ");
             contents += std::string(std::begin(buff), std::begin(buff) + rc);
             continue; /* continue recv-ing till all data is read */
         }
@@ -328,7 +329,8 @@ void App::run(int port)
         error_exit("Failed to listen", servSock);
 
     /* initialize fd_set for select() */
-    struct fd_set allSocks;
+    // If "struct fd_set allSocks", Ubuntu returned an typedef error
+    fd_set allSocks;
     FD_ZERO(&allSocks);
     FD_SET(servSock, &allSocks);
     int maxSock = servSock;
@@ -346,7 +348,7 @@ void App::run(int port)
     for (;;) {
 
         /* use a temporary fd_set for pulling from select() */
-        struct fd_set tmpSocks;
+        fd_set tmpSocks;
         FD_ZERO(&tmpSocks);
         memcpy(&tmpSocks, &allSocks, sizeof(allSocks));
 
