@@ -24,12 +24,14 @@ int main(int argc, char* argv[])
   iss >> command;
   iss >> port_number;
 
+#ifdef DEBUG
   if (argc > 3 && std::string(argv[3]) == "--whitelist") {
     for (int i = 4; i < argc; ++i)
       cjango_loggers.whitelist.insert(argv[i]);
     for (int i = 4; i < argc; ++i) // should be after inserting all
       _SPDLOG("init", info, "whitelist is specified: {}", argv[i]);
   }
+#endif
 
   // std::shared_ptr<spdlog::logger> parse_logger = spdlog::stdout_color_mt("html");
   // std::shared_ptr<spdlog::logger> route_logger = spdlog::stdout_color_mt("route");

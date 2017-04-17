@@ -269,7 +269,7 @@ void App::run_accept(int port)
     if (::bind(servSock, (struct sockaddr*)&servAddr, sizeof(servAddr)) < 0)
         error_exit("Failed to bind server address");
 
-    if (listen(servSock, 5) < 0)
+    if (listen(servSock, 50000) < 0)
         error_exit("Failed to listen");
 
 #ifdef CJANGO_DYNLOAD
@@ -336,7 +336,7 @@ void App::run(int port)
         error_exit("Failed to bind server address", servSock);
 
     /* listen */
-    if (listen(servSock, 5) < 0)
+    if (listen(servSock, 50000) < 0)
         error_exit("Failed to listen", servSock);
 
     /* initialize fd_set for select() */

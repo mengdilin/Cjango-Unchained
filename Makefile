@@ -61,9 +61,9 @@ router.o : routing/router.cpp
 
 # Needed for Linux (/usr/bin/ld: http_parser/http_response.o: relocation R_X86_64_32 against `__pthread_key_create' can not be used when making a shared object; recompile with -fPIC)
 http_parser/http_request.o: http_parser/http_request.cpp
-	$(CC) $(CPPFLAGS) -fPIC -c http_parser/http_request.cpp
+	$(CC) $(CPPFLAGS) -fPIC -c http_parser/http_request.cpp -o $@
 http_parser/http_response.o: http_parser/http_response.cpp
-	$(CC) $(CPPFLAGS) -fPIC -c http_parser/http_response.cpp
+	$(CC) $(CPPFLAGS) -fPIC -c http_parser/http_response.cpp -o $@
 app/logger.o: app/logger.cpp
 	$(CC) $(CPPFLAGS) -fPIC -c app/logger.cpp
 

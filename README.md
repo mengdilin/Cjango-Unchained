@@ -8,10 +8,38 @@ Cjango is a simple and fast C++ Web framework that provides blazingly high-speed
 
 ## Installation
 
+```bash
+git clone git@github.com:mengdilin/Cjango-Unchained.git
+
+# -std=c++1z needs recent g++, so
+# on Ubuntu 14.04
+sudo add-apt-repository ppa:ubuntu-toolchain-r/test
+sudo apt-get update
+sudo apt-get install g++-6
+
+cd Cjango-Unchained
+
+make
+# or make -j[number of cores] on multicore machines
+# e.g. "make -j2"
+
+# executing Makefile on callbacks/ subdir or "cd callbacks && make"
+make -C callbacks
 ```
-# -std=c++1z needs recent g++
+
+## Usage
+
+```bash
+python manage.py runserver 8080         # if you prefer more Django-like execution
+```
+
+or
 
 ```
+./runapp runserver 8080                 # directly execute C++ if you don't have Python installed
+```
+
+And access to `http://192.168.0.1:8080` shows Cjango welcome page.
 
 ## Features
 
