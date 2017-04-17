@@ -85,7 +85,6 @@ public:
     }
     void print_routes();
     void run(int port);
-    void run_accept(int port);
     int handle_request(int socket);
 };
 
