@@ -17,7 +17,6 @@
 #include <FileWatcher.h>
 #endif
 
-//using namespace std;
 
 #ifdef DEBUG
 // See: https://github.com/gabime/spdlog/issues/154
@@ -45,62 +44,7 @@ void error_exit(std::string msg, int sock=0)
         close(sock);
     exit(1);
 }
-#if 0
-void worker(int clntSock)
-{
-    char buff[BUFFER_MAXSIZE];
-    memset(buff, 0, BUFFER_MAXSIZE);
-    int len = read(clntSock, buff, BUFFER_MAXSIZE-1);
-    if (len < 0) {
-        _DEBUG("Failed to read from client");
-        close(clntSock);
-        return;
-    }
-    // _DEBUG("Received request from client:\n", string(buff));
 
-    HttpRequest request(buff);
-    try {
-        http::HttpRequestParser parser;
-        std::stringstream ss;
-        ss << buff;
-        //std::cout << ss << std::endl;
-        http::HttpRequest headers = parser.parse_request_line_and_headers(ss);
-        std::unordered_map<std::string, std::string> map = parser.parse_body(ss, "application/x-www-form-urlencoded", ss.str().length());
-
-        //std::unordered_map<std::string, std::string> body = parser.parse_body(ss, );
-        _DEBUG(headers); // FIXME _DEBUG for multi lines
-        _DEBUG("finished headers");
-        for (auto entry : map) {
-            _DEBUG(entry.first, ":", entry.second);
-        }
-    } catch (const char *e) {
-    // if you throw a char* instead of exception class, that comes as const char*
-        std::cout << e << std::endl;
-    }
-    request.path = "/abc"; // FIXME set path
-    // HttpResponse response = get_phony_response(request);
-    HttpResponse response = router.get_http_response(request);
-
-    /*
-    string resp = "HTTP/1.1 200 OK\r\n"
-                  "Content-Type: text/html\r\n\r\n";
-    resp += response.content + "\r\n\r\n";
-    */
-
-
-    string resp = http::HttpResponse(response.content).to_string();
-    _DEBUG(resp);
-    _DEBUG(resp.length());
-    //_DEBUG(resp.c_str());
-
-
-    // _DEBUG("Response:\n", resp);
-    // if (write(clntSock, resp.c_str(), resp.length()) < 0)
-    if (::send(clntSock, resp.c_str(), resp.length(), 0) < 0)
-        _DEBUG("Failed to send response on socket: ", clntSock);
-    close(clntSock);
-}
-#endif
 void App::worker(int clntSock, std::string strRequest)
 {
     try {
@@ -124,27 +68,10 @@ void App::worker(int clntSock, std::string strRequest)
         // if you throw a char* instead of exception class, that comes as const char*
             std::cout << e << std::endl;
         }
-        // HttpResponse response = get_phony_response(request);
         http::HttpResponse response = router.get_http_response(request);
-
-        /*
-        string resp = "HTTP/1.1 200 OK\r\n"
-                      "Content-Type: text/html\r\n\r\n";
-        resp += response.content + "\r\n\r\n";
-        */
-
-
         string resp = response.to_string();
         // If static files served, resp is gibberish
-        // _DEBUG(resp);
         _SPDLOG(logskt, debug, "resp.length: ", resp.length());
-        //_DEBUG(resp.c_str());
-
-        // HttpResponse response = router.get_http_response(request);
-
-        // std::string resp = "HTTP/1.1 200 OK\r\n"
-        //                    "Content-Type: text/html\r\n\r\n";
-        // resp += response.content + "\r\n\r\n";
 
         if (send(clntSock, resp.c_str(), resp.length(), 0) < 0) {
             _SPDLOG(logskt, error, "Failed to send response on socket: {}", clntSock);
@@ -175,7 +102,6 @@ int App::handle_request(int clntSock)
 
         if (rc > 0) {
             /* recv() returns > 0, some data is read */
-            // _DEBUG("Appending contents: ", std::string(std::begin(buff), std::begin(buff) + rc - 1));
 
             /*
              mengdi: fix off by 1 error for content materials by changing
@@ -253,41 +179,6 @@ void App::spawn_monitor_thread() {
 
 #endif
 
-void App::run_accept(int port)
-{
-    _SPDLOG(logskt, info, "Invoked for port: {}", port);
-
-    int servSock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-    if (servSock < 0)
-        error_exit("Failed to create server socket");
-
-    struct sockaddr_in servAddr;
-    memset(&servAddr, 0, sizeof(servAddr));
-    servAddr.sin_family = AF_INET;
-    servAddr.sin_addr.s_addr = htonl(INADDR_ANY);
-    servAddr.sin_port = htons(port);
-    if (::bind(servSock, (struct sockaddr*)&servAddr, sizeof(servAddr)) < 0)
-        error_exit("Failed to bind server address");
-
-    if (listen(servSock, 5) < 0)
-        error_exit("Failed to listen");
-
-#ifdef CJANGO_DYNLOAD
-    spawn_monitor_thread();
-#endif
-
-    for (;;) {
-        struct sockaddr_in clntAddr;
-        unsigned int clntLen;
-        int clntSock = ::accept(servSock, (struct sockaddr*)&clntAddr, &clntLen);
-        if (clntSock < 0)
-            error_exit("Failed to accept");
-
-        _SPDLOG(logskt, info, "Call handling request for socket: {}", clntSock);
-        this->handle_request(clntSock);
-    }
-}
-
 static void set_nonblocking(const int sock, const int servSock=0)
 {
     int fl = fcntl(sock, F_GETFL);
@@ -319,11 +210,7 @@ void App::run(int port)
     if (setsockopt(servSock, SOL_SOCKET, SO_REUSEADDR, (char*)&reuse, sizeof(reuse)) < 0)
         error_exit("Failed to set socket reuseable", servSock);
 
-    /* set socket to non-blocking, all sockets for incoming connections
-     * will also be non-blocking */
-    // int nbio = 1;
-    // if (ioctl(servSock, FIONBIO, (char*)&nbio) < 0)
-    //     error_exit("Failed to set socket non-blocking", servSock);
+    /* set socket to non-blocking */
     set_nonblocking(servSock, servSock);
 
     /* bind the socket */
@@ -355,7 +242,7 @@ void App::run(int port)
     spawn_monitor_thread();
 #endif
 
-    int heartBeat = 1;
+    int heartBeat = 0; /* set to 0 if u don't want to print heartbeats */
     for (;;) {
 
         /* use a temporary fd_set for pulling from select() */
@@ -373,12 +260,12 @@ void App::run(int port)
         if (rc == 0) {
             /* if heartBeat > 0, print sth to show it's alive */
             if (heartBeat == 60) {
-                // std::cout << "." << std::endl;
+                std::cout << "." << std::endl;
                 fflush(stdout);
                 heartBeat = 1;
             }
             else if (heartBeat > 0) {
-                // std::cout << ".";
+                std::cout << ".";
                 fflush(stdout);
                 heartBeat++;
             }
@@ -404,6 +291,7 @@ void App::run(int port)
                             error_exit("Failed to accept", servSock);
                         break;
                     }
+                    /* set clinet socket to non-blocking */
                     set_nonblocking(clntSock, servSock);
 
                     /* a new client connection accepted, add it to fd_set */
@@ -434,8 +322,3 @@ void App::run(int port)
     _SPDLOG(logskt, info, "Terminating server, closing socket {}", servSock);
     close(servSock);
 }
-
-/* TODO
- * 1. more graceful exit
- * 2. dynamic loading
- */
