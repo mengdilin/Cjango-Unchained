@@ -1,30 +1,30 @@
 {
   "/hello" : {
-    "file" : "callbacks/mycallback.so",
+    "file" : "../callbacks/mycallback.so",
     "funcname": "callback_hello_world"
   },
   "/" : {
-    "file" : "callbacks/cjango-welcome.so",
+    "file" : "../callbacks/cjango-welcome.so",
     "funcname": "render_cjango_welcome_page"
   },
   "/efg/[0-9]{4}/[0-9]{2}" : {
-        "file": "callbacks/mycallback2.so",
+        "file": "../callbacks/mycallback2.so",
     "funcname": "current_datetime"
   },
   "/aaa" : {
-    "file" : "callbacks/mycallback.so",
+    "file" : "../callbacks/mycallback.so",
     "funcname": "callback_mine2"
   },
   "/home" : {
-    "file" : "callbacks/mycallback.so",
+    "file" : "../callbacks/mycallback.so",
     "funcname": "page_home"
   },
   "/welcome" : {
-    "file" : "callbacks/mycallback.so",
+    "file" : "../callbacks/mycallback.so",
     "funcname": "page_index"
   },
   "/cjango" : {
-    "file" : "callbacks/official-site.so",
+    "file" : "../callbacks/official-site.so",
     "funcname": "render_official_site"
   }
 }

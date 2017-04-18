@@ -26,7 +26,7 @@ extern "C" http::HttpResponse callback_mine3(http::HttpRequest request) {
                 "</body>\r\n</html>";
   http::HttpResponse resp(text);
   // return resp;
-  return http::HttpResponse::render_to_response("logo.png", "image/png", request);
+  return http::HttpResponse::render_to_response("doc/logo.png", "image/png", request);
 }
 
 std::string logger_name = "session"; // use both in page_index() and page_home()
@@ -63,7 +63,7 @@ extern "C" http::HttpResponse page_home(http::HttpRequest request) {
 for (auto it=session_map->begin(); it!=session_map->end(); ++it) {
       _SPDLOG(logger_name, info, "session:  {}, {}", it->first, it->second);
     }
-    return http::HttpResponse::render_to_response("callbacks/templates/index.html", request);
+    return http::HttpResponse::render_to_response("../templates/index.html", request);
   } else if (request.get_method() == "POST"){
     _SPDLOG(logger_name, info, "home session id: {}", std::to_string(request.get_session_id()));
     auto session_map = request.get_session();

@@ -8,7 +8,8 @@ LDFLAGS = -L./../app/ -lhttp_response -lhttp_request
 # read callbacks/*.cpp files into a variable SOURCES
 SOURCES = $(wildcard *.cpp)
 # substitute .cpp by .so
-OBJS = $(SOURCES:.cpp=.so)
+OBJS = $(SOURCES:.cpp=.so) $(SOURCES:.cpp=.o)
+OBJDIRS = $(SOURCES:.cpp=.so.dSYM)
 
 # When you execute "make" (i.e. make with no arugment),
 # this "all" target or all *.so files will be built.
@@ -27,3 +28,5 @@ all: $(OBJS)
 
 clean:
 	rm -f $(OBJS)
+	rm -r $(OBJDIRS)
+	# FIXME: rm OBJDIRS error

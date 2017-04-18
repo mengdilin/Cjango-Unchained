@@ -169,7 +169,7 @@ http::HttpResponse Router::get_http_response(http::HttpRequest request) {
       suffix = sm[0];
     // MAYBE-LATER other than image
     _SPDLOG(cjango::route_logger_name, info, "imageSuffix: {}", suffix);
-    return http::HttpResponse::render_to_response("callbacks" + request.get_path(), "image/" + suffix, request);
+    return http::HttpResponse::render_to_response(".." + request.get_path(), "image/" + suffix, request);
   }
 
   functor callback = pattern_to_callback[url_path];
