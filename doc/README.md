@@ -7,3 +7,13 @@ doxygen doc/Doxyfile
 ```
 
 to update documantation files.
+
+# Installation
+
+```
+# Mac OS
+brew install doxygen
+
+# Debian
+ sudo apt-get install doxygen
+```
