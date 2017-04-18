@@ -8,6 +8,11 @@ inline bool registered(std::vector<std::string> patterns_list, std::string url_p
   return found;
 }
 
+/**
+** @brief add a mapping from url_pattern to a callback function into patterns_list and pattern_to_callback
+** @param url_pattern
+** @return void
+*/
 void Router::add_route(std::string url_pattern, functor f) {
   // Note: url_pattern may be a regex pattern or an actual url_path
 #ifdef CJANGO_DYNLOAD
@@ -33,6 +38,10 @@ void Router::add_route(std::string url_pattern, functor f) {
 #endif
 }
 
+/**
+** @brief called in get_http_response() for mapping a given request's path to a corresponding url pattern
+** @return a corresponding url pattern such as "diary/[0-9]{4}/[0-9]{2}/"
+*/
 std::string Router::resolve(http::HttpRequest request) {
 
   std::string url_pattern = request.get_path();
@@ -105,6 +114,10 @@ void *Router::load_callback(const std::string& path, const std::string& func_nam
 #include <fstream>
 // third-party library for json parsing. Usage: just loading this file
 // usage: github nlohmann/json
+
+/**
+** @brief called in App::monitor_file_change() for reloading entire url mappings
+*/
 void Router::load_url_pattern_from_file() {
   std::ifstream i("callbacks/url-pattern.json");
   nlohmann::json j;
@@ -137,6 +150,10 @@ void Router::load_url_pattern_from_file() {
 }
 #endif
 
+/**
+** @brief find and execute a callback corresponding to the given request
+** @return an HttpResponse object built by the callback
+*/
 http::HttpResponse Router::get_http_response(http::HttpRequest request) {
   std::string url_path = resolve(request);
   if (url_path == cjango::INVALIDURL) {

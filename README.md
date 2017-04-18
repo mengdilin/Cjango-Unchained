@@ -2,7 +2,7 @@
 
 <img align="center" src="logo.png">
 
-Cjango is a simple and fast C++ Web framework that provides blazingly high-speed server responses and aims for [Django](https://github.com/django/django)-like usability.
+Cjango is a lightweight C++ Web framework that provides high-speed server responses and aims for [Django](https://github.com/django/django)-like usability.
 
 <!-- ![](performance.png) -->
 
@@ -30,16 +30,16 @@ make -C callbacks
 ## Usage
 
 ```bash
-python manage.py runserver 8080         # if you prefer more Django-like execution
+python manage.py runserver 8000         # if you prefer more Django-like execution
 ```
 
 or
 
 ```
-./runapp runserver 8080                 # directly execute C++ if you don't have Python installed
+./runapp runserver 8000                 # directly execute C++ if you don't have Python installed
 ```
 
-And access to `http://192.168.0.1:8080` shows Cjango welcome page.
+And access to `http://127.0.0.1:8000` shows Cjango welcome page.
 
 ## Features
 

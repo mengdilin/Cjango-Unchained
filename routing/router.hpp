@@ -17,6 +17,15 @@
 using dlib_handler = void *;
 #endif
 
+/**
+* @file  router.hpp
+* @brief Router class definition and related consts/aliases
+* @author   caprice-j
+* @date   2017.04.17
+* @version   0.1
+* @warning  this example may include some wrong descriptions
+*/
+
 // FIXME scoped enum
 namespace cjango {
   const std::string INVALIDURL = "__INVALIDURL";
@@ -28,9 +37,14 @@ using functor = std::function<http::HttpResponse(http::HttpRequest)>;
 using URLmap = std::unordered_map<std::string, functor>;
 
 class Router {
-  public:
+  private:
     URLmap pattern_to_callback;
     std::vector<std::string> patterns_list;
+#ifdef CJANGO_DYNLOAD
+    std::vector<dlib_handler> dlib_handlers;
+    std::unordered_map<std::string, int> ref_count;
+#endif
+  public:
     Router(URLmap routes) {
       for (std::pair<std::string, functor> p : routes) {
         add_route(p.first, p.second);
@@ -40,13 +54,10 @@ class Router {
     Router() {};
     void add_route(std::string url_pattern, functor f);
 #ifdef CJANGO_DYNLOAD
-    std::unordered_map<std::string, int> ref_count;
-    std::vector<dlib_handler> dlib_handlers;
     void *load_shared_object_file(const std::string& path);
     void *load_callback(const std::string& path, const std::string& func_name);
     void load_url_pattern_from_file();
 #endif
-    void register_static_file_routing();
     // Note: register() should be renamed from add_route() for django mimicking,
     // but "register" is a reserved word in C++.
     std::string resolve(http::HttpRequest);

@@ -4,6 +4,11 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+/** @file http_request.hpp
+ * \ingroup http
+ * @brief HttpRequest class declaration
+ */
+
 namespace http {
   class HttpRequest {
   private:

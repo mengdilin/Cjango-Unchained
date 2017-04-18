@@ -17,7 +17,6 @@
 #include <FileWatcher.h>
 #endif
 
-
 #ifdef DEBUG
 // See: https://github.com/gabime/spdlog/issues/154
 #include <memory>
@@ -26,6 +25,15 @@
 // std::unordered_map<std::string, std::shared_ptr<spdlog::logger>> loggers;
 
 #endif
+
+/**
+* @mainpage Cjango-Unchained
+* @section Introduction
+*
+* The Cjango-Unchained is a lightweight C++ web app framework. This documentation
+* describes Cjango's internal programming interfaces,
+* including ones which you will use when you write your original callback functions.
+*/
 
 constexpr unsigned int BUFFER_MAXSIZE = 4096;
 const std::string logskt = "skt";
@@ -223,6 +231,11 @@ void App::run(int port)
         error_exit("Failed to bind server address", servSock);
 
     /* listen */
+    /** @bug if the number of opened sockets exceeds SOMAXCONN,
+     Cjango gets "apr_socket_recv: Connection reset by peer (54)" error and halts immediately.
+     On Mac OS X (default: 128), check by "sysctl -a | grep somax" and
+     change it by "sudo sysctl -w kern.ipc.somaxconn=2048"
+    */
     _SPDLOG(logskt, info, "Backlog of listen: {}", SOMAXCONN);
     if (listen(servSock, SOMAXCONN) < 0)
         error_exit("Failed to listen", servSock);
