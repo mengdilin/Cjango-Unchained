@@ -35,7 +35,7 @@ public:
 
         // Currently only a single file but might be expanded to other files.
         // Thus using regex instead of fixed pattern matching
-        std::regex rgx("url-pattern.json");
+        std::regex rgx("urls.json");
         std::smatch match;
 
         if (std::regex_search(filename.begin(), filename.end(), match, rgx)) {
@@ -74,7 +74,7 @@ public:
         // the file watcher doesn't manage the pointer to the listener - so make sure you don't just
         // allocate a listener here and expect the file watcher to manage it - there will be a leak!
         // FW::WatchID watchID =
-        fileWatcher.addWatch("./callbacks", &listener, true);
+        fileWatcher.addWatch("../json", &listener, true);
 #endif
     }
     //App(Router& rt): router(rt), servSock{-1} {}

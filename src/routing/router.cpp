@@ -119,10 +119,10 @@ void *Router::load_callback(const std::string& path, const std::string& func_nam
 ** @brief called in App::monitor_file_change() for reloading entire url mappings
 */
 void Router::load_url_pattern_from_file() {
-  std::ifstream i("callbacks/url-pattern.json");
+  std::ifstream i("../json/urls.json");
   nlohmann::json j;
   i >> j;
-  _SPDLOG(cjango::route_logger_name, info, "loaded url-pattern.json");
+  _SPDLOG(cjango::route_logger_name, info, "loaded urls.json");
   for (nlohmann::json::iterator it = j.begin(); it != j.end(); ++it) {
     const auto cinfo = it.value(); // callback info
 

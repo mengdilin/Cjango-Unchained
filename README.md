@@ -49,9 +49,9 @@ And access to `http://127.0.0.1:8000` shows Cjango welcome page.
 
 ### Regular expression URL matching
 
-As in Django, Cjango deal with URL routing by regex matching. All matching rules are written in `url-pattern.json`. The earlier rules have higher priorities (first-match, first-served).
+As in Django, Cjango deal with URL routing by regex matching. All matching rules are written in `urls.json` as like in Django's `urls.py`. The earlier rules have higher priorities (first-match, first-served).
 
-`url-pattern.json` is dynamically (i.e. at runtime) loaded into our routing logic and enables **each callback function to be compiled separately from main application**. This is the most notable functionality in Cjango.
+`urls.json` is dynamically (i.e. at runtime) loaded into our routing logic and enables **each callback function to be compiled separately from main application**. This is the most notable functionality in Cjango.
 
 ### Template file rendering by `HttpResponse::render_to_response()`
 
@@ -73,7 +73,7 @@ Suppose that you compiled Cjango in debug mode (`make DEBUG=1`). If you run Cjan
 ```
 user@host Cjango-Unchained $ ./runapp runserver 8000
 
-[20170416 20:00:03.857] [route] [info] [router.cpp:112:load_all] loaded url-pattern.json
+[20170416 20:00:03.857] [route] [info] [router.cpp:112:load_all] loaded urls.json
 [20170416 20:00:03.857] [route] [info] [router.cpp:19:add_route] updated route: /
 [20170416 20:00:03.858] [route] [info] [router.cpp:19:add_route] updated route: /cjango
 [20170416 20:00:03.858] [route] [info] [router.cpp:19:add_route] updated route: /[0-9]{4}/[0-9]{2}
@@ -159,11 +159,11 @@ At first, we thought to port Django's API as much as possible, and naively assum
 
 In existing famous C++ web application frameworks, users have to recompile the entire application every time they change callback functions which handle coming HTTP requests. All callback functions are defined in application routing logic, and cannot be loadable to a running app as far as we researched.
 
-Cjango solves this issue by leveraging [Dynamic Loading](https://en.wikipedia.org/wiki/Dynamic_loading) functionality. In Cjango, users can modify/add URL-callback hashmaps and callbacks themselves **without any server downtime**. All URL-callback mappings are written in `callbacks/url-pattern.json`. When you change the `url-pattern.json` file, cjango monitors and detects the json file change and dynamically reload your new functions. This is inspired by a 3D C++ racing game "[HexRacer](http://elfery.net/projects/hexracer.html)" which employs text configuration files as dynamic loading triggers.
+Cjango solves this issue by leveraging [Dynamic Loading](https://en.wikipedia.org/wiki/Dynamic_loading) functionality. In Cjango, users can modify/add URL-callback hashmaps and callbacks themselves **without any server downtime**. All URL-callback mappings are written in `callbacks/urls.json`. When you change the `urls.json` file, cjango monitors and detects the json file change and dynamically reload your new functions. This is inspired by a 3D C++ racing game "[HexRacer](http://elfery.net/projects/hexracer.html)" which employs text configuration files as dynamic loading triggers.
 
 ##### Example 1: Changing an existing callback to another function
 
-When your main application is invoked, Cjango automatically spawns a file-monitoring thread. The monotoring thread checks the `url-pattern.json` change for every one second, and if it's changed, reloading the routing file to update callback hashmaps.
+When your main application is invoked, Cjango automatically spawns a file-monitoring thread. The monotoring thread checks the `urls.json` change for every one second, and if it's changed, reloading the routing file to update callback hashmaps.
 
 For example, suppose you defined `render_with_db_fast` and `render_with_db_fast_v2` in your `callbacks/db-access.cpp`. If your callback function is written in a single file, you can compile your callback function  without writing single line of Make commands.
 
@@ -173,10 +173,10 @@ g++ -std=c++1z -Wall -DCJANGO_DYNLOAD -I./../app/ -I./../lib/ -fPIC -c db-access
 g++ -std=c++1z -Wall -DCJANGO_DYNLOAD -I./../app/ -I./../lib/ -L./../app/ -lhttp_response -lhttp_request -shared -o db-access.so db-access.o
 
 $ ls
-db-access.cpp    db-access.o   db-access.so   url-pattern.json
+db-access.cpp    db-access.o   db-access.so   urls.json
 ```
 
-Then, let's modify your `url-pattern.json` from
+Then, let's modify your `urls.json` from
 
 ```
 {
@@ -199,14 +199,14 @@ to
 }
 ```
 
-Immediately after you saved the `url-pattern.json`, Cjango's file-monitoring thread detects the change and automatically reloads your `render_with_db_fast_v2` callback function. You don't need a hassle to `make` all application -- just 2 characters change.
+Immediately after you saved the `urls.json`, Cjango's file-monitoring thread detects the change and automatically reloads your `render_with_db_fast_v2` callback function. You don't need a hassle to `make` all application -- just 2 characters change.
 
 If you're a traditional C++ programer, you can also stores old callback functions by shared object version numbers (e.g. `db-access.so.0.1` or `db-access.so.0.2`) and a soft link to `db-access.so`.
 
 
 ##### Example 2: Updating an existing callback to its newer version (with same name)
 
-Since the file-monitoring thread just checks **the url-mapping file**, it's possible that the thread doesn't notice **the shared object file** even if you updated your callback function. However, the solution is simple -- just to enable commented-out `touch url-pattern.json` command. `touch` changes the `url-pattern.json`'s recent modification time, and then Cjango can notice its change.
+Since the file-monitoring thread just checks **the url-mapping file**, it's possible that the thread doesn't notice **the shared object file** even if you updated your callback function. However, the solution is simple -- just to enable commented-out `touch urls.json` command. `touch` changes the `urls.json`'s recent modification time, and then Cjango can notice its change.
 
 
 ##### Error Handlings

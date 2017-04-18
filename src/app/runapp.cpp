@@ -43,7 +43,7 @@ int main(int argc, char* argv[])
   if (command == "runserver") {
     App app;
 #ifndef CJANGO_DYNLOAD
-    // if CJANGO_DYNLOAD, load "callbacks/url-pattern.json"
+    // if CJANGO_DYNLOAD, load "json/urls.json"
     app.add_route("/abc", callback_1);
     app.add_route("/efg/[0-9]{4}/[0-9]{2}", callback_1);
 #endif
