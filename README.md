@@ -1,6 +1,6 @@
 # Cjango-Unchained
 
-<img align="center" src="logo.png">
+<img align="center" src="src/doc/logo.png">
 
 Cjango is a lightweight C++ Web framework that provides high-speed server responses and aims for [Django](https://github.com/django/django)-like usability.
 
@@ -64,6 +64,7 @@ All template files are placed under `callbacks/templates`. And in source files, 
 
 As of April 2017, Cjango can handle HTTP 1.0 GET/POST requests.
 
+`django.contrib.sessions`
 
 ### Whitelist-based debug messages
 
