@@ -35,11 +35,18 @@ public:
 
         // Currently only a single file but might be expanded to other files.
         // Thus using regex instead of fixed pattern matching
-        std::regex rgx("urls.json");
+        std::regex urls_rgx("urls.json");
         std::smatch match;
 
-        if (std::regex_search(filename.begin(), filename.end(), match, rgx)) {
+        if (std::regex_search(filename.begin(), filename.end(), match, urls_rgx)) {
             _DEBUG(dir, " -> ", filename, " has event ", action, "\n\n\n");
+            is_updated = true;
+        }
+
+        std::regex settings_rgx("settings.json");
+        if (std::regex_search(filename.begin(), filename.end(), match, settings_rgx)) {
+            _DEBUG(dir, " -> ", filename, " has event ", action, "\n\n\n");
+            // FIXME return filenames
             is_updated = true;
         }
     }

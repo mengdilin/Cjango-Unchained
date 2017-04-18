@@ -46,6 +46,8 @@ public:
 };
 extern CjangoLogger cjango_loggers;
 extern std::string http_logger_name;
+extern std::string g_templates_root_dir;
+extern std::string g_callbacks_root_dir;
 
 // http://stackoverflow.com/questions/31050113/how-to-extract-the-source-filename-without-path-and-suffix-at-compile-time
 constexpr const char* str_end(const char *str) {

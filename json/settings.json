@@ -1,0 +1,5 @@
+{
+  "STATIC_URL": "../static/",
+  "TEMPLATES": "../templates/",
+  "CALLBACKS": "../callbacks/"
+}

@@ -8,6 +8,9 @@ inline bool registered(std::vector<std::string> patterns_list, std::string url_p
   return found;
 }
 
+std::string g_templates_root_dir;
+std::string g_callbacks_root_dir;
+
 /**
 ** @brief add a mapping from url_pattern to a callback function into patterns_list and pattern_to_callback
 ** @param url_pattern
@@ -51,7 +54,7 @@ std::string Router::resolve(http::HttpRequest request) {
       return p;
   }
 
-  std::regex r("/static/.*");
+  std::regex r("/static/.*"); // FIXME arbitrary static folder
   if (std::regex_match(url_pattern, r)) {
     return cjango::STATIC_FILE_SERVED;
   }
@@ -64,7 +67,7 @@ std::string Router::resolve(http::HttpRequest request) {
 
 #ifdef CJANGO_DYNLOAD
 void *Router::load_shared_object_file(const std::string& path) {
-  const auto lib = dlopen(path.c_str(), RTLD_LAZY);
+  const auto lib = dlopen((g_callbacks_root_dir + path).c_str(), RTLD_LAZY);
   if (!lib) {
     // Note: two successive dlerror() calls result in segfault
     const auto human_readable_str = dlerror();
@@ -159,7 +162,9 @@ http::HttpResponse Router::get_http_response(http::HttpRequest request) {
   if (url_path == cjango::INVALIDURL) {
     _SPDLOG(cjango::route_logger_name, warn, "this HttpRequest.path is invalid: {}", request.get_path());
     return http::HttpResponse("Cjango: 404 Page Not Found");
-  } else if (url_path == cjango::STATIC_FILE_SERVED) {
+  }
+
+  if (url_path == cjango::STATIC_FILE_SERVED) {
     const std::regex r("((png|gif|jpeg|bmp|webp))$");
     std::smatch sm;
     // std::regex_search forbids a temporary string
