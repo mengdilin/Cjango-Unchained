@@ -80,7 +80,7 @@ void *Router::load_shared_object_file(const std::string& path) {
   return lib;
 }
 
-void *Router::load_callback(const std::string& path, const std::string& func_name) {
+callback_type Router::load_callback(const std::string& path, const std::string& func_name) {
   auto lib = (dlib_handler) load_shared_object_file(path);
   _SPDLOG(cjango::route_logger_name, debug, "dlopen() finished for {}", path);
   bool found = std::find(dlib_handlers.begin(), dlib_handlers.end(), lib) != dlib_handlers.end();
@@ -107,7 +107,7 @@ void *Router::load_callback(const std::string& path, const std::string& func_nam
     // exit(EXIT_FAILURE);
   }
    // FIXME where should we invoke dlclise()?
-  return func;
+  return reinterpret_cast<callback_type>(func);
 }
 
 #include "../lib/json.hpp"
@@ -126,7 +126,7 @@ void Router::load_url_pattern_from_file() {
   for (nlohmann::json::iterator it = j.begin(); it != j.end(); ++it) {
     const auto cinfo = it.value(); // callback info
 
-    using callback_type = http::HttpResponse (*)(http::HttpRequest);
+
     // A pointer type of a function
     // receiving http::HttpRequest as an argument and returns http::HttpResponse
     // Item 9 in "Effective Modern C++" prefers alias (using) to typedef
@@ -138,7 +138,7 @@ void Router::load_url_pattern_from_file() {
       // 'functor' (aka 'function<http::HttpResponse (http::HttpRequest)>')" error,
       // here we first cast to callback_type, and then the callback_type is
       // implicitly casted into std::function<callback_type>
-      callback = (callback_type) load_callback(cinfo["file"], cinfo["funcname"]);
+      callback = load_callback(cinfo["file"], cinfo["funcname"]);
     } catch (const char *e) {
       callback = [](http::HttpRequest h){ return http::HttpResponse("invalid callback specified"); };
       _SPDLOG(cjango::route_logger_name, info, "Invalid callback: {} {}", cinfo["file"], cinfo["funcname"]);

@@ -15,6 +15,7 @@
 #include <dlfcn.h>
 
 using dlib_handler = void *;
+using callback_type = http::HttpResponse (*)(http::HttpRequest);
 #endif
 
 /**
@@ -56,7 +57,7 @@ class Router {
     void add_route(std::string url_pattern, functor f);
 #ifdef CJANGO_DYNLOAD
     void *load_shared_object_file(const std::string& path);
-    void *load_callback(const std::string& path, const std::string& func_name);
+    callback_type load_callback(const std::string& path, const std::string& func_name);
     void load_url_pattern_from_file();
 #endif
     void set_static_root_dir(std::string dir) { static_root_dir = dir; };
