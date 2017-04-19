@@ -8,9 +8,6 @@ inline bool registered(std::vector<std::string> patterns_list, std::string url_p
   return found;
 }
 
-std::string g_templates_root_dir;
-std::string g_callbacks_root_dir;
-
 /**
 ** @brief add a mapping from url_pattern to a callback function into patterns_list and pattern_to_callback
 ** @param url_pattern

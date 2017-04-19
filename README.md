@@ -41,6 +41,18 @@ or
 
 And access to `http://127.0.0.1:8000` shows Cjango welcome page.
 
+## Main files
+
+- `Cjango-Unchained` ... root directory (can be renamed)
+  + `callbacks` ... default directory for you to write C++ functions
+  + `json` ... json files for app configurations
+  + `templates` ... default directory for storing template html files
+  + `static` ... default directory for static files like images
+  + `src` ... Cjango C++ codes. Usually you don't have to look into it.
+  + `Makefile` ... Makefile to compile Cjango
+  + `manage.py` ... A wrapper script for running `src/runapp` executable conveniently
+
+
 ## Features
 
 ### Asyncronous request handling
