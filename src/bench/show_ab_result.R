@@ -34,3 +34,15 @@ ggplot(as.data.frame(res), aes(x=ncon, y=ttime, color=app, group=app)) + geom_li
 
 
 ggplot(res, aes(x=as.character(ncon) %>% str_pad(pad="0", width=3), y=ttime, fill=reorder(app, -ttime) )) + geom_bar(stat="identity", position="dodge") 
+
+ggplot(scalability, aes(x=log10(dtime), fill=app)) + geom_density(alpha=.4) + labs(x="Processing Time [log10(ms)]")+ theme(legend.position = c(.7,.7)) + theme2(l.txt(sz=15, f="bold"), a.txt(size=18, f="bold"), a.ttl(f="bold", sz=20))
+
+ggplot(scalability, aes(x=log10(wait), fill=app)) + geom_density(alpha=.4) + labs(x="Waiting Time [log10(ms)]")+ theme(legend.position = c(.7,.7)) + theme2(l.txt(sz=15, f="bold"), a.txt(size=18, f="bold"), a.ttl(f="bold", sz=20))
+
+scalability <- out %>% filter(take==1 & ncon==150)
+ggplot(scalability, aes(x=log(dtime))) +
+    geom_histogram(data=scalability%>% filter(app=="Cjango (C++)"), fill="red", alpha=.4) +
+    geom_histogram(data=scalability%>% filter(app=="Crow (C++, Github Star #1)"), fill="blue", alpha=.4) +
+    geom_histogram(data=scalability%>% filter(app=="Silicon (C++, Star #2)"), fill="green", alpha=.4)
+
+
