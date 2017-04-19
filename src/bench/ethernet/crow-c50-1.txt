@@ -1,0 +1,42 @@
+This is ApacheBench, Version 2.3 <$Revision: 1748469 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking 192.168.0.15 (be patient)
+
+
+Server Software:        Crow/0.1
+Server Hostname:        192.168.0.15
+Server Port:            8000
+
+Document Path:          /
+Document Length:        10 bytes
+
+Concurrency Level:      50
+Time taken for tests:   3.834 seconds
+Complete requests:      10000
+Failed requests:        0
+Total transferred:      1040000 bytes
+HTML transferred:       100000 bytes
+Requests per second:    2608.42 [#/sec] (mean)
+Time per request:       19.169 [ms] (mean)
+Time per request:       0.383 [ms] (mean, across all concurrent requests)
+Transfer rate:          264.92 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        2    8   4.0      7      18
+Processing:     3   11   3.5     10      25
+Waiting:        1    8   2.9      7      18
+Total:         11   19   6.9     16      35
+
+Percentage of the requests served within a certain time (ms)
+  50%     16
+  66%     16
+  75%     17
+  80%     31
+  90%     32
+  95%     32
+  98%     32
+  99%     32
+ 100%     35 (longest request)
