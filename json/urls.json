@@ -26,5 +26,9 @@
   "/cjango" : {
     "file" : "official-site.so",
     "funcname": "render_official_site"
+  },
+  "/json" : {
+    "file" : "json-example.so",
+    "funcname": "return_hello_json"
   }
 }

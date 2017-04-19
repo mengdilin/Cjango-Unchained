@@ -175,6 +175,6 @@ http::HttpResponse Router::get_http_response(http::HttpRequest request) {
   }
 
   functor callback = pattern_to_callback[url_path];
-  _SPDLOG(cjango::route_logger_name, info, "return callback for: ", url_path);
+  _SPDLOG(cjango::route_logger_name, info, "return callback for: {}", url_path);
   return callback(request);
 }

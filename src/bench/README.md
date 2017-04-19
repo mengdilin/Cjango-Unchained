@@ -33,3 +33,4 @@
     + silicon/django uses `/hello/` as URL
   + disable all debugging messages for all app frameworks
   + use the same port (8000)
+  + all compiled by the same compiler `Apple LLVM version 7.0.2 (clang-700.1.81)`

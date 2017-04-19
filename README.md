@@ -76,7 +76,39 @@ All template files are placed under `callbacks/templates`. And in source files, 
 
 As of April 2017, Cjango can handle HTTP 1.0 GET/POST requests.
 
-`django.contrib.sessions`
+Cjango supports Http session (similar with `django.contrib.sessions`).
+
+### Json Support
+
+```bash
+python manage.py runserver 8000
+```
+
+```bash
+# On another terminal
+
+PCUser@abc callbacks (master) $ curl -s http://127.0.0.1:8000/json | jq '.'
+{
+  "parents": [
+    {
+      "sha": "54b9c9bdb225af5d886466d72f47eafc51acb4f7",
+      "url": "https://api.github.com/repos/stedolan/jq/commits/54b",
+      "html_url": "https://github.com/stedolan/jq/commit/54b"
+    },
+    {
+      "sha": "8b1b503609c161fea4b003a7179b3fbb2dd4345a",
+      "url": "https://api.github.com/repos/stedolan/jq/commits/8b1",
+      "html_url": "https://github.com/stedolan/jq/commit/8b1"
+    }
+  ]
+}
+PCUser@abc callbacks (master) $ curl -s http://127.0.0.1:8000/json | jq '.parents[0]'
+{
+  "sha": "54b9c9bdb225af5d886466d72f47eafc51acb4f7",
+  "url": "https://api.github.com/repos/stedolan/jq/commits/54b",
+  "html_url": "https://github.com/stedolan/jq/commit/54b"
+}
+```
 
 ### Whitelist-based debug messages
 

@@ -21,6 +21,7 @@ all: $(OBJS)
 # Suffix Rule 1: create *.o from corresponding *.cpp
 .cpp.o:
 	$(CC) $(CPPFLAGS) -fPIC -c $<
+	touch ../json/urls.json
 
 # Suffix Rule 2: create a shared object *.so from the corresponding *.o object file
 .o.so:
