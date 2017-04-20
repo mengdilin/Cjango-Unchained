@@ -22,7 +22,7 @@ endif
 # CPPFLAGS = -std=c++1z -Wall
 SFCDIR=lib/simplefilewatcher/build/intermediate/Debug
 OBJS = app/app.o app/main.o routing/router.o
-TESTOBJS = app/app.o routing/router.o \
+TESTOBJS = app/app.o routing/router.o app/logger.o \
   $(SFCDIR)/FileWatcher.o \
   $(SFCDIR)/FileWatcherOSX.o \
   $(SFCDIR)/FileWatcherLinux.o
@@ -58,14 +58,14 @@ app.o : app/app.cpp
 	$(CC) $(CPPFLAGS) -c $^
 router.o : routing/router.cpp
 	$(CC) $(CPPFLAGS) -c $^
+logger.o: app/logger.cpp
+	$(CC) $(CPPFLAGS) -fPIC -c $^
 
 # Needed for Linux (/usr/bin/ld: http_parser/http_response.o: relocation R_X86_64_32 against `__pthread_key_create' can not be used when making a shared object; recompile with -fPIC)
 http_parser/http_request.o: http_parser/http_request.cpp
 	$(CC) $(CPPFLAGS) -fPIC -c http_parser/http_request.cpp -o $@
 http_parser/http_response.o: http_parser/http_response.cpp
 	$(CC) $(CPPFLAGS) -fPIC -c http_parser/http_response.cpp -o $@
-app/logger.o: app/logger.cpp
-	$(CC) $(CPPFLAGS) -fPIC -c app/logger.cpp
 
 # http_request.cpp uses _SPDLOG which calls cjango_logger global variable
 # Without defining that variable, linker returns error. Thus app/logger.o
