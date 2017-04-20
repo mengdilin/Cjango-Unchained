@@ -159,7 +159,7 @@ def run_case(conn, module, case, id=None):
         try:
             rverifun = str(rverifun)
             print('\n - VERIFICATION by {}'.format(rverifun))
-            if getattr(module, 'verify_case_1')(resp.read()):
+            if getattr(module, rverifun)(resp.read()):
                 print('[OK]')
             else:
                 print('[FAIL]')
