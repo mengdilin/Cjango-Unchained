@@ -1,16 +1,22 @@
 {
     "case1" : {
         "NAME" : "test_case_1",
+        "DESCRIPTION" : "",
 
         "REQ_PATH" : "/",
-        "REQ_METHOD" : "GET",
-        "REQ_PARAMS" : "",
+        "REQ_METHOD" : "POST",
+        "REQ_PARAMS" : {
+            "name" : "Jason Bourne",
+            "occupation" : "freelance"
+        },
         "REQ_FILE" : "",
-        "REQ_HEADERS" : "",
+        "REQ_HEADERS" : {
+            "Accept" : "text/plain"
+        },
 
         "RESP_STATUS" : "200",
         "RESP_REASON" : "OK",
-        "RESP_VERSION" : "1.0",
+        "RESP_VERSION" : "HTTP/1.0",
         "RESP_HEADERS" : {
             "content-type" : "text/html",
             "content-length" : ""
@@ -20,16 +26,17 @@
 
     "case2" : {
         "NAME" : "test_case_2",
+        "DESCRIPTION" : "GET request on an undefined path",
 
         "REQ_PATH" : "/mm",
         "REQ_METHOD" : "GET",
         "REQ_PARAMS" : "",
-        "REQ_FILE" : "",
+        "REQ_FILE" : "requests/request.txt",
         "REQ_HEADERS" : "",
 
         "RESP_STATUS" : "200",
         "RESP_REASON" : "OK",
-        "RESP_VERSION" : "1.0",
+        "RESP_VERSION" : "HTTP/1.0",
         "RESP_HEADERS" : {
             "content-type" : "text/html",
             "content-length" : ""
