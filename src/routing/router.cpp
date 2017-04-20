@@ -85,6 +85,7 @@ callback_type Router::load_callback(const std::string& path, const std::string& 
   _SPDLOG(cjango::route_logger_name, debug, "dlopen() finished for {}", path);
   bool found = std::find(dlib_handlers.begin(), dlib_handlers.end(), lib) != dlib_handlers.end();
   if (found) {
+    // MAYBE-LATER RTLD_NOLOAD would be much cleaner
     // dlopen() returns the same (opaque) handler when specified twice
     // For updating the same-name function, we first close (as the same times as dlopen()),
     // unload the library, and then reload the updated function
@@ -98,7 +99,6 @@ callback_type Router::load_callback(const std::string& path, const std::string& 
   dlib_handlers.push_back(lib);
   _SPDLOG(cjango::route_logger_name, debug,
           "dlib_handlers.size: {} ref_count: {}", dlib_handlers.size(), ref_count[path]);
-
   const auto func = dlsym(lib, func_name.c_str());
   const auto dlsym_error = dlerror();
   if (dlsym_error) {
@@ -138,7 +138,7 @@ void Router::load_url_pattern_from_file() {
       // 'functor' (aka 'function<http::HttpResponse (http::HttpRequest)>')" error,
       // here we first cast to callback_type, and then the callback_type is
       // implicitly casted into std::function<callback_type>
-      callback = load_callback(cinfo["file"], cinfo["funcname"]);
+      callback = static_cast<functor>(load_callback(cinfo["file"], cinfo["funcname"]));
     } catch (const char *e) {
       callback = [](http::HttpRequest h){ return http::HttpResponse("invalid callback specified"); };
       _SPDLOG(cjango::route_logger_name, info, "Invalid callback: {} {}", cinfo["file"], cinfo["funcname"]);
