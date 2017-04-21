@@ -19,10 +19,15 @@
     "file" : "mycallback.so",
     "funcname": "page_home"
   },
-   "/index" : {
+   "/search_blog" : {
     "file" : "mycallback.so",
     "funcname": "page_index"
   },
+  "/insert_blog" : {
+    "file" : "mycallback.so",
+    "funcname": "page_insert"
+  },
+
   "/welcome" : {
     "file" : "mycallback.so",
     "funcname": "page_index"
