@@ -35,15 +35,14 @@ extern "C" http::HttpResponse page_index(http::HttpRequest request) {
   //return http::HttpResponse("blah");
 
   auto session_map = request.get_session();
-  session_map->insert({"user","mengdi"});
+
+  session_map->set("user","mengdi");
   _SPDLOG(logger_name, info, "index session id: {}", std::to_string(request.get_session_id()));
-for (auto it=session_map->begin(); it!=session_map->end(); ++it) {
-      _SPDLOG(logger_name, info, "session:  {}, {}", it->first, it->second);
-    }
-  auto username = session_map->find("username");
+
+  auto username = session_map->get("username");
   std::string response_body = "<html><p>welcome to your homepage, ";
-  if (username != session_map->end()) {
-    response_body += username->second;
+  if (username != "") {
+    response_body += username;
   }
   response_body += "</p></html>";
   //auto resp = http::HttpResponse::render_to_response("callbacks/templates/index.html", request);
@@ -60,9 +59,7 @@ extern "C" http::HttpResponse page_home(http::HttpRequest request) {
     auto session_map = request.get_session();
   //session_map.insert({"user","mengdi"});
   _SPDLOG(logger_name, info, "index session id: {}", std::to_string(request.get_session_id()));
-for (auto it=session_map->begin(); it!=session_map->end(); ++it) {
-      _SPDLOG(logger_name, info, "session:  {}, {}", it->first, it->second);
-    }
+
     return http::HttpResponse::render_to_response("../templates/index.html", request);
   } else if (request.get_method() == "POST"){
     _SPDLOG(logger_name, info, "home session id: {}", std::to_string(request.get_session_id()));
@@ -81,16 +78,9 @@ for (auto it=session_map->begin(); it!=session_map->end(); ++it) {
 
     if (first_name_result != params.end()) {
       _SPDLOG(logger_name, info, "found first name: {}", first_name_result->second);
-      session_map->insert({"username", first_name_result->second});
+      session_map->set("username", first_name_result->second);
     }
-    for (auto it=session_map->begin(); it!=session_map->end(); ++it) {
-      _SPDLOG(logger_name, info, "before session:  {}, {}", it->first, it->second);
-    }
-    session_map = request.get_session();
-    for (auto it=session_map->begin(); it!=session_map->end(); ++it) {
-      _SPDLOG(logger_name, info, "after session:  {}, {}", it->first, it->second);
-    }
-      auto resp = http::HttpResponse(response_body, request);
+    auto resp = http::HttpResponse(response_body, request);
 
     _SPDLOG(logger_name, info, "{}", resp.to_string());
     return resp;

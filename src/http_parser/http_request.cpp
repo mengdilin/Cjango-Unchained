@@ -3,12 +3,13 @@
 #include <stdlib.h>     /* strtoul */
 #include "../app/externs.hpp"
 
-std::string http_logger_name = "http"; // FIXME refactor
+std::string http_logger_name = "http_request"; // FIXME refactor
 unsigned long http::HttpRequest::x=123456789;
   unsigned long http::HttpRequest::y=362436069;
   unsigned long http::HttpRequest::z=521288629;
   std::string http::HttpRequest::session_cookie_key="session";
-  std::unordered_map<std::string, std::unordered_map<std::string, std::string>*> http::HttpRequest::sessions;
+  std::unordered_map<std::string, std::shared_ptr<http::HttpSession>> http::HttpRequest::sessions;
+  std::shared_mutex http::HttpRequest::mutex_;
 http::HttpRequest::HttpRequest(
   std::string method,
   std::string path,
@@ -82,7 +83,7 @@ unsigned long http::HttpRequest::get_session_id() {
 bool http::HttpRequest::has_session_id() {
   return this->has_set_session_id;
 }
-std::unordered_map<std::string, std::string>* http::HttpRequest::get_session() {
+std::shared_ptr<http::HttpSession> http::HttpRequest::get_session() {
 
   //TODO: r/w LOCKING session map here and in callbacks
   auto result = this->cookie.find(HttpRequest::session_cookie_key);
@@ -99,24 +100,42 @@ std::unordered_map<std::string, std::string>* http::HttpRequest::get_session() {
     if (session_result != HttpRequest::sessions.end()) {
       return session_result->second;
     } else {
-      _SPDLOG(http_logger_name, info, "cannot find session id: {}", key);
-      unsigned long ul;
-      ul = strtoul (key.c_str(), NULL, 0);
-      this->has_set_session_id = true;
-      this->session_id = ul;
-      std::unordered_map<std::string, std::string>* map = new std::unordered_map<std::string, std::string>();
-      HttpRequest::sessions.insert({key, map});
-      return map;
+
+        std::unique_lock<std::shared_mutex> lock(mutex_);
+        //re-check if another thread has added a new session
+        //for the current key right after obtaining the lock
+        auto session_result = HttpRequest::sessions.find(key);
+        if (session_result != HttpRequest::sessions.end()) {
+          return session_result->second;
+        } else {
+          _SPDLOG(http_logger_name, info, "cannot find session id: {}", key);
+          unsigned long ul;
+          ul = strtoul (key.c_str(), NULL, 0);
+          this->has_set_session_id = true;
+          this->session_id = ul;
+          std::shared_ptr<HttpSession> new_session = std::make_shared<HttpSession>();
+          //std::unordered_map<std::string, std::string>* map = new std::unordered_map<std::string, std::string>();
+          HttpRequest::sessions.insert({key, new_session});
+          return new_session;
+        }
     }
 
 
   } else {
-    this->session_id = HttpRequest::xorshf96();
-    this->has_set_session_id = true;
-    _SPDLOG(http_logger_name, info, "set session id to {}", std::to_string(this->session_id));
-    _SPDLOG(http_logger_name, info, "session id equals 60441451194812 {}", std::to_string(this->session_id)=="60441451194812");
-    std::unordered_map<std::string, std::string>* map = new std::unordered_map<std::string, std::string>();
-    HttpRequest::sessions.insert({std::to_string(this->session_id), map});
-    return map;
-  }
+    std::unique_lock<std::shared_mutex> lock(mutex_);
+    //re-check if another thread has added a new session
+    //for the current key right after obtaining the lock
+
+      this->session_id = HttpRequest::xorshf96();
+      this->has_set_session_id = true;
+      _SPDLOG(http_logger_name, info, "set session id to {}", std::to_string(this->session_id));
+      _SPDLOG(http_logger_name, info, "session id equals 60441451194812 {}", std::to_string(this->session_id)=="60441451194812");
+      //std::unordered_map<std::string, std::string>* map = new std::unordered_map<std::string, std::string>();
+      std::shared_ptr<HttpSession> new_session = std::make_shared<HttpSession>();
+
+      HttpRequest::sessions.insert({std::to_string(this->session_id), new_session});
+      return new_session;
+    }
+
+
 }

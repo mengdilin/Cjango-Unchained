@@ -19,6 +19,10 @@
     "file" : "mycallback.so",
     "funcname": "page_home"
   },
+   "/index" : {
+    "file" : "mycallback.so",
+    "funcname": "page_index"
+  },
   "/welcome" : {
     "file" : "mycallback.so",
     "funcname": "page_index"

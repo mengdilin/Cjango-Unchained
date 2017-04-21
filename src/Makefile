@@ -33,12 +33,14 @@ HTTPPARSEROBJ = http_parser/http_request_parser.o\
 	http_parser/http_request_line.o \
 	http_parser/http_stream_reader.o \
 	http_parser/http_response.o \
-	http_parser/http_request.o
+	http_parser/http_request.o \
+	http_parser/http_session.o
 
 HTTPPARSERLIB = app/libhttp_response.so \
 	app/libhttp_request.so \
 	http_parser/http_response.o \
-	http_parser/http_request.o
+	http_parser/http_request.o \
+	http_parser/http_session.o
 
 TESTOBJS += $(HTTPPARSEROBJ)
 OBJS += $(HTTPPARSEROBJ)
@@ -62,16 +64,16 @@ logger.o: app/logger.cpp
 	$(CC) $(CPPFLAGS) -fPIC -c $^
 
 # Needed for Linux (/usr/bin/ld: http_parser/http_response.o: relocation R_X86_64_32 against `__pthread_key_create' can not be used when making a shared object; recompile with -fPIC)
-http_parser/http_request.o: http_parser/http_request.cpp
+http_parser/http_request.o: http_parser/http_request.cpp http_parser/http_session.cpp
 	$(CC) $(CPPFLAGS) -fPIC -c http_parser/http_request.cpp -o $@
 http_parser/http_response.o: http_parser/http_response.cpp
 	$(CC) $(CPPFLAGS) -fPIC -c http_parser/http_response.cpp -o $@
 
 # http_request.cpp uses _SPDLOG which calls cjango_logger global variable
 # Without defining that variable, linker returns error. Thus app/logger.o
-app/libhttp_response.so: http_parser/http_request.o http_parser/http_response.o app/logger.o
+app/libhttp_response.so: http_parser/http_request.o http_parser/http_session.o http_parser/http_response.o app/logger.o
 	$(CC) $(CPPFLAGS) -shared -o $@ $^
-app/libhttp_request.so: http_parser/http_request.o app/logger.o
+app/libhttp_request.so: http_parser/http_request.o http_parser/http_session.o app/logger.o
 	$(CC) $(CPPFLAGS) -shared -o $@ $^
 
 lib/simplefilewatcher/build/intermediate/Debug/FileWatcher.o:

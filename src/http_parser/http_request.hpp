@@ -4,6 +4,8 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <memory>
+#include "http_session.hpp"
 /** @file http_request.hpp
  * \ingroup http
  * @brief HttpRequest class declaration
@@ -22,7 +24,8 @@ namespace http {
     std::unordered_map<std::string, std::string> meta;
     std::unordered_map<std::string, std::string> parameters;
     std::unordered_map<std::string, std::string> cookie;
-    static std::unordered_map<std::string, std::unordered_map<std::string, std::string>*> sessions;
+    static std::unordered_map<std::string, std::shared_ptr<HttpSession>> sessions;
+    static std::shared_mutex mutex_;
   public:
     static std::string session_cookie_key;
   public:
@@ -43,7 +46,7 @@ namespace http {
     std::unordered_map<std::string, std::string> const & get_meta() const;
     std::unordered_map<std::string, std::string> const & get_parameters() const;
     std::unordered_map<std::string, std::string> const & get_cookie() const;
-    std::unordered_map<std::string, std::string>* get_session();
+    std::shared_ptr<HttpSession> get_session();
     static unsigned long xorshf96(); //Marsaglia's xorshf generator
 
 
