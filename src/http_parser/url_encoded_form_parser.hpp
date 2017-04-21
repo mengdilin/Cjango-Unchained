@@ -22,12 +22,6 @@ class UrlEncodedFormParser {
     char charToInt(char);
     char strToBin(char *pString);
     std::string urlDecode(const std::string &str);
-    /*
-     * using uri decode functionality found via codeguru.com
-     * source: http://www.codeguru.com/cpp/cpp/algorithms/strings/article.php/c12759/URI-Encoding-and-Decoding.htm
-     */
-    std::string uri_decode(const std::string & sSrc);
-
     std::unordered_map<std::string, std::string> get_parameter(std::istream& input_stream, int content_leng);
 
     std::vector<std::string> split(std::string str, char delimiter);

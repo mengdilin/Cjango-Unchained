@@ -34,8 +34,8 @@ char http::UrlEncodedFormParser::strToBin(char *pString)
 {
     char szBuffer[2];
     char ch;
-    szBuffer[0] = CharToInt(pString[0]); //make the B to 11 -- 00001011
-    szBuffer[1] = CharToInt(pString[1]); //make the 0 to 0 -- 00000000
+    szBuffer[0] = charToInt(pString[0]); //make the B to 11 -- 00001011
+    szBuffer[1] = charToInt(pString[1]); //make the 0 to 0 -- 00000000
     ch = (szBuffer[0] << 4) | szBuffer[1]; //to change the BO to 10110000
     return ch;
 }
@@ -52,7 +52,7 @@ std::string http::UrlEncodedFormParser::urlDecode(const std::string &str)
         {
             szTemp[0] = str[i + 1];
             szTemp[1] = str[i + 2];
-            strResult += StrToBin(szTemp);
+            strResult += strToBin(szTemp);
             i = i + 3;
         }
         else if (str[i] == '+')
