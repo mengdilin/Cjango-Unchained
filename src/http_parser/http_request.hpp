@@ -6,6 +6,8 @@
 #include <string>
 #include <memory>
 #include "http_session.hpp"
+#include <pthread.h>
+
 /** @file http_request.hpp
  * \ingroup http
  * @brief HttpRequest class declaration
@@ -25,7 +27,7 @@ namespace http {
     std::unordered_map<std::string, std::string> parameters;
     std::unordered_map<std::string, std::string> cookie;
     static std::unordered_map<std::string, std::shared_ptr<HttpSession>> sessions;
-    static std::shared_mutex mutex_;
+    //static ting::shared_mutex mutex_;
   public:
     static std::string session_cookie_key;
   public:

@@ -9,7 +9,9 @@ unsigned long http::HttpRequest::x=123456789;
   unsigned long http::HttpRequest::z=521288629;
   std::string http::HttpRequest::session_cookie_key="session";
   std::unordered_map<std::string, std::shared_ptr<http::HttpSession>> http::HttpRequest::sessions;
-  std::shared_mutex http::HttpRequest::mutex_;
+  //std::shared_mutex http::HttpRequest::mutex_;
+
+  static pthread_rwlock_t lock = PTHREAD_RWLOCK_INITIALIZER;
 http::HttpRequest::HttpRequest(
   std::string method,
   std::string path,
@@ -101,11 +103,13 @@ std::shared_ptr<http::HttpSession> http::HttpRequest::get_session() {
       return session_result->second;
     } else {
 
-        std::unique_lock<std::shared_mutex> lock(mutex_);
+        //std::unique_lock<ting::shared_mutex> lock(mutex_);
+        pthread_rwlock_wrlock(&lock);
         //re-check if another thread has added a new session
         //for the current key right after obtaining the lock
         auto session_result = HttpRequest::sessions.find(key);
         if (session_result != HttpRequest::sessions.end()) {
+          pthread_rwlock_unlock(&lock);
           return session_result->second;
         } else {
           _SPDLOG(http_logger_name, info, "cannot find session id: {}", key);
@@ -116,13 +120,15 @@ std::shared_ptr<http::HttpSession> http::HttpRequest::get_session() {
           std::shared_ptr<HttpSession> new_session = std::make_shared<HttpSession>();
           //std::unordered_map<std::string, std::string>* map = new std::unordered_map<std::string, std::string>();
           HttpRequest::sessions.insert({key, new_session});
+          pthread_rwlock_unlock(&lock);
           return new_session;
         }
     }
 
 
   } else {
-    std::unique_lock<std::shared_mutex> lock(mutex_);
+    //std::unique_lock<ting::shared_mutex> lock(mutex_);
+    pthread_rwlock_wrlock(&lock);
     //re-check if another thread has added a new session
     //for the current key right after obtaining the lock
 
@@ -134,6 +140,7 @@ std::shared_ptr<http::HttpSession> http::HttpRequest::get_session() {
       std::shared_ptr<HttpSession> new_session = std::make_shared<HttpSession>();
 
       HttpRequest::sessions.insert({std::to_string(this->session_id), new_session});
+      pthread_rwlock_unlock(&lock);
       return new_session;
     }
 
