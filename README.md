@@ -71,10 +71,9 @@ All template files are placed under `callbacks/templates`. And in source files, 
 
 ### HTTP 1.0 Compatibility with Session Support
 
-+ <the usecase of sessions such as unique ID by some hash>
-+ <the explanation of sessions such as unique ID by some hash>
+Cjango provides a HttpSession object that provides a way to identify a user across more than one page request or visit to a Web site and to store information about that user. The session object is implemented on top of the cookie functionality that Cjango also provides.
 
-As of April 2017, Cjango can handle HTTP 1.0 GET/POST requests.
+As of April 2017, Cjango can handle HTTP 1.0 requests and responses.
 
 Cjango supports Http session (similar with `django.contrib.sessions`).
 
