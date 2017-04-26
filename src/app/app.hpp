@@ -3,6 +3,7 @@
 
 #include <string>
 #include <cstring>
+#include "msocket.hpp"
 #include "externs.hpp"
 
 #ifdef CJANGO_DYNLOAD
@@ -55,6 +56,8 @@ public:
 };
 #endif
 
+typedef shared_ptr<MSocket> Sock_ptr;
+
 class App {
     int servSock; /* server socket id */
 public:
@@ -71,8 +74,8 @@ public:
       router.add_route(url_pattern, f);
     }
     // App(Router& rt): router(rt) {}
-    void worker(int clntSock, string strRequest);
-    // void worker(int clntSock);
+    // void worker(int clntSock, string strRequest);
+    void worker(Sock_ptr clntSock, string strRequest);
 #ifndef CJANGO_DYNLOAD
     App() : servSock{-1} {
 #else
@@ -99,7 +102,8 @@ public:
     std::string get_urls_json_dir() const { return urls_json_dir; };
     void print_routes();
     void run(int port);
-    int handle_request(int socket);
+    // int handle_request(int socket);
+    void handle_request(Sock_ptr sp);
 };
 #endif
 
