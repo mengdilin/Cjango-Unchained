@@ -383,7 +383,7 @@ void App::run(int port)
         // allSocks.insert(servSock);
 
         auto selector = Selector(server);
-        selector.fd_set(server);
+        selector.fd_set2(server);
         // selector.report();
 
         for (;;) {
@@ -420,7 +420,7 @@ void App::run(int port)
 
                     /* a new client connection accepted, register it to selector */
                     _SPDLOG(logskt, info, "New client connection: {}", clntSock->socket());
-                    selector.fd_set(clntSock->socket());
+                    selector.fd_set2(clntSock->socket());
                     allSocks.push_back(clntSock);
                 } while(true);
             }

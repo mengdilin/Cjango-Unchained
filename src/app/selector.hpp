@@ -24,7 +24,7 @@ struct Selector {
 
     void set_server(int sock);
     void fd_zero();
-    void fd_set(int sock);
+    void fd_set2(int sock); // On Linux, fd_set conflicts with system's fd_set struct and returns error
     bool fd_isset(int sock, int m=0);
     void fd_clr(int sock);
     bool server_isset(int m=0);
@@ -42,7 +42,7 @@ void Selector::fd_zero() {
     FD_ZERO(&allSocks);
 }
 
-void Selector::fd_set(int sock) {
+void Selector::fd_set2(int sock) {
     FD_SET(sock, &allSocks);
     if (sock > maxSock)
         maxSock = sock;
