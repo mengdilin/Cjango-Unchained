@@ -1,8 +1,8 @@
 #include "http_response.hpp"
-#include "../app/externs.hpp"
 #include <fstream>
 #include <streambuf>
-
+#include "../app/externs.hpp"
+std::string http::HttpResponse::templates_root;
 
 void http::HttpResponse::set_cookie(std::string key, std::string value) {
   auto result = headers.find("Set-Cookie");
@@ -33,14 +33,26 @@ http::HttpResponse http::HttpResponse::render_to_response(std::string file, http
   return response;
 }
 http::HttpResponse http::HttpResponse::render_to_response(std::string path) {
-  std::ifstream t(path);
+    //_SPDLOG("http_response", info, "path: {}", HttpResponse::templates_root+path);
+    //_SPDLOG("http_response", info, "template root: {}", HttpResponse::templates_root);
+
+
+  std::ifstream t(HttpResponse::templates_root+path);
   std::string str((std::istreambuf_iterator<char>(t)),
                  std::istreambuf_iterator<char>());
   return HttpResponse(str);
 }
 
+std::string http::HttpResponse::get_template(std::string path) {
+  std::ifstream t(HttpResponse::templates_root+path);
+  std::string str((std::istreambuf_iterator<char>(t)),
+                 std::istreambuf_iterator<char>());
+  return str;
+}
 http::HttpResponse http::HttpResponse::render_to_response(std::string path, std::string content_type) {
-  std::ifstream t(path);
+  //_SPDLOG("http_response", info, "path: {}", HttpResponse::templates_root+path);
+  //_SPDLOG("http_response", info, "template root: {}", HttpResponse::templates_root);
+  std::ifstream t(HttpResponse::templates_root+path);
   std::string str((std::istreambuf_iterator<char>(t)),
                  std::istreambuf_iterator<char>());
   return HttpResponse(str, content_type);

@@ -4,6 +4,8 @@ PROG = runapp
 CC = g++
 CPPFLAGS = -std=c++1z -Wall -pthread -MMD -MP
 CPPFLAGS += -I./app/ -I./lib/
+OVERALLCPP = $(CPPFLAGS)
+OVERALLCPP += -L./app/ -lhttp_response -lhttp_request
 
 #CPPFLAGS += -ferror-limit=5   # doesn't work on Linux
 DEBUG ?= 1
@@ -36,16 +38,10 @@ HTTPPARSEROBJ = http_parser/http_request_parser.o\
 	http_parser/http_request_body_parser.o \
 	http_parser/url_encoded_form_parser.o \
 	http_parser/http_request_line.o \
-	http_parser/http_stream_reader.o \
-	http_parser/http_response.o \
-	http_parser/http_request.o \
-	http_parser/http_session.o
-
+	http_parser/http_stream_reader.o
 HTTPPARSERLIB = app/libhttp_response.so \
 	app/libhttp_request.so \
-	http_parser/http_response.o \
-	http_parser/http_request.o \
-	http_parser/http_session.o
+
 
 TESTOBJS += $(HTTPPARSEROBJ)
 OBJS += $(HTTPPARSEROBJ)
@@ -58,7 +54,7 @@ DEPENDS   = $(TESTOBJS:.o=.d)
 
 # -ldl is needed for Linux
 $(PROG) : $(TESTOBJS) $(HTTPPARSERLIB) app/runapp.cpp
-	$(CC) $(CPPFLAGS) -o $@ $^ -ldl
+	$(CC) $(OVERALLCPP) -o $@ $^ -ldl
 main.o : app/main.cpp
 	$(CC) $(CPPFLAGS) -c $^
 app.o : app/app.cpp

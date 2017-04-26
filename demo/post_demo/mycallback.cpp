@@ -89,7 +89,7 @@ std::vector<std::string> database_select_blog(std::string sql, sqlite3 *db) {
 }
 
 std::string get_error_template(std::string error_msg) {
-  std::ifstream error_s("../templates/error_template.html");
+  std::ifstream error_s("error_template.html");
   mstch::map errorcontext {{"error_message", error_msg}};
   std::string errorview((std::istreambuf_iterator<char>(error_s)),
             std::istreambuf_iterator<char>());
@@ -97,7 +97,7 @@ std::string get_error_template(std::string error_msg) {
 }
 
 std::string get_success_template(std::string success_msg) {
-  std::ifstream success_s("../templates/success_template.html");
+  std::ifstream success_s("success_template.html");
   mstch::map successcontext {{"success_message", success_msg}};
   std::string successview((std::istreambuf_iterator<char>(success_s)),
             std::istreambuf_iterator<char>());
@@ -110,9 +110,7 @@ extern "C" http::HttpResponse page_insert(http::HttpRequest request) {
   mstch::config::escape = [](const std::string& str) -> std::string {
     return str;
   };
-  std::ifstream t("../templates/index.html");
-  std::string view((std::istreambuf_iterator<char>(t)),
-                 std::istreambuf_iterator<char>());
+  std::string view = http::HttpResponse::get_template("index.html");
 
   mstch::array data_rows;
   mstch::map context;
@@ -164,12 +162,10 @@ extern "C" http::HttpResponse page_index(http::HttpRequest request) {
   mstch::config::escape = [](const std::string& str) -> std::string {
   return str;
 };
-  std::ifstream t("../templates/index.html");
-  std::string view((std::istreambuf_iterator<char>(t)),
-                 std::istreambuf_iterator<char>());
+  std::string view = http::HttpResponse::get_template("index.html");
   mstch::array data_rows;
   mstch::map context;
-
+  _SPDLOG(logger_name, error, "callback root: {}", http::HttpResponse::templates_root);
   _SPDLOG(logger_name, info, "index session id: {}", std::to_string(request.get_session_id()));
 
   auto session_map = request.get_session();
@@ -207,7 +203,7 @@ extern "C" http::HttpResponse page_home(http::HttpRequest request) {
 
   if (request.get_method() == "GET") {
     auto session_map = request.get_session();
-    return http::HttpResponse::render_to_response("../templates/home.html", request);
+    return http::HttpResponse::render_to_response("home.html", request);
   } else if (request.get_method() == "POST"){
     _SPDLOG(logger_name, info, "home session id: {}", std::to_string(request.get_session_id()));
     auto session_map = request.get_session();

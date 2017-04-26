@@ -54,7 +54,6 @@ class Router {
       // "calls add_route to populate pattern_to_callback and patterns_list"
     };
     Router() {};
-    int nr_patterns() const { return patterns_list.size(); };
     void add_route(std::string url_pattern, functor f);
 #ifdef CJANGO_DYNLOAD
     void *load_shared_object_file(const std::string& path);
@@ -62,7 +61,7 @@ class Router {
     void load_url_pattern_from_file();
 #endif
     void set_static_root_dir(std::string dir) { static_root_dir = dir; };
-    std::string get_static_root_dir() { return static_root_dir; };
+    std::string get_static_root_dir(std::string dir) { return static_root_dir; };
     // Note: register() should be renamed from add_route() for django mimicking,
     // but "register" is a reserved word in C++.
     std::string resolve(http::HttpRequest);

@@ -2,7 +2,7 @@
 #include <sstream>
 #include "../lib/json.hpp"
 #include "../app/externs.hpp"
-
+#include "../http_parser/http_response.hpp"
 http::HttpResponse callback_1 (http::HttpRequest req) {
   _DEBUG("callback1 called");
   string text = "<html>\r\n<body>\r\n"
@@ -17,7 +17,7 @@ http::HttpResponse callback_1 (http::HttpRequest req) {
 int main(int argc, char* argv[])
 {
   if (argc < 3) {
-    printf("usage: ./manage runserver <port number>\n");
+    printf("usage: ./manage runserver <port number>  [--setting <settings.json path>]\n");
     return -1;
   }
   std::istringstream iss(std::string(argv[1]) + std::string(" ") + std::string(argv[2]));
@@ -25,6 +25,12 @@ int main(int argc, char* argv[])
   int port_number;
   iss >> command;
   iss >> port_number;
+  std::string settings_path = "../json/settings.json";
+  if (argc == 5) {
+    if (strncmp(argv[3], "--setting", strlen("--setting")) == 0) {
+      settings_path = argv[4];
+    }
+  }
 
 #ifdef DEBUG
   if (argc > 3 && std::string(argv[3]) == "--whitelist") {
@@ -46,18 +52,26 @@ int main(int argc, char* argv[])
 
   std::string static_root_dir;
   // set mappings of URL -> static files
-  std::ifstream i("../json/settings.json");
+  std::ifstream i(settings_path);
+  _SPDLOG("path", info, "settings: {}", settings_path);
   nlohmann::json j;
   i >> j;
+  g_url_json_dir = "../json/";
   for (nlohmann::json::iterator it = j.begin(); it != j.end(); ++it) {
     if (it.key() == std::string("STATIC_URL"))
       static_root_dir = it.value();
 
-    if (it.key() == std::string("TEMPLATES"))
+    if (it.key() == std::string("TEMPLATES")) {
       g_templates_root_dir = it.value(); // FIXME global variable
+      http::HttpResponse::templates_root = g_templates_root_dir;
+
+    }
 
     if (it.key() == std::string("CALLBACKS"))
       g_callbacks_root_dir = it.value();
+    if (it.key() == std::string("URLS_JSON")) {
+      g_url_json_dir = it.value();
+    }
   }
 
   if (command == "runserver") {
