@@ -64,6 +64,7 @@ int main(int argc, char* argv[])
     _SPDLOG("path", error, "json error: {}", e.what());
     return 1;
   }
+  _SPDLOG("path", error, "urls json: {}", app.get_urls_json_dir());
 
 
   if (command == "runserver") {

@@ -4,12 +4,12 @@
 
 # Overview
 
-+ Executed the following commands from a 1.2GHz single board computer (Raspberry Pi 3)
++ Executed the following commands from a client machine
   + `nc=${num}; name=cjango-c${nc}-1; ab -n 10000 -c ${nc} -g ${name}.log http://192.168.0.15:8000/ > ${name}.txt`
-  + `${num}` is set as 1, 3, 5, 7, 10, 50, 100, 150
+  + `${num}` is set as 1, 3, 5, 7, 10, 50, 100, 150, 200, 250, 300, 350, 400, 450, 500
     + Django cannot handle >=15 concurrent requests (`connection reset by peer` error)
     + All C++ libraries cannot handle 200 concurrent requests (the same as above)
-  + all raw log files are stored under `bench/ethernet/`
+  + all raw log files are stored under `bench/ether-ether/`
 
 # Experimental Conditions
 
@@ -22,10 +22,14 @@
 
 #### Client Spec
 
-  + [Raspberry Pi 3 Model B+](https://www.raspberrypi.org/products/raspberry-pi-3-model-b/)
+  + Windows Machine
+    + 2.4Ghz 8cores
+    + 8192MB memory
+    + 1gbps ether cable (cat6)
+    + use ab.exe
 
 #### Network settings
-  + (Raspberry Pi 3) <- 100Mbps ethernet (RPI3's maximum) -> Router <- 1Gbps Ether-Thunderbolt adapter -> Macbook
+  + (Windows Machine) <- 1Gbps ethernet -> Router <- 1Gbps Ether-Thunderbolt adapter -> Macbook
 
 #### App Framework Settings
 
