@@ -177,15 +177,22 @@ http::HttpResponse Router::get_http_response(http::HttpRequest request) {
         return http::HttpResponse("Cjango: 404 Page Not Found");
       case RouterException::STATIC_FILE_SERVED:
         const std::regex r("((png|gif|jpeg|bmp|webp|ico))$");
+        const std::regex reg_texts("((css|js))$");
         std::smatch sm;
         // std::regex_search forbids a temporary string
         std::string path = request.get_path();
         std::string suffix;
-        if (std::regex_search(path, sm, r))
+        if (std::regex_search(path, sm, r)) {
           suffix = sm[0];
-        // MAYBE-LATER other than image
-        _SPDLOG(route_logger_name, info, "imageSuffix: {}", suffix);
-        return http::HttpResponse::render_to_response(".." + request.get_path(), "image/" + suffix, request);
+          _SPDLOG(route_logger_name, info, "imageSuffix: {}", suffix);
+          return http::HttpResponse::render_to_response(".." + request.get_path(), "image/" + suffix, request);
+        } else if (std::regex_search(path, sm, reg_texts)) {
+          suffix = sm[0];
+          if (suffix == std::string("js"))
+            suffix = "javascript";
+          _SPDLOG(route_logger_name, info, "textSuffix: {}", suffix);
+          return http::HttpResponse::render_to_response(".." + request.get_path(), "text/" + suffix, request);
+        }
     }
   }
 
