@@ -54,7 +54,7 @@ void App::add_monitored_dir(const std::string dir) {
         } catch (FW::FileNotFoundException e) {
             _SPDLOG(logskt, error,
                 "no such dir: {}. "
-                "Please check the 'URLS_JSON' value in your settings.json", dir)
+                "Please check the 'URLS_JSON' value in your settings.json", dir);
             exit(1);
         }
     }
