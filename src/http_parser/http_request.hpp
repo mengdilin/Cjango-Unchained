@@ -7,7 +7,6 @@
 #include <memory>
 #include "http_session.hpp"
 #include <pthread.h>
-//#include "../routing/router.hpp"
 
 /** @file http_request.hpp
  * \ingroup http
@@ -16,20 +15,18 @@
 
 namespace http {
   class HttpRequest {
-  //friend class Router;
   public:
     std::string method;
     std::string path;
     std::string scheme;
   private:
-    static unsigned long x, y, z;
+    static unsigned long x, y, z; /*!< helper variables used to set session id */
     mutable unsigned long session_id;
     mutable bool has_set_session_id = false;
-    std::unordered_map<std::string, std::string> meta;
-    std::unordered_map<std::string, std::string> parameters;
-    std::unordered_map<std::string, std::string> cookie;
-    static std::unordered_map<std::string, std::shared_ptr<HttpSession>> sessions;
-    //static ting::shared_mutex mutex_;
+    std::unordered_map<std::string, std::string> meta; /*!< map that stores http request's header parameters */
+    std::unordered_map<std::string, std::string> parameters; /*!< map that stores http request's get/post parameters */
+    std::unordered_map<std::string, std::string> cookie;  /*!< map that stores http request's cookies */
+    static std::unordered_map<std::string, std::shared_ptr<HttpSession>> sessions; /*!< static map that keeps track of all session objects for all http requests */
   public:
     static std::string session_cookie_key;
   public:
@@ -56,7 +53,6 @@ namespace http {
 
   };
   std::ostream& operator<<(std::ostream& Str, HttpRequest const & v);
-  //std::string HttpRequest::session_cookie_key="session";
 }
 
 

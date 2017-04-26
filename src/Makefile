@@ -32,6 +32,7 @@ TESTOBJS = app/app.o routing/router.o app/logger.o \
 
 UNITTESTDIR=tests
 UNITTESTS= $(UNITTESTDIR)/test-Router.o
+UNITTESTS= $(UNITTESTDIR)/test-http-request-parser.o
 UNITTESTEXE=$(UNITTESTDIR)/tests
 
 HTTPPARSEROBJ = http_parser/http_request_parser.o\
@@ -40,7 +41,7 @@ HTTPPARSEROBJ = http_parser/http_request_parser.o\
 	http_parser/http_request_line.o \
 	http_parser/http_stream_reader.o
 HTTPPARSERLIB = app/libhttp_response.so \
-	app/libhttp_request.so \
+	app/libhttp_request.so
 
 
 TESTOBJS += $(HTTPPARSEROBJ)
@@ -84,9 +85,9 @@ lib/simplefilewatcher/build/intermediate/Debug/FileWatcherOSX.o:
 lib/simplefilewatcher/build/intermediate/Debug/FileWatcherLinux.o:
 	make -C lib/simplefilewatcher/build/gmake
 
-test: $(UNITTESTS) $(TESTOBJS)
-	$(CC) $(CPPFLAGS) $(UNITTESTDIR)/test-main.cpp -c -o $(UNITTESTDIR)/test-main.o
-	$(CC) $(CPPFLAGS) $(UNITTESTDIR)/test-main.o $(UNITTESTS) $(TESTOBJS) -o $(UNITTESTEXE)
+test: $(UNITTESTS) $(TESTOBJS) $(HTTPPARSERLIB)
+	$(CC) $(OVERALLCPP) $(UNITTESTDIR)/test-main.cpp -c -o $(UNITTESTDIR)/test-main.o
+	$(CC) $(OVERALLCPP) $(UNITTESTDIR)/test-main.o $(UNITTESTS) $(TESTOBJS) -o $(UNITTESTEXE)
 test-run:
 	$(UNITTESTEXE) -r compact
 

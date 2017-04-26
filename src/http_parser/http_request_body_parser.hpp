@@ -8,7 +8,7 @@
 namespace http {
   class HttpRequestBodyParser {
   public:
-    std::vector<UrlEncodedFormParser> url_encoded_form_parsers;
+    std::vector<UrlEncodedFormParser> url_encoded_form_parsers; /*!< parser that parses application/x-www-form-urlencoded */
 
   public:
     HttpRequestBodyParser();

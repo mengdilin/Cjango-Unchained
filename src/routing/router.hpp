@@ -61,7 +61,7 @@ class Router {
     void load_url_pattern_from_file();
 #endif
     void set_static_root_dir(std::string dir) { static_root_dir = dir; };
-    std::string get_static_root_dir(std::string dir) { return static_root_dir; };
+    std::string get_static_root_dir() { return static_root_dir; };
     // Note: register() should be renamed from add_route() for django mimicking,
     // but "register" is a reserved word in C++.
     std::string resolve(http::HttpRequest);
