@@ -125,7 +125,6 @@ callback_type Router::load_callback(const std::string& path, const std::string& 
 */
 void Router::load_url_pattern_from_file() {
   std::ifstream i(g_url_json_dir+"urls.json");
-  _SPDLOG(cjango::route_logger_name, error, g_url_json_dir+"urls.json");
   nlohmann::json j;
   i >> j;
   _SPDLOG(cjango::route_logger_name, info, "loaded urls.json");
