@@ -24,8 +24,9 @@ endif
 
 # CPPFLAGS = -std=c++1z -Wall
 SFCDIR=lib/simplefilewatcher/build/intermediate/Debug
-OBJS = app/app.o app/main.o routing/router.o
-TESTOBJS = app/app.o routing/router.o app/logger.o \
+# OBJS = app/app.o app/main.o routing/router.o
+OBJS = app/msocket.o app/app.o routing/router.o
+TESTOBJS = app/msocket.o app/app.o routing/router.o app/logger.o \
   $(SFCDIR)/FileWatcher.o \
   $(SFCDIR)/FileWatcherOSX.o \
   $(SFCDIR)/FileWatcherLinux.o
@@ -56,7 +57,9 @@ DEPENDS   = $(TESTOBJS:.o=.d)
 # -ldl is needed for Linux
 $(PROG) : $(TESTOBJS) $(HTTPPARSERLIB) app/runapp.cpp
 	$(CC) $(OVERALLCPP) -o $@ $^ -ldl
-main.o : app/main.cpp
+# main.o : app/main.cpp
+# 	$(CC) $(CPPFLAGS) -c $^
+msocket.o : app/msocket.cpp
 	$(CC) $(CPPFLAGS) -c $^
 app.o : app/app.cpp
 	$(CC) $(CPPFLAGS) -c $^
