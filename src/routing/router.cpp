@@ -2,6 +2,9 @@
 #include <regex>
 #include "../app/externs.hpp"
 
+std::string g_templates_root_dir;
+std::string g_callbacks_root_dir;
+
 inline bool registered(std::vector<std::string> patterns_list, std::string url_pattern) {
   bool found = find(patterns_list.begin(),
                     patterns_list.end(), url_pattern) != patterns_list.end();

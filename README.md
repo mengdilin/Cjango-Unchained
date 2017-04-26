@@ -206,7 +206,9 @@ Cjango solves this issue by leveraging [Dynamic Loading](https://en.wikipedia.or
 
 ##### Example 1: Changing an existing callback to another function
 
-When your main application is invoked, Cjango automatically spawns a file-monitoring thread. The monotoring thread checks the `urls.json` change for every one second, and if it's changed, reloading the routing file to update callback hashmaps.
+When your main application is invoked, Cjango automatically spawns a file-monitoring thread by `spawn_monitor_thread()` before an http request handling event loop of `App` class. The monotoring thread checks the `callbacks/urls.json` change for every one second by `App::monitor_file_change()`, and if it's changed, reloading the routing file to update callback hashmaps (`Router::pattern_to_callback`) by `Router::load_url_pattern_from_file()`. More specifically, all `.so` files specified in the `callbacks/urls.json` file are loaded by `Router::load_shared_object_file()` and then Cjango loads callbacks from the files by `Router::load_callback()`.
+
+Note that if the specified `.so` file is not located to the path, Cjango instead loads a default callback function which returns `500 Internal Server Error` on web browsers and generates a debugging message to terminal.
 
 For example, suppose you defined `render_with_db_fast` and `render_with_db_fast_v2` in your `callbacks/db-access.cpp`. If your callback function is written in a single file, you can compile your callback function  without writing single line of Make commands.
 
@@ -260,5 +262,6 @@ Since the file-monitoring thread just checks **the url-mapping file**, it's poss
 ### Credits
 
 #### Libraries
-+ [nlohmann/json](https://github.com/nlohmann/json)
-+ [simplefilewatcher](https://github.com/apetrone/simplefilewatcher)
++ Json parser library: [nlohmann/json](https://github.com/nlohmann/json) (MIT)
++ File monitoring library: [simplefilewatcher](https://github.com/apetrone/simplefilewatcher) (MIT)
++ Fast logging library: [spdlog](https://github.com/gabime/spdlog/) (MIT)
