@@ -25,13 +25,14 @@ int main(int argc, char* argv[])
   int port_number;
   iss >> command;
   iss >> port_number;
-  std::string settings_path = "../json/settings.json";
+  std::string settings_path = "../json/settings.json"; // default
   if (argc == 5) {
     if (strncmp(argv[3], "--setting", strlen("--setting")) == 0) {
       settings_path = argv[4];
     }
   }
 
+// FIXME --whitelist and --settings
 #ifdef DEBUG
   if (argc > 3 && std::string(argv[3]) == "--whitelist") {
     for (int i = 4; i < argc; ++i)
@@ -41,50 +42,45 @@ int main(int argc, char* argv[])
   }
 #endif
 
+  App app;
 
-
-  // std::shared_ptr<spdlog::logger> parse_logger = spdlog::stdout_color_mt("html");
-  // std::shared_ptr<spdlog::logger> route_logger = spdlog::stdout_color_mt("route");
-  // loggers[parse_logger->name()] = parse_logger;
-  // loggers[route_logger->name()] = route_logger;
-
-  _SPDLOG("html", info, "Welcome to spdlog! {} {}", 1, " 23");
-
-  std::string static_root_dir;
   // set mappings of URL -> static files
   std::ifstream i(settings_path);
   _SPDLOG("path", info, "settings: {}", settings_path);
   nlohmann::json j;
-  i >> j;
-  g_url_json_dir = "../json/";
-  for (nlohmann::json::iterator it = j.begin(); it != j.end(); ++it) {
-    if (it.key() == std::string("STATIC_URL"))
-      static_root_dir = it.value();
-
-    if (it.key() == std::string("TEMPLATES")) {
-      g_templates_root_dir = it.value(); // FIXME global variable
-      http::HttpResponse::templates_root = g_templates_root_dir;
-
+  try {
+    i >> j;
+    for (nlohmann::json::iterator it = j.begin(); it != j.end(); ++it) {
+      if (it.key() == std::string("STATIC_URL"))
+        app.router.set_static_dir(it.value());
+      if (it.key() == std::string("TEMPLATES"))
+        http::HttpResponse::templates_root = it.value();
+      if (it.key() == std::string("CALLBACKS"))
+        g_callbacks_root_dir = it.value(); // FIXME local
+      if (it.key() == std::string("URLS_JSON"))
+        app.set_urls_json_dir(it.value()); // FIXME local
     }
-
-    if (it.key() == std::string("CALLBACKS"))
-      g_callbacks_root_dir = it.value();
-    if (it.key() == std::string("URLS_JSON")) {
-      g_url_json_dir = it.value();
-    }
+  } catch (const std::exception& e) {
+    _SPDLOG("path", error, "json error: {}", e.what());
+    return 1;
   }
 
+
   if (command == "runserver") {
-    App app;
-#ifndef CJANGO_DYNLOAD
-    // if CJANGO_DYNLOAD, load "json/urls.json"
+
+#ifdef CJANGO_DYNLOAD
+    app.add_monitored_dir(app.get_urls_json_dir());
+    app.reload_url_mappings();
+#else
     app.add_route("/abc", callback_1);
     app.add_route("/efg/[0-9]{4}/[0-9]{2}", callback_1);
 #endif
-    app.router.set_static_dir(static_root_dir);
     app.run(port_number);
+
   } else {
+
     printf("invalid command");
+
   }
 
   return 0;

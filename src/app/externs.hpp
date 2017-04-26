@@ -8,7 +8,6 @@
 #include "../routing/router.hpp"
 using std::string;
 
-extern std::string g_templates_root_dir;
 extern std::string g_callbacks_root_dir;
 extern std::string g_url_json_dir;
 

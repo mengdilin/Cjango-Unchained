@@ -27,9 +27,8 @@ using callback_type = http::HttpResponse (*)(http::HttpRequest);
 * @warning  this example may include some wrong descriptions
 */
 
-// FIXME scoped enum
 enum class RouterException { INVALID_URL, STATIC_FILE_SERVED };
-const std::string route_logger_name = "route";
+const std::string route_logger_name = "route"; //FIXME non-global
 
 using functor = std::function<http::HttpResponse(http::HttpRequest)>;
 using URLmap = std::unordered_map<std::string, functor>;
@@ -38,17 +37,15 @@ class Router {
   private:
     URLmap pattern_to_callback;
     std::vector<std::string> patterns_list;
-    std::string static_root_dir;
+    static std::string static_root_dir; // class variable
 #ifdef CJANGO_DYNLOAD
     std::vector<dlib_handler> dlib_handlers;
     std::unordered_map<std::string, int> ref_count;
 #endif
   public:
     Router(URLmap routes) {
-      for (std::pair<std::string, functor> p : routes) {
+      for (std::pair<std::string, functor> p : routes)
         add_route(p.first, p.second);
-      }
-      // "calls add_route to populate pattern_to_callback and patterns_list"
     };
     Router() {};
     int nr_patterns() const { return patterns_list.size(); };
@@ -57,13 +54,13 @@ class Router {
 #ifdef CJANGO_DYNLOAD
     void *load_shared_object_file(const std::string& path);
     callback_type load_callback(const std::string& path, const std::string& func_name);
-    void load_url_pattern_from_file();
+    void load_url_pattern_from_file(const std::string url_json_dir);
 #endif
-    void set_static_dir(std::string dir) { static_root_dir = dir; };
-    std::string get_static_dir() { return static_root_dir; };
-    // Note: register() should be renamed from add_route() for django mimicking,
+    void set_static_dir(const std::string dir) { static_root_dir = dir; };
+    std::string get_static_dir() const { return static_root_dir; };
+    // Note: register() should be renamed from add_route() for mimicking django,
     // but "register" is a reserved word in C++.
-    std::string resolve(http::HttpRequest);
+    std::string resolve(http::HttpRequest) const;
     http::HttpResponse get_http_response(http::HttpRequest);
 };
 

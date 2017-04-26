@@ -5,9 +5,10 @@
 #include <algorithm>
 #endif
 
-std::string g_templates_root_dir;
 std::string g_callbacks_root_dir;
 std::string g_url_json_dir;
+
+std::string Router::static_root_dir; // static var has to be defined in cpp
 
 inline bool registered(std::vector<std::string> plist, std::string url_pattern) {
   bool found = find(plist.begin(), plist.end(), url_pattern) != plist.end();
@@ -50,7 +51,7 @@ void Router::add_route(std::string url_pattern, functor f) {
 ** Both enums are handled in get_http_response().
 ** @return a corresponding url pattern such as "diary/[0-9]{4}/[0-9]{2}/"
 */
-std::string Router::resolve(http::HttpRequest request) {
+std::string Router::resolve(http::HttpRequest request) const {
 
   std::string path = request.get_path();
   for (const auto &p : patterns_list) {
@@ -73,7 +74,6 @@ std::string Router::resolve(http::HttpRequest request) {
 
 #ifdef CJANGO_DYNLOAD
 void *Router::load_shared_object_file(const std::string& path) {
-  _SPDLOG(cjango::route_logger_name, error,"callback root path: {}", g_callbacks_root_dir + path);
   const auto lib = dlopen((g_callbacks_root_dir + path).c_str(), RTLD_LAZY);
   if (!lib) {
     // Note: two successive dlerror() calls result in segfault
@@ -113,8 +113,7 @@ callback_type Router::load_callback(const std::string& path, const std::string& 
   const auto dlsym_error = dlerror();
   if (dlsym_error) {
     _SPDLOG(route_logger_name, error, "Cannot load symbol {}", dlsym_error);
-    throw "no such a callback name";
-    // exit(EXIT_FAILURE);
+    throw "no such an object file";
   }
    // FIXME where should we invoke dlclise()?
   return reinterpret_cast<callback_type>(func);
@@ -128,15 +127,16 @@ callback_type Router::load_callback(const std::string& path, const std::string& 
 /**
 ** @brief called in App::monitor_file_change() for reloading entire url mappings
 */
-void Router::load_url_pattern_from_file() {
+void Router::load_url_pattern_from_file(const std::string url_json_dir) {
 
   erase_all_patterns();
 
-  std::ifstream i(g_url_json_dir+"urls.json");
-
+  std::ifstream i(url_json_dir + "urls.json");
+  printf("%s   \n", url_json_dir.c_str());
   nlohmann::json j;
   i >> j;
   _SPDLOG(route_logger_name, info, "loaded urls.json");
+  _SPDLOG(route_logger_name, info, "callback dir: {}", g_callbacks_root_dir);
   for (nlohmann::json::iterator it = j.begin(); it != j.end(); ++it) {
     const auto cinfo = it.value(); // callback info
 
@@ -154,8 +154,8 @@ void Router::load_url_pattern_from_file() {
       // implicitly casted into std::function<callback_type>
       callback = static_cast<functor>(load_callback(cinfo["file"], cinfo["funcname"]));
     } catch (const char *e) {
-      callback = [](http::HttpRequest h){ return http::HttpResponse("invalid callback specified"); };
-      _SPDLOG(route_logger_name, info, "Invalid callback: {} {}", cinfo["file"], cinfo["funcname"]);
+      callback = [](http::HttpRequest h){ return http::HttpResponse("<h1>500 Internal Server Error</h1>"); };
+      _SPDLOG(route_logger_name, info, "Invalid callback");
       // continue;
     }
     add_route(it.key(), callback);

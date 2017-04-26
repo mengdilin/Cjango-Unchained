@@ -18,9 +18,12 @@ class UpdateListener : public FW::FileWatchListener
 {
 public:
     UpdateListener() {}
-    void handleFileAction(FW::WatchID watchid, const FW::String& dir, const FW::String& filename,
-        FW::Action action, bool& is_updated)
-    {
+    void handleFileAction(
+        FW::WatchID watchid,
+        const FW::String& dir,
+        const FW::String& filename,
+        FW::Action action, bool& is_updated
+    ) {
         // In order to share a update flag between monitor process and main process
         // without using a global variable, I needed to add is_update argument.
         // However, adding is_updated is actually a LARGE change because:
@@ -39,15 +42,14 @@ public:
         std::smatch match;
 
         if (std::regex_search(filename.begin(), filename.end(), match, urls_rgx)) {
-            _DEBUG(dir, " -> ", filename, " has event ", action, "\n\n\n");
+            _SPDLOG("update", info, "{}:{}:{}", dir, filename, action);
             is_updated = true;
         }
 
         std::regex settings_rgx("settings.json");
         if (std::regex_search(filename.begin(), filename.end(), match, settings_rgx)) {
-            _DEBUG(dir, " -> ", filename, " has event ", action, "\n\n\n");
-            // FIXME return filenames
-            is_updated = true;
+            _SPDLOG("update", info, "{}:{}:{}", dir, filename, action);
+            is_updated = true; // FIXME return filenames
         }
     }
 };
@@ -63,6 +65,7 @@ public:
     bool is_file_updated;
     void monitor_file_change();
     void spawn_monitor_thread();
+    std::string urls_json_dir;
 #endif
     void add_route(std::string url_pattern, functor f) {
       router.add_route(url_pattern, f);
@@ -74,14 +77,6 @@ public:
     App() : servSock{-1} {
 #else
     App() : servSock{-1}, is_file_updated(false) {
-        router.load_url_pattern_from_file();
-        // create the listener (before the file watcher - so it gets destroyed after the file watcher)
-
-        // add a watch to the system
-        // the file watcher doesn't manage the pointer to the listener - so make sure you don't just
-        // allocate a listener here and expect the file watcher to manage it - there will be a leak!
-        // FW::WatchID watchID =
-        fileWatcher.addWatch(g_url_json_dir, &listener, true);
 #endif
     }
     //App(Router& rt): router(rt), servSock{-1} {}
@@ -90,6 +85,18 @@ public:
         Router tmp(routes);
         this->router = tmp;
     }
+    void reload_url_mappings() { router.load_url_pattern_from_file(urls_json_dir); };
+    void add_monitored_dir(std::string dir) {
+        // create the listener (before the file watcher - so it gets destroyed after the file watcher)
+
+        // add a watch to the system
+        // the file watcher doesn't manage the pointer to the listener - so make sure you don't just
+        // allocate a listener here and expect the file watcher to manage it - there will be a leak!
+        // FW::WatchID watchID =
+        fileWatcher.addWatch(dir, &listener, true);
+    };
+    void set_urls_json_dir(std::string dir) { urls_json_dir = dir; };
+    std::string get_urls_json_dir() const { return urls_json_dir; };
     void print_routes();
     void run(int port);
     int handle_request(int socket);

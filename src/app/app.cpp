@@ -166,7 +166,7 @@ void App::monitor_file_change() {
     for (;;) {
         this->fileWatcher.update(is_file_updated);
         if(is_file_updated) {
-            router.load_url_pattern_from_file();
+            router.load_url_pattern_from_file(get_urls_json_dir());
             is_file_updated = false;
         }
         // prevent busy looping -- should take a rest for a while
