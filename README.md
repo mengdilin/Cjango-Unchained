@@ -41,6 +41,19 @@ or
 
 And access to `http://127.0.0.1:8000` shows Cjango welcome page.
 
+## Demo
+
+To run the 2 demos under the demo folder
+```
+python manage.py runserver 8080 --setting $(PWD)/Cjango-Unchained/demo/get_demo/json/settings.json
+
+```
+or
+```
+python manage.py runserver 8080 --setting $(PWD)/Cjango-Unchained/demo/post_demo/json/settings.json
+
+```
+
 ## Main files
 
 - `Cjango-Unchained` ... root directory (can be renamed)
