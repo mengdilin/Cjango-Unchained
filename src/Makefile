@@ -65,14 +65,16 @@ app.o : app/app.cpp
 	$(CC) $(CPPFLAGS) -c $^
 router.o : routing/router.cpp
 	$(CC) $(CPPFLAGS) -c $^
-logger.o: app/logger.cpp
-	$(CC) $(CPPFLAGS) -fPIC -c $^
+app/logger.o: app/logger.cpp
+	$(CC) $(CPPFLAGS) -fPIC -o $@ -c $^
 
 # Needed for Linux (/usr/bin/ld: http_parser/http_response.o: relocation R_X86_64_32 against `__pthread_key_create' can not be used when making a shared object; recompile with -fPIC)
 http_parser/http_request.o: http_parser/http_request.cpp http_parser/http_session.cpp
 	$(CC) $(CPPFLAGS) -fPIC -c http_parser/http_request.cpp -o $@
 http_parser/http_response.o: http_parser/http_response.cpp
 	$(CC) $(CPPFLAGS) -fPIC -c http_parser/http_response.cpp -o $@
+http_parser/http_session.o: http_parser/http_session.cpp
+	$(CC) $(CPPFLAGS) -fPIC -c http_parser/http_session.cpp -o $@
 
 # http_request.cpp uses _SPDLOG which calls cjango_logger global variable
 # Without defining that variable, linker returns error. Thus app/logger.o
@@ -95,7 +97,7 @@ test-run:
 	$(UNITTESTEXE) -r compact
 
 clean:
-	rm -f core $(PROG) $(OBJS) $(HTTPPARSERCPP) $(DEPENDS) $(UNITTESTS) $(UNITTESTEXE)
+	rm -f core $(PROG) $(OBJS) $(HTTPPARSEROBJ) $(HTTPPARSEROBJ:.o=.d) $(DEPENDS) $(UNITTESTS) $(UNITTESTEXE)
 
 # By -MMD -MP flags, dependency between source files are written in *.d files
 # These *.d files are included here in order to auto-recompile when header files change

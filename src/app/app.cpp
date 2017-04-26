@@ -48,7 +48,7 @@ void App::add_monitored_dir(const std::string dir) {
         // the file watcher doesn't manage the pointer to the listener - so make sure you don't just
         // allocate a listener here and expect the file watcher to manage it - there will be a leak!
         // FW::WatchID watchID =
-        _SPDLOG(logskt, info, "add: {}", dir)
+        _SPDLOG(logskt, info, "add: {}", dir);
         try {
             fileWatcher.addWatch(dir, &listener, true);
         } catch (FW::FileNotFoundException e) {
