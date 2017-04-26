@@ -60,14 +60,11 @@ std::string Router::resolve(http::HttpRequest request) const {
       return p;
   }
 
-  std::regex rgx(get_static_dir() + "/.*"); // FIXME arbitrary static folder
+  _SPDLOG(route_logger_name, info, "static dir:{}  path:{}", get_static_dir(), path);
+  std::regex rgx(".*static/.*"); // Note: regex_match is for an entire string
   if (std::regex_match(path, rgx)) {
     throw RouterException::STATIC_FILE_SERVED;
   }
-
-  _SPDLOG(route_logger_name, error,
-          "resolve(): this path doesn't match any rules: {}",
-          request.get_path());
 
   throw RouterException::INVALID_URL;
 }
@@ -179,7 +176,7 @@ http::HttpResponse Router::get_http_response(http::HttpRequest request) {
         _SPDLOG(route_logger_name, warn, "this HttpRequest.path is invalid: {}", request.get_path());
         return http::HttpResponse("Cjango: 404 Page Not Found");
       case RouterException::STATIC_FILE_SERVED:
-        const std::regex r("((png|gif|jpeg|bmp|webp))$");
+        const std::regex r("((png|gif|jpeg|bmp|webp|ico))$");
         std::smatch sm;
         // std::regex_search forbids a temporary string
         std::string path = request.get_path();
