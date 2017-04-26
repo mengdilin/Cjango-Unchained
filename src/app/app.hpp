@@ -89,15 +89,7 @@ public:
         this->router = tmp;
     }
     void reload_url_mappings() { router.load_url_pattern_from_file(urls_json_dir); };
-    void add_monitored_dir(std::string dir) {
-        // create the listener (before the file watcher - so it gets destroyed after the file watcher)
-
-        // add a watch to the system
-        // the file watcher doesn't manage the pointer to the listener - so make sure you don't just
-        // allocate a listener here and expect the file watcher to manage it - there will be a leak!
-        // FW::WatchID watchID =
-        fileWatcher.addWatch(dir, &listener, true);
-    };
+    void add_monitored_dir(const std::string dir);
     void set_urls_json_dir(std::string dir) { urls_json_dir = dir; };
     std::string get_urls_json_dir() const { return urls_json_dir; };
     void print_routes();

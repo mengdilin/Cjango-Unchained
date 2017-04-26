@@ -1,0 +1,6 @@
+{
+  "/" : {
+    "file" : "example.so",
+    "funcname": "hello_world"
+  }
+}

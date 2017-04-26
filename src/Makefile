@@ -1,6 +1,6 @@
 #Makefile for our library
 
-PROG = runapp
+PROG = manage
 CC = g++
 CPPFLAGS = -std=c++1z -Wall -pthread -MMD -MP
 CPPFLAGS += -I./app/ -I./lib/
@@ -55,7 +55,7 @@ DEPENDS   = $(TESTOBJS:.o=.d)
 # Note: $< is only the first source file
 
 # -ldl is needed for Linux
-$(PROG) : $(TESTOBJS) $(HTTPPARSERLIB) app/runapp.cpp
+$(PROG) : $(TESTOBJS) $(HTTPPARSERLIB) app/manage.cpp
 	$(CC) $(OVERALLCPP) -o $@ $^ -ldl
 # main.o : app/main.cpp
 # 	$(CC) $(CPPFLAGS) -c $^

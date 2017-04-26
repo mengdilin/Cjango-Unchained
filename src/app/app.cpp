@@ -41,6 +41,24 @@ constexpr unsigned int BUFFER_MAXSIZE = 4096;
 const std::string logskt = "skt";
 enum HandleRequestOp { NO_CHANGE, CLR_FDSET, CLOSE_SOCK };
 
+void App::add_monitored_dir(const std::string dir) {
+        // create the listener (before the file watcher - so it gets destroyed after the file watcher)
+
+        // add a watch to the system
+        // the file watcher doesn't manage the pointer to the listener - so make sure you don't just
+        // allocate a listener here and expect the file watcher to manage it - there will be a leak!
+        // FW::WatchID watchID =
+        _SPDLOG(logskt, info, "add: {}", dir)
+        try {
+            fileWatcher.addWatch(dir, &listener, true);
+        } catch (FW::FileNotFoundException e) {
+            _SPDLOG(logskt, error,
+                "no such dir: {}. "
+                "Please check the 'URLS_JSON' value in your settings.json", dir)
+            exit(1);
+        }
+    }
+
 void App::print_routes()
 {
     std::cout << "Hello app!" << std::endl;

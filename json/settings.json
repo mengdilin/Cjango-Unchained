@@ -1,0 +1,6 @@
+{
+  "CALLBACKS": "callbacks/",
+  "URLS_JSON": "jsons/",
+  "STATIC_URL": "static/",
+  "TEMPLATES": "templates/"
+}
