@@ -4,6 +4,7 @@ PROG = runapp
 CC = g++
 CPPFLAGS = -std=c++1z -Wall -pthread -MMD -MP
 CPPFLAGS += -I./app/ -I./lib/
+
 #CPPFLAGS += -ferror-limit=5   # doesn't work on Linux
 DEBUG ?= 1
 CJANGO_DYNLOAD ?= 1
@@ -26,6 +27,10 @@ TESTOBJS = app/app.o routing/router.o app/logger.o \
   $(SFCDIR)/FileWatcher.o \
   $(SFCDIR)/FileWatcherOSX.o \
   $(SFCDIR)/FileWatcherLinux.o
+
+UNITTESTDIR=tests
+UNITTESTS= $(UNITTESTDIR)/test-Router.o
+UNITTESTEXE=$(UNITTESTDIR)/tests
 
 HTTPPARSEROBJ = http_parser/http_request_parser.o\
 	http_parser/http_request_body_parser.o \
@@ -83,8 +88,12 @@ lib/simplefilewatcher/build/intermediate/Debug/FileWatcherOSX.o:
 lib/simplefilewatcher/build/intermediate/Debug/FileWatcherLinux.o:
 	make -C lib/simplefilewatcher/build/gmake
 
+test: $(UNITTESTS) $(TESTOBJS)
+	$(CC) $(CPPFLAGS) $(UNITTESTDIR)/test-main.cpp -c -o $(UNITTESTDIR)/test-main.o
+	$(CC) $(CPPFLAGS) $(UNITTESTDIR)/test-main.o $(UNITTESTS) $(TESTOBJS) -o $(UNITTESTEXE) && $(UNITTESTDIR)/tests -r compact
+
 clean:
-	rm -f core $(PROG) $(OBJS) $(HTTPPARSERCPP) $(DEPENDS)
+	rm -f core $(PROG) $(OBJS) $(HTTPPARSERCPP) $(DEPENDS) $(UNITTESTS) $(UNITTESTEXE)
 
 # By -MMD -MP flags, dependency between source files are written in *.d files
 # These *.d files are included here in order to auto-recompile when header files change

@@ -13,3 +13,6 @@ misc
 logs
 src/doc/html
 src/doc/latex
+.Rhistory
+tests
+*.pyc

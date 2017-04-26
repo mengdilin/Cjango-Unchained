@@ -260,5 +260,6 @@ Since the file-monitoring thread just checks **the url-mapping file**, it's poss
 ### Credits
 
 #### Libraries
-+ [nlohmann/json](https://github.com/nlohmann/json)
-+ [simplefilewatcher](https://github.com/apetrone/simplefilewatcher)
++ Json parser library: [nlohmann/json](https://github.com/nlohmann/json) (MIT)
++ File monitoring library: [simplefilewatcher](https://github.com/apetrone/simplefilewatcher) (MIT)
++ Fast logging library: [spdlog](https://github.com/gabime/spdlog/) (MIT)
