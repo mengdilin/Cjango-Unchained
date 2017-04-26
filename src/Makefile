@@ -90,7 +90,9 @@ lib/simplefilewatcher/build/intermediate/Debug/FileWatcherLinux.o:
 
 test: $(UNITTESTS) $(TESTOBJS)
 	$(CC) $(CPPFLAGS) $(UNITTESTDIR)/test-main.cpp -c -o $(UNITTESTDIR)/test-main.o
-	$(CC) $(CPPFLAGS) $(UNITTESTDIR)/test-main.o $(UNITTESTS) $(TESTOBJS) -o $(UNITTESTEXE) && $(UNITTESTDIR)/tests -r compact
+	$(CC) $(CPPFLAGS) $(UNITTESTDIR)/test-main.o $(UNITTESTS) $(TESTOBJS) -o $(UNITTESTEXE)
+test-run:
+	$(UNITTESTEXE) -r compact
 
 clean:
 	rm -f core $(PROG) $(OBJS) $(HTTPPARSERCPP) $(DEPENDS) $(UNITTESTS) $(UNITTESTEXE)
