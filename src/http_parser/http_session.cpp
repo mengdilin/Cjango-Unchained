@@ -6,9 +6,13 @@ http::HttpSession::~HttpSession() {
 
 
 http::HttpSession::HttpSession() {
+  //initializes rw lock
   pthread_rwlock_init(&lock, NULL);
 }
 
+/**
+** @brief exception class in case HttpSession::get wants to hard-fail when key is not present
+*/
 class http_session_get_exception: public std::exception {
   virtual const char* what() const throw()
   {
@@ -17,9 +21,11 @@ class http_session_get_exception: public std::exception {
 } sessionex;
 
 
+/**
+** @brief a key in a session map, return its value. Returns an empty string if key not found
+*/
 std::string http::HttpSession::get(std::string key) {
-  //get shared access for read lock
-  //std::shared_lock<ting::shared_mutex> lock(mutex_);
+
   pthread_rwlock_rdlock(&lock);
   auto result = single_session.find(key);
   if (result != single_session.end()) {
@@ -34,9 +40,11 @@ std::string http::HttpSession::get(std::string key) {
 
 }
 
+/**
+** @brief a (key, value pair), insert it to session map
+*/
 void http::HttpSession::set(std::string key, std::string value) {
   //get exclusive access for write lock
-  //std::unique_lock<ting::shared_mutex> lock(mutex_);
   pthread_rwlock_wrlock(&lock);
   auto result = single_session.find(key);
   if (result != single_session.end()) {

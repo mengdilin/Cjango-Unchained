@@ -4,6 +4,8 @@ PROG = runapp
 CC = g++
 CPPFLAGS = -std=c++1z -Wall -pthread -MMD -MP
 CPPFLAGS += -I./app/ -I./lib/
+OVERALLCPP = $(CPPFLAGS)
+OVERALLCPP += -L./app/ -lhttp_response -lhttp_request
 
 #CPPFLAGS += -ferror-limit=5   # doesn't work on Linux
 DEBUG ?= 1
@@ -30,22 +32,17 @@ TESTOBJS = app/app.o routing/router.o app/logger.o \
 
 UNITTESTDIR=tests
 UNITTESTS= $(UNITTESTDIR)/test-Router.o
+UNITTESTS= $(UNITTESTDIR)/test-http-request-parser.o
 UNITTESTEXE=$(UNITTESTDIR)/tests
 
 HTTPPARSEROBJ = http_parser/http_request_parser.o\
 	http_parser/http_request_body_parser.o \
 	http_parser/url_encoded_form_parser.o \
 	http_parser/http_request_line.o \
-	http_parser/http_stream_reader.o \
-	http_parser/http_response.o \
-	http_parser/http_request.o \
-	http_parser/http_session.o
-
+	http_parser/http_stream_reader.o
 HTTPPARSERLIB = app/libhttp_response.so \
-	app/libhttp_request.so \
-	http_parser/http_response.o \
-	http_parser/http_request.o \
-	http_parser/http_session.o
+	app/libhttp_request.so
+
 
 TESTOBJS += $(HTTPPARSEROBJ)
 OBJS += $(HTTPPARSEROBJ)
@@ -58,7 +55,7 @@ DEPENDS   = $(TESTOBJS:.o=.d)
 
 # -ldl is needed for Linux
 $(PROG) : $(TESTOBJS) $(HTTPPARSERLIB) app/runapp.cpp
-	$(CC) $(CPPFLAGS) -o $@ $^ -ldl
+	$(CC) $(OVERALLCPP) -o $@ $^ -ldl
 main.o : app/main.cpp
 	$(CC) $(CPPFLAGS) -c $^
 app.o : app/app.cpp
@@ -88,9 +85,9 @@ lib/simplefilewatcher/build/intermediate/Debug/FileWatcherOSX.o:
 lib/simplefilewatcher/build/intermediate/Debug/FileWatcherLinux.o:
 	make -C lib/simplefilewatcher/build/gmake
 
-test: $(UNITTESTS) $(TESTOBJS)
-	$(CC) $(CPPFLAGS) $(UNITTESTDIR)/test-main.cpp -c -o $(UNITTESTDIR)/test-main.o
-	$(CC) $(CPPFLAGS) $(UNITTESTDIR)/test-main.o $(UNITTESTS) $(TESTOBJS) -o $(UNITTESTEXE)
+test: $(UNITTESTS) $(TESTOBJS) $(HTTPPARSERLIB)
+	$(CC) $(OVERALLCPP) $(UNITTESTDIR)/test-main.cpp -c -o $(UNITTESTDIR)/test-main.o
+	$(CC) $(OVERALLCPP) $(UNITTESTDIR)/test-main.o $(UNITTESTS) $(TESTOBJS) -o $(UNITTESTEXE)
 test-run:
 	$(UNITTESTEXE) -r compact
 

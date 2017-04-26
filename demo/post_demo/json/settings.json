@@ -1,0 +1,6 @@
+{
+  "STATIC_URL": "../demo/post_demo/static/",
+  "TEMPLATES": "../demo/post_demo/templates/",
+  "CALLBACKS": "../demo/post_demo/callbacks/",
+  "URLS_JSON": "../demo/post_demo/json/"
+}

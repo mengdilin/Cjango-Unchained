@@ -9,14 +9,13 @@
 #include <pthread.h>
 /** @file http_session.hpp
  * \ingroup http
- * @brief HttpSession class declaration
+ * @brief HttpSession class declaration. This class is thread-safe
  */
 
 namespace http {
   class HttpSession {
   private:
     std::unordered_map<std::string, std::string> single_session;
-    //mutable ting::shared_mutex mutex_;
     pthread_rwlock_t lock;
 
   public:

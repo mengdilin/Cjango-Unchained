@@ -7,6 +7,7 @@
 
 std::string g_templates_root_dir;
 std::string g_callbacks_root_dir;
+std::string g_url_json_dir;
 
 inline bool registered(std::vector<std::string> plist, std::string url_pattern) {
   bool found = find(plist.begin(), plist.end(), url_pattern) != plist.end();
@@ -72,6 +73,7 @@ std::string Router::resolve(http::HttpRequest request) {
 
 #ifdef CJANGO_DYNLOAD
 void *Router::load_shared_object_file(const std::string& path) {
+  _SPDLOG(cjango::route_logger_name, error,"callback root path: {}", g_callbacks_root_dir + path);
   const auto lib = dlopen((g_callbacks_root_dir + path).c_str(), RTLD_LAZY);
   if (!lib) {
     // Note: two successive dlerror() calls result in segfault
@@ -130,7 +132,8 @@ void Router::load_url_pattern_from_file() {
 
   erase_all_patterns();
 
-  std::ifstream i("../json/urls.json");
+  std::ifstream i(g_url_json_dir+"urls.json");
+
   nlohmann::json j;
   i >> j;
   _SPDLOG(route_logger_name, info, "loaded urls.json");

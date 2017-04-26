@@ -30,6 +30,10 @@ char http::UrlEncodedFormParser::charToInt(char ch)
     return -1;
 }
 
+/* UrlDecoder codes found online:
+ * https://github.com/int2e/UrlEncoder/blob/master/Encoder.cpps
+ *
+ */
 char http::UrlEncodedFormParser::strToBin(char *pString)
 {
     char szBuffer[2];
@@ -40,6 +44,10 @@ char http::UrlEncodedFormParser::strToBin(char *pString)
     return ch;
 }
 
+/* UrlDecoder codes found online:
+ * https://github.com/int2e/UrlEncoder/blob/master/Encoder.cpps
+ *
+ */
 std::string http::UrlEncodedFormParser::urlDecode(const std::string &str)
 {
     std::string strResult;
@@ -68,8 +76,10 @@ std::string http::UrlEncodedFormParser::urlDecode(const std::string &str)
     }
     return strResult;
 }
-/* end of external code use */
 
+/**
+** @brief given current input stream containing get or post params encoded as a single string, parses it into a map
+*/
 std::unordered_map<std::string, std::string> http::UrlEncodedFormParser::get_parameter(std::istream& input_stream, int content_leng) {
   std::unordered_map<std::string, std::string> parameters_map;
   if (content_leng != 0) {
@@ -79,15 +89,12 @@ std::unordered_map<std::string, std::string> http::UrlEncodedFormParser::get_par
     if (content.length() == 0) {
       return parameters_map;
     }
-    //_DEBUG("content: ", content);
 
     std::string url_decoded_query;
     url_decoded_query = urlDecode(content);
-   //_DEBUG("url decoded query: ", url_decoded_query);
     std::vector<std::string> params_for_content = split(url_decoded_query, '&');
 
     for (auto key_value_string : params_for_content) {
-      //_DEBUG("key_value_string: ", key_value_string);
       auto loc = key_value_string.find("=", 0);
       if (loc == std::string::npos || loc == 0) {
         _DEBUG("malformed url query string: ", key_value_string);
@@ -97,11 +104,7 @@ std::unordered_map<std::string, std::string> http::UrlEncodedFormParser::get_par
 
       } else {
         std::string key = key_value_string.substr(0, loc);
-        //std::replace(key.begin(), key.end(), '+', ' ');
         std::string value = key_value_string.substr(loc+1, key_value_string.length());
-
-        //std::replace(value.begin(), value.end(), '+', ' ');
-        //_DEBUG("param key:",key,":",value);
         parameters_map.insert(std::make_pair(key, value));
       }
     }
@@ -109,6 +112,9 @@ std::unordered_map<std::string, std::string> http::UrlEncodedFormParser::get_par
   return parameters_map;
 }
 
+/**
+** @brief splits a string by a character delimiter and returns the result as a vector
+*/
 std::vector<std::string> http::UrlEncodedFormParser::split(std::string str, char delimiter) {
   std::vector<std::string> result;
   std::istringstream ss(str);

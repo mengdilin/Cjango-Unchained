@@ -1,0 +1,14 @@
+{
+  "/home" : {
+    "file" : "mycallbacks.so",
+    "funcname": "page_home"
+  },
+   "/search_blog" : {
+    "file" : "mycallbacks.so",
+    "funcname": "page_index"
+  },
+  "/insert_blog" : {
+    "file" : "mycallbacks.so",
+    "funcname": "page_insert"
+  }
+}

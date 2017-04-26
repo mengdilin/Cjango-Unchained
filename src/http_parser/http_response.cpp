@@ -1,9 +1,12 @@
 #include "http_response.hpp"
-#include "../app/externs.hpp"
 #include <fstream>
 #include <streambuf>
+#include "../app/externs.hpp"
+std::string http::HttpResponse::templates_root;
 
-
+/**
+** @brief given a key value pair, inserts the pair to request's cookie
+*/
 void http::HttpResponse::set_cookie(std::string key, std::string value) {
   auto result = headers.find("Set-Cookie");
   if (result != headers.end()) {
@@ -12,12 +15,14 @@ void http::HttpResponse::set_cookie(std::string key, std::string value) {
     headers.insert({"Set-Cookie", result->second});
 
   } else {
-    _DEBUG("inside second");
     headers.insert({"Set-Cookie", key+"="+value});
   }
 
 }
 
+/**
+** @brief given a file path, content type of the file, and a http request, generate a http response
+*/
 http::HttpResponse http::HttpResponse::render_to_response(std::string path, std::string content_type, http::HttpRequest& request) {
   auto response = HttpResponse::render_to_response(path, content_type);
   if (request.has_session_id()) {
@@ -25,6 +30,10 @@ http::HttpResponse http::HttpResponse::render_to_response(std::string path, std:
   }
   return response;
 }
+
+/**
+** @brief given a file path and a http request, generate a http response
+*/
 http::HttpResponse http::HttpResponse::render_to_response(std::string file, http::HttpRequest& request) {
   auto response = HttpResponse::render_to_response(file);
   if (request.has_session_id()) {
@@ -32,15 +41,33 @@ http::HttpResponse http::HttpResponse::render_to_response(std::string file, http
   }
   return response;
 }
+
+/**
+** @brief given a file path, generate a http response
+*/
 http::HttpResponse http::HttpResponse::render_to_response(std::string path) {
-  std::ifstream t(path);
+  std::ifstream t(HttpResponse::templates_root+path);
   std::string str((std::istreambuf_iterator<char>(t)),
                  std::istreambuf_iterator<char>());
   return HttpResponse(str);
 }
 
+
+/**
+** @brief given a file path, generate a string containing file's data
+*/
+std::string http::HttpResponse::get_template(std::string path) {
+  std::ifstream t(HttpResponse::templates_root+path);
+  std::string str((std::istreambuf_iterator<char>(t)),
+                 std::istreambuf_iterator<char>());
+  return str;
+}
+
+/**
+** @brief given a file path and content type of the file, generate a http response
+*/
 http::HttpResponse http::HttpResponse::render_to_response(std::string path, std::string content_type) {
-  std::ifstream t(path);
+  std::ifstream t(HttpResponse::templates_root+path);
   std::string str((std::istreambuf_iterator<char>(t)),
                  std::istreambuf_iterator<char>());
   return HttpResponse(str, content_type);
@@ -50,7 +77,6 @@ http::HttpResponse::HttpResponse(std::string content, std::string content_type) 
   this->content = content;
   this->content_type = content_type;
   headers.insert({"Content-Type", content_type});
-  //_DEBUG("content_length: ", content_type.length());
   headers.insert({"Content-Length", std::to_string(content.length())});
 }
 
@@ -58,7 +84,6 @@ http::HttpResponse::HttpResponse(std::string content, std::string content_type) 
 http::HttpResponse::HttpResponse(std::string content) {
   this->content = content;
   headers.insert({"Content-Type", content_type});
-  //_DEBUG("content_length: ", content_type.length());
   headers.insert({"Content-Length", std::to_string(content.length())});
 }
 
@@ -66,14 +91,15 @@ http::HttpResponse::HttpResponse(std::string content) {
 http::HttpResponse::HttpResponse(std::string content, http::HttpRequest& request) {
   this->content = content;
   headers.insert({"Content-Type", content_type});
-  //_DEBUG("content_length: ", content_type.length());
   headers.insert({"Content-Length", std::to_string(content.length())});
   if (request.has_session_id()) {
     this->set_cookie(HttpRequest::session_cookie_key, std::to_string(request.get_session_id()));
   }
 }
 
-
+/**
+** @brief helper method that translates http status code to status message
+*/
 std::string get_reason_phrase(int status_code) {
   switch(status_code) {
     case 200:
@@ -111,6 +137,7 @@ std::string get_reason_phrase(int status_code) {
   }
 }
 
+//default good constructor
 http::HttpResponse::HttpResponse(int status_code) {
   this->status_code = status_code;
   get_reason_phrase(status_code);
@@ -118,6 +145,9 @@ http::HttpResponse::HttpResponse(int status_code) {
   headers.insert({"Content-Length", std::to_string(content.length())});
 }
 
+/**
+** @brief returns a well-formated string version of http response compliant with the http protocol
+*/
 std::string http::HttpResponse::to_string() {
   std::string result;
   std::string crfl = "\r\n";
@@ -134,6 +164,9 @@ std::string http::HttpResponse::to_string() {
   result += content;
   return result;
 }
+/**
+** @brief helper function for debugging purposes: convenience of printing out http response
+*/
 std::ostream& http::operator<<(std::ostream& Str, const http::HttpResponse& v) {
 std::string result;
   std::string crfl = "\r\n";

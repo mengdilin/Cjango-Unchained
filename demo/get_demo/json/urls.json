@@ -1,0 +1,19 @@
+{
+  "/" : {
+    "file" : "cjango-welcome.so",
+    "funcname": "render_cjango_welcome_page"
+  },
+  "/efg/[0-9]{4}/[0-9]{2}" : {
+        "file": "mycallback2.so",
+    "funcname": "current_datetime"
+  },
+  "/cjango" : {
+    "file" : "official-site.so",
+    "funcname": "render_official_site"
+  },
+  "/json" : {
+    "file" : "json-example.so",
+    "funcname": "return_hello_json"
+  }
+}
+

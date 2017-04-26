@@ -11,12 +11,21 @@ http::HttpRequestParser::HttpRequestParser(
   this->body_parser = body_parser;
 }
 
+/**
+** @brief given an input_stream containing a http request, parses the request line and headers
+** @return a http request with populated headers and an empty body
+*/
 http::HttpRequest http::HttpRequestParser::parse_request_line_and_headers(std::istream& input_stream) {
   HttpRequestLine request_line = parse_line(input_stream); //line_parser
   std::unordered_map<std::string, std::string> request_headers = parse_head(input_stream); //header_parser
 
   return HttpRequest(request_line.action, request_line.uri, request_line.protocolVersion, request_headers, request_line.parameters, get_http_cookie(request_headers));
 }
+
+/**
+** @brief given an input_stream containing a http request, parses the request line, headers, and body
+** @return a http request object representing the data from the input_stream
+*/
 http::HttpRequest http::HttpRequestParser::parse(std::istream& input_stream) {
 
   HttpRequestLine request_line = parse_line(input_stream); //line_parser
@@ -41,7 +50,6 @@ http::HttpRequest http::HttpRequestParser::parse(std::istream& input_stream) {
     }
     std::stringstream ss;
     ss << input_stream.rdbuf();
-    //_DEBUG("stream: " , ss.str());
     return HttpRequest(
       request_line.action,
       request_line.uri,
@@ -52,20 +60,22 @@ http::HttpRequest http::HttpRequestParser::parse(std::istream& input_stream) {
       );
 
   } else {
-    //TODO: handle http HEAD
     return HttpRequest(request_line.action, request_line.uri, request_line.protocolVersion, request_headers, request_line.parameters, get_http_cookie(request_headers));
-
   }
 
 
 }
 
+/**
+** @brief helper method that given a string of encoded cookie key value pairs from parameters map, creates a cookie map,
+*/
 std::unordered_map<std::string, std::string> http::HttpRequestParser::get_http_cookie(std::unordered_map<std::string, std::string>& params) {
   std::unordered_map<std::string, std::string> cookies;
+
+  //get cookie value from params and parse
   auto result = params.find("Cookie");
   if (result != params.end()) {
     auto value = result->second;
-      //std::cout << "value: " << value << std::endl;
       std::vector<std::string> cookie_pairs = url_encoded_form_parser.split(value, ';');
       for (auto pair : cookie_pairs) {
         _SPDLOG(cjango_loggers.http, info, "cookie pair: {}",  pair);
@@ -87,28 +97,27 @@ std::unordered_map<std::string, std::string> http::HttpRequestParser::parse_body
   return body_parser.parse(input_stream, content_type, content_leng);
 }
 
+/**
+** @brief helper method that parses the first line of a http request
+*/
 http::HttpRequestLine http::HttpRequestParser::parse_line(std::istream& input_stream) {
   std::string request_line = this->reader.get_next_line(input_stream);
-  //_DEBUG("vector: ", request_line); // e.g. "GET /favicon.ico HTTP/1.1"
   //split request_line by white spaces
   std::vector<std::string> result;
   std::istringstream iss(request_line);
   for(std::string s; iss >> s;) {
-    //_DEBUG("vector: ", s);
-    //std::cout << "vector: " << s << std::endl;
     result.push_back(s);
   }
   if (result.size() != 3) {
-    // std::cout << request_line << std::endl;
     _SPDLOG(cjango_loggers.http, warn, "malformed request line: request has != 3 items on the first line");
     throw "malformed request line: request has != 3 items on the first line";
-    // if you access localhost:8080 by browser and leave it for a few seconds,
-    // A request(s?) comes with 0 item on the first line
   }
-  //std::cout << "reached get_http_request_line" << std::endl;
   return get_http_request_line(result);
 }
 
+/**
+** @brief helper method that parses get paramters in the first line of a http request
+*/
 http::HttpRequestLine http::HttpRequestParser::get_http_request_line(std::vector<std::string> request_line_fields) {
   std::string uri = request_line_fields[1];
 
@@ -123,13 +132,6 @@ http::HttpRequestLine http::HttpRequestParser::get_http_request_line(std::vector
     uri_fields.push_back("");
   }
 
-  //std::cout << "uri: " << uri << std::endl;
-  //std::cout << "uri_fileds[0]" << uri_fields[0] << std::endl;
-  /*
-    for (auto & x : request_line_fields) {
-    std::cout << "line field: " << x << std::endl;
-  }
-  */
   std::istringstream str(uri_fields[1]);
   _SPDLOG(cjango_loggers.http, info, "uri fields: {}", uri_fields[1]);
   if (request_line_fields[0] == "GET") {
@@ -141,10 +143,11 @@ http::HttpRequestLine http::HttpRequestParser::get_http_request_line(std::vector
   return http::HttpRequestLine(request_line_fields[0], uri, request_line_fields[2]);
 
   }
-  //std::cout << "request line fields 2: " << request_line_fields[2] << std::endl;
 
 }
-
+/**
+** @brief helper method that parses a http request's headers
+*/
 std::unordered_map<std::string, std::string> http::HttpRequestParser::parse_head(std::istream& input_stream) {
   std::unordered_map<std::string, std::string> request_headers;
   std::string next;
