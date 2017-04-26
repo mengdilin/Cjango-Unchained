@@ -16,3 +16,5 @@ src/doc/latex
 .Rhistory
 tests
 *.pyc
+manage
+Doxyfile.bak

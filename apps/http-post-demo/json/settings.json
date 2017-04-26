@@ -1,0 +1,6 @@
+{
+  "STATIC_URL": "apps/http-post-demo/static/",
+  "TEMPLATES": "apps/http-post-demo/templates/",
+  "CALLBACKS": "apps/http-post-demo/callbacks/",
+  "URLS_JSON": "apps/http-post-demo/json/"
+}

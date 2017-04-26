@@ -23,7 +23,8 @@ make
 # or make -j[number of cores] on multicore machines
 # e.g. "make -j2"
 
-# executing Makefile on callbacks/ subdir or "cd callbacks && make"
+# -C: search Makefile (default) in the specified subdir
+# same as "cd callbacks && make ; cd .."
 make -C callbacks
 ```
 
@@ -45,14 +46,14 @@ And access to `http://127.0.0.1:8000` shows Cjango welcome page.
 
 To run the 2 demos under the demo folder
 ```
-make -C demo/get_demo/callbacks
-python manage.py runserver 8080 --setting $(PWD)/demo/get_demo/json/settings.json
+make -C demo/http-get-demo/callbacks
+python manage.py runserver 8000 --setting apps/http-get-demo/json/settings.json
 
 ```
 or
 ```
-make -C demo/post_demo/callbacks
-python manage.py runserver 8080 --setting $(PWD)/demo/post_demo/json/settings.json
+make -C demo/http-get-demo/callbacks
+python manage.py runserver 8000 --setting apps/http-post-demo/json/settings.json
 
 ```
 

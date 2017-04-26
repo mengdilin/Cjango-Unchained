@@ -1,6 +1,0 @@
-{
-  "STATIC_URL": "../demo/get_demo/static/",
-  "TEMPLATES": "../demo/get_demo/templates/",
-  "CALLBACKS": "../demo/get_demo/callbacks/",
-  "URLS_JSON": "../demo/get_demo/json/"
-}
