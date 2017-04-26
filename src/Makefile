@@ -25,8 +25,8 @@ endif
 # CPPFLAGS = -std=c++1z -Wall
 SFCDIR=lib/simplefilewatcher/build/intermediate/Debug
 # OBJS = app/app.o app/main.o routing/router.o
-OBJS = app/msocket.o app/app.o routing/router.o
-TESTOBJS = app/msocket.o app/app.o routing/router.o app/logger.o \
+OBJS = app/app.o routing/router.o
+TESTOBJS = app/app.o routing/router.o app/logger.o \
   $(SFCDIR)/FileWatcher.o \
   $(SFCDIR)/FileWatcherOSX.o \
   $(SFCDIR)/FileWatcherLinux.o
