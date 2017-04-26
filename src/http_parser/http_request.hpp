@@ -7,6 +7,7 @@
 #include <memory>
 #include "http_session.hpp"
 #include <pthread.h>
+//#include "../routing/router.hpp"
 
 /** @file http_request.hpp
  * \ingroup http
@@ -15,14 +16,15 @@
 
 namespace http {
   class HttpRequest {
-  private:
+  //friend class Router;
+  public:
     std::string method;
+    std::string path;
+    std::string scheme;
+  private:
     static unsigned long x, y, z;
     mutable unsigned long session_id;
     mutable bool has_set_session_id = false;
-
-    std::string path;
-    std::string scheme;
     std::unordered_map<std::string, std::string> meta;
     std::unordered_map<std::string, std::string> parameters;
     std::unordered_map<std::string, std::string> cookie;

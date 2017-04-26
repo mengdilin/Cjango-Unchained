@@ -16,7 +16,6 @@ http::HttpResponse callback_1 (http::HttpRequest req) {
 
 std::string g_templates_root_dir;
 std::string g_callbacks_root_dir;
-
 int main(int argc, char* argv[])
 {
   if (argc < 3) {

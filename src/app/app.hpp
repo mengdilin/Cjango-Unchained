@@ -25,7 +25,7 @@ public:
         // without using a global variable, I needed to add is_update argument.
         // However, adding is_updated is actually a LARGE change because:
         //      1. The current library (SimpleFileWatcher) is cross-platform
-        //      2. It's implemented by abstract class and needed to rewrite 
+        //      2. It's implemented by abstract class and needed to rewrite
         //         arguments of all relative functions
         //
         // Here I only handled file update calse correctly (because that's the only use case)
@@ -94,5 +94,5 @@ public:
     void run(int port);
     int handle_request(int socket);
 };
-
 #endif
+

@@ -1,8 +1,4 @@
 {
-  "/hello" : {
-    "file" : "mycallback.so",
-    "funcname": "callback_hello_world"
-  },
   "/" : {
     "file" : "cjango-welcome.so",
     "funcname": "render_cjango_welcome_page"
@@ -10,10 +6,6 @@
   "/efg/[0-9]{4}/[0-9]{2}" : {
         "file": "mycallback2.so",
     "funcname": "current_datetime"
-  },
-  "/aaa" : {
-    "file" : "mycallback.so",
-    "funcname": "callback_mine2"
   },
   "/home" : {
     "file" : "mycallback.so",
@@ -26,11 +18,6 @@
   "/insert_blog" : {
     "file" : "mycallback.so",
     "funcname": "page_insert"
-  },
-
-  "/welcome" : {
-    "file" : "mycallback.so",
-    "funcname": "page_index"
   },
   "/cjango" : {
     "file" : "official-site.so",
