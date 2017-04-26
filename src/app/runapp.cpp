@@ -67,7 +67,7 @@ int main(int argc, char* argv[])
     app.add_route("/abc", callback_1);
     app.add_route("/efg/[0-9]{4}/[0-9]{2}", callback_1);
 #endif
-    app.router.set_static_root_dir(static_root_dir);
+    app.router.set_static_dir(static_root_dir);
     app.run(port_number);
   } else {
     printf("invalid command");

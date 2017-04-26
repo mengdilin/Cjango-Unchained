@@ -28,11 +28,8 @@ using callback_type = http::HttpResponse (*)(http::HttpRequest);
 */
 
 // FIXME scoped enum
-namespace cjango {
-  const std::string INVALIDURL = "__INVALIDURL";
-  const std::string STATIC_FILE_SERVED = "__STATIC_FILE_SERVED";
-  const std::string route_logger_name = "route";
-}
+enum class RouterException { INVALID_URL, STATIC_FILE_SERVED };
+const std::string route_logger_name = "route";
 
 using functor = std::function<http::HttpResponse(http::HttpRequest)>;
 using URLmap = std::unordered_map<std::string, functor>;
@@ -55,14 +52,15 @@ class Router {
     };
     Router() {};
     int nr_patterns() const { return patterns_list.size(); };
+    void erase_all_patterns() { patterns_list.clear(); pattern_to_callback.clear(); };
     void add_route(std::string url_pattern, functor f);
 #ifdef CJANGO_DYNLOAD
     void *load_shared_object_file(const std::string& path);
     callback_type load_callback(const std::string& path, const std::string& func_name);
     void load_url_pattern_from_file();
 #endif
-    void set_static_root_dir(std::string dir) { static_root_dir = dir; };
-    std::string get_static_root_dir() { return static_root_dir; };
+    void set_static_dir(std::string dir) { static_root_dir = dir; };
+    std::string get_static_dir() { return static_root_dir; };
     // Note: register() should be renamed from add_route() for django mimicking,
     // but "register" is a reserved word in C++.
     std::string resolve(http::HttpRequest);

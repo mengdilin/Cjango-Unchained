@@ -17,8 +17,22 @@ TEST_CASE("Router - path resolve() and get_http_response()", "[router]") {
 TEST_CASE("static_dir setting") {
   Router r;
   const std::string sdir = "/custom-static";
-  r.set_static_root_dir(sdir);
-  REQUIRE( r.get_static_root_dir() == sdir );
+  r.set_static_dir(sdir);
+  REQUIRE( r.get_static_dir() == sdir );
+
+  http::HttpRequest req(sdir + "/photo.jpg");
+  try {
+    std::string s = r.resolve(req);
+  } catch (RouterException e) {
+    REQUIRE( e == RouterException::STATIC_FILE_SERVED );
+  }
+
+  http::HttpRequest req2("/some_invalid_url");
+  try {
+    std::string s = r.resolve(req2);
+  } catch (RouterException e) {
+    REQUIRE( e == RouterException::INVALID_URL );
+  }
 }
 
 TEST_CASE("size of URL pattern map") {
@@ -49,4 +63,16 @@ TEST_CASE("size of URL pattern map") {
     r.add_route(url_pattern, f_router_test);
     REQUIRE( r.nr_patterns() == 1 ); // no increase
   }
+}
+
+TEST_CASE("delete all patterns") {
+  Router r;
+  r.add_route("/1", f_router_test);
+  r.add_route("/2", f_router_test);
+  r.add_route("/3", f_router_test);
+
+  REQUIRE( r.nr_patterns() == 3 );
+
+  r.erase_all_patterns();
+  REQUIRE( r.nr_patterns() == 0 );
 }
