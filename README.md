@@ -45,12 +45,12 @@ And access to `http://127.0.0.1:8000` shows Cjango welcome page.
 
 To run the 2 demos under the demo folder
 ```
-python manage.py runserver 8080 --setting $(PWD)/Cjango-Unchained/demo/get_demo/json/settings.json
+python manage.py runserver 8080 --setting $(PWD)/demo/get_demo/json/settings.json
 
 ```
 or
 ```
-python manage.py runserver 8080 --setting $(PWD)/Cjango-Unchained/demo/post_demo/json/settings.json
+python manage.py runserver 8080 --setting $(PWD)/demo/post_demo/json/settings.json
 
 ```
 
