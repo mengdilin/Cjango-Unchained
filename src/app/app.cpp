@@ -10,7 +10,6 @@
 #include <netinet/in.h>
 #include <errno.h>
 #include "app.hpp"
-#include "selector.hpp"
 #include "../http_parser/http_request_parser.hpp"
 #include "../http_parser/http_response.hpp"
 #include <sstream>
@@ -63,7 +62,7 @@ void App::print_routes()
 {
     std::cout << "Hello app!" << std::endl;
 }
-#if 0
+
 void error_exit(std::string msg, int sock=0)
 {
     // _DEBUG(msg);
@@ -72,117 +71,7 @@ void error_exit(std::string msg, int sock=0)
         close(sock);
     exit(1);
 }
-#endif
-#if 1
-void App::worker(Sock_ptr clntSock, std::string strRequest)
-{
-    if (!clntSock) {
-        _SPDLOG(logskt, info, "Worker thread invoked for null socket pointer");
-        return;
-    }
 
-    try {
-        _SPDLOG(logskt, info, "Worker thread invoked for socket {}", clntSock->socket());
-        http::HttpRequest request("");
-        // _SPDLOG(logskt, info, "request: {}", strRequest); // long
-        try {
-            http::HttpRequestParser parser;
-            std::stringstream ss;
-            ss << strRequest;
-            //std::cout << ss << std::endl;
-            request = parser.parse(ss);
-
-            //std::unordered_map<std::string, std::string> body = parser.parse_body(ss, );
-            // _SPDLOG(logskt, info, "{}", request);  // FIXME _DEBUG for multi lines
-            _SPDLOG(logskt, info, "finished request");
-            for (auto entry : request.get_parameters()) {
-                _SPDLOG(logskt, info, "{}:{}", entry.first, entry.second);
-            }
-        } catch (const char *e) {
-            // if you throw a char* instead of exception class, that comes as const char*
-            std::cout << e << std::endl;
-        }
-
-        http::HttpResponse response = router.get_http_response(request);
-        string resp = response.to_string();
-        // If static files served, resp is gibberish
-        _SPDLOG(logskt, debug, "resp.length: ", resp.length());
-
-        // if (send(clntSock, resp.c_str(), resp.length(), 0) < 0) {
-        //     _SPDLOG(logskt, error, "Failed to send response on socket: {}", clntSock->socket());
-        // }
-        clntSock->send(resp);
-
-        /* It is assumed that at this point the server has done its job,
-         * so it is closing the client socket */
-        _SPDLOG(logskt, info, "Worker thread has done its job, closing socket {}", clntSock->socket());
-        // close(clntSock);
-    } 
-    catch (const std::exception& e) {
-        _SPDLOG(logskt, info, "Exceptions caught in worker thread: {}. Closing socket anyway", e.what());
-    }
-    catch (const std::string& es) {
-        _SPDLOG(logskt, info, "Exceptions caught in worker thread: {}. Closing socket anyway", es);
-    } 
-    catch (...) {
-        _SPDLOG(logskt, info, "Exceptions caught in worker thread. Closing socket anyway");
-    }
-
-    /* no matter what, close the socket */
-    clntSock->close();
-}
-
-void App::handle_request(Sock_ptr clntSock)
-{
-    std::string contents;
-    char buff[BUFFER_MAXSIZE];
-
-    /* loop recv() from client socket for request contents */
-    while (1) {
-        memset(buff, 0, BUFFER_MAXSIZE);
-        // int rc = recv(clntSock, buff, sizeof(buff), 0);
-        int rc = clntSock->recv(buff, sizeof(buff));
-        _SPDLOG(logskt, info, "From socket {}  recv returns value: {}", clntSock->socket(), rc);
-
-        if (rc > 0) {
-            /* recv() returns > 0, some data is read */
-
-            /*
-             mengdi: fix off by 1 error for content materials by changing
-             std::begin(buff)+rc-1 to std::begin(buff)+rc
-             */
-            _SPDLOG(logskt, info, "rc >0 ");
-            contents += std::string(std::begin(buff), std::begin(buff) + rc);
-            continue; /* continue recv-ing till all data is read */
-        }
-        else if (rc == 0) {
-            /* recv() returns 0, client has closed this connection, would have thrown an exception */
-            _SPDLOG(logskt, info, "Client has closed connection on socket {}", clntSock->socket());
-            return;
-        }
-        else if (rc < 0) {
-            /* recv() returns < 0, and no exception is thrown, then it must be EWOULDBLOCK */
-            _SPDLOG(logskt, info, "May try again later on socket {}", clntSock->socket());
-            break;
-        }
-    } /* END: while(1) */
-
-    /* At this point, if it has not yet returned or thrown,
-     * there might be data for us to process, start a new
-     * thread to do the job if necessary */
-    if (contents.size() > 0) {
-        std::thread t(&App::worker, this, clntSock, contents);
-        auto id = t.get_id();
-        t.detach();
-        std::ostringstream ss;
-        ss << id;
-        _SPDLOG(logskt, info, "Created and detached new thread {} for socket {}", ss.str(), clntSock->socket());
-    }
-
-    return;
-}
-#endif
-#if 0
 void App::worker(int clntSock, std::string strRequest)
 {
     try {
@@ -289,7 +178,7 @@ int App::handle_request(int clntSock)
 
     return ret;
 }
-#endif
+
 #ifdef CJANGO_DYNLOAD
 #include <chrono>
 void App::monitor_file_change() {
@@ -316,7 +205,6 @@ void App::spawn_monitor_thread() {
 }
 
 #endif
-#if 0
 static void set_nonblocking(const int sock, const int servSock=0)
 {
     int fl = fcntl(sock, F_GETFL);
@@ -326,153 +214,7 @@ static void set_nonblocking(const int sock, const int servSock=0)
     if (fcntl(sock, F_SETFL, fl | O_NONBLOCK) < 0)
         error_exit("Failed to set socket flags", servSock);
 }
-#endif
-#if 1
-void App::run(int port)
-{
-    _SPDLOG(logskt, info, "Invoked for port: {}", port);
 
-    if (this->servSock >= 0) {
-        _SPDLOG(logskt, info, "Already running on socket: {}", this->servSock);
-        return;
-    }
-
-#ifdef CJANGO_DYNLOAD
-    spawn_monitor_thread();
-#endif
-
-    try {
-        /* open socket to listen to client connections */
-        auto servSock = shared_ptr<MSocket>(new MSocket());
-        const int server = servSock->socket();
-        this->servSock = server;
-        _SPDLOG(logskt, info, "Created server socket: {}", server);
-
-        /* set socket to be reuseable */
-        servSock->set_reusable();
-
-        /* set socket to non-blocking */
-        servSock->set_nonblocking();
-
-        /* bind the socket */
-        servSock->bind(port);
-
-        /* listen */
-        /** @bug if the number of opened sockets exceeds SOMAXCONN,
-         Cjango gets "apr_socket_recv: Connection reset by peer (54)" error and halts immediately.
-         On Mac OS X (default: 128), check by "sysctl -a | grep somax" and
-         change it by "sudo sysctl -w kern.ipc.somaxconn=2048"
-        */
-        _SPDLOG(logskt, info, "Backlog of listen: {}", SOMAXCONN);
-        servSock->listen(SOMAXCONN);
-
-        /* initialize fd_set for select() */
-        // If "struct fd_set allSocks", Ubuntu returned an typedef error
-        // fd_set allSocks;
-        // FD_ZERO(&allSocks);
-        // FD_SET(servSock, &allSocks);
-        // int maxSock = servSock;
-
-        /* initialize timeout interval for select() */
-        // struct timeval timeout;
-        // timeout.tv_sec = 1; /* check select() every 1 second */
-        // timeout.tv_usec = 0;
-
-        /* all client sockets to watch for in select() function */
-        std::list<Sock_ptr> allSocks;
-        // allSocks.insert(servSock);
-
-        auto selector = Selector(server);
-        selector.fd_set2(server);
-        // selector.report();
-
-        for (;;) {
-
-            /* use a temporary fd_set for pulling from select() */
-            // fd_set tmpSocks;
-            // FD_ZERO(&tmpSocks);
-            // memcpy(&tmpSocks, &allSocks, sizeof(allSocks));
-
-            /* call select() and wait till it returns for either socket events or timeout */
-            // int rc = select(maxSock + 1, &tmpSocks, NULL, NULL, &timeout);
-            int rc = selector.select();
-            // _SPDLOG(logskt, info, "selector returns {}", rc);
-
-            if (rc < 0)
-                throw std::string("Failed to select");
-
-            /* nothing changes, timeout */
-            if (rc == 0)
-                continue;
-
-            _SPDLOG(logskt, info, "Number of sockets readable: {}", rc);
-
-            /* first check server socket, if it is readable, there is no client connection */
-            if (selector.server_isset()) {
-                _SPDLOG(logskt, info, "Server socket readable");
-                do {
-                    auto clntSock = servSock->accept();
-                    if (!clntSock)
-                        break;
-
-                    /* set clinet socket to non-blocking */
-                    clntSock->set_nonblocking();
-
-                    /* a new client connection accepted, register it to selector */
-                    _SPDLOG(logskt, info, "New client connection: {}", clntSock->socket());
-                    selector.fd_set2(clntSock->socket());
-                    allSocks.push_back(clntSock);
-                } while(true);
-            }
-
-            /* iterate thru all client sockets */
-            for (auto ite = allSocks.begin(); ite != allSocks.end(); ++ite) {
-                auto sp = *ite;
-                int sock = sp->socket();
-                if (!selector.fd_isset(sock)) {
-                    _SPDLOG(logskt, info, "Socket {} in list but not readable", sock);
-                    continue;
-                }
-
-                _SPDLOG(logskt, info, "Client socket {} readable", sock);
-                try {
-                    this->handle_request(sp);
-                }
-                catch (const std::string& es) {
-                    std::cout << "Error occured handling request on socket " << sock <<": " << es << std::endl;
-                    sp->close();
-                } 
-                catch (...) {
-                    std::cout << "Error occured handling request on socket " << sock << std::endl;
-                    sp->close();
-                }
-                /* a new thread has started to handle the socket,
-                 * it will eventually CLOSE the client socket, so
-                 * we must remove it from fd_set */
-                selector.fd_clr(sock);
-                allSocks.erase(ite);
-            }
-
-        }  /* END: main loop */
-    } /* END: try */
-    catch (const std::exception& e) {
-        std::cout << "Runtime error: " << e.what() << std::endl;
-        std::cout << "Terminating ... " << std::endl;
-    }
-    catch (const std::string& es) {
-        std::cout << "Runtime error: " << es << std::endl;
-        std::cout << "Terminating ... " << std::endl;
-    }
-    catch (...) {
-        std::cout << "Runtime error: " << std::endl;
-        std::cout << "Terminating ... " << std::endl;
-    }
-
-    _SPDLOG(logskt, info, "Stopping server");
-    // close(servSock);
-}
-#endif
-#if 0
 void App::run(int port)
 {
     _SPDLOG(logskt, info, "Invoked for port: {}", port);
@@ -612,4 +354,3 @@ void App::run(int port)
     _SPDLOG(logskt, info, "Terminating server, closing socket {}", servSock);
     close(servSock);
 }
-#endif
