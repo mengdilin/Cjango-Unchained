@@ -1,0 +1,6 @@
+{
+  "dummy": {
+    "file": "dummy-file.so",
+    "funcname": "dummy-function"
+  }
+}
