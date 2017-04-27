@@ -4,7 +4,6 @@ CPPFLAGS += -DDEBUG -DCJANGO_DYNLOAD
 CPPFLAGS += -I./../../../src/app/ -I./../../../src/lib/
 #CPPFLAGS += -ferror-limit=5   # doesn't work on Linux
 LDFLAGS = -L./../../../src/http_parser/ -lhttp_response -lhttp_request
-#LDFLAGS += -L./../Jinja2CppLight/build -lJinja2CppLight
 # read callbacks/*.cpp files into a variable SOURCES
 SOURCES = $(wildcard *.cpp)
 # substitute .cpp by .so
