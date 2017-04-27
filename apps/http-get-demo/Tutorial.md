@@ -2,7 +2,7 @@
 
 This tutorial teaches you how to write a simple web application that displays a html page when visiting a path.
 
-##Directory Structure Overview
+## Directory Structure Overview
 You will notice that this directory contains four folders: `callbacks`, `json`, `static`, and `templates`. `callbacks` directory contains our application codes and their compiled `.so`. `templates` directory contains all html files our application codes will be using. `static` contains all `.js`, `.css`, `.png`, and etc resources that our html pages reference to. `json` directory contains two files: `settings.json` and `urls.json`. `urls.json` provides a mapping from a http path to our application callback functions. `settings.json` defines environment variables that tells Cjango the location of `callbacks`, `json`, `static`, and `templates` directories.
 
 ## Step 1: Write a callback
