@@ -62,4 +62,5 @@ TEST_CASE("HttpRequestParser - post param request parsing", "[HttpRequestParser]
   REQUIRE( param_result->second == "string" );
   param_result = params.find("/paramsXML");
   REQUIRE( param_result != params.end() );
+  REQUIRE( param_result->second == "string" );
 }

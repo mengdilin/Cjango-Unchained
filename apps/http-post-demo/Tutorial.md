@@ -7,9 +7,9 @@ All configurations are specified in `json/settings.json` which specifies paths t
 
 ## Step 1: Home page callback
 
-Let's write a callback function that returns a html page when receiving a `GET request.
+Let's write a callback function that returns a html page when receiving a `GET` request.
 
-```
+```c++
 extern "C" http::HttpResponse page_home(http::HttpRequest request) {
 
   if (request.get_method() == "GET") {
@@ -25,7 +25,7 @@ This will return `apps/http-post-demo/templates/home.html` which is a page with 
 ## Step 2: Distinguishing POST from GET
 Now, we need to handle `POST` requests which will be sent after the user has entered his username and clicked submit. The new `page_home` looks like:
 
-```
+```c++
 extern "C" http::HttpResponse page_home(http::HttpRequest request) {
 
   if (request.get_method() == "GET") {
@@ -42,7 +42,7 @@ New `page_home` now returns a different page when it receives a `POST` request.
 ## Step 3: Retrieve parameters from http requests
 But how do we get the username the user has entered in `home.html`? You can access form parameters using `HttpRequest`'s `get_parameters()` which returns a `unordered_map<string, string>` containing all parameters of a http request.
 
-```
+```c++
 extern "C" http::HttpResponse page_home(http::HttpRequest request) {
 
   if (request.get_method() == "GET") {
@@ -66,7 +66,7 @@ New `page_home` retrieves the username entered by the user and inserts it into `
 ## Step 4: HttpSession
 But what if we want to remember the username of the same user across different requests? `HttpRequest` also provides a useful `HttpSession` object which provides a way to identify a user across more than one page request or visit to a Web site and to store information about that user. Let's put the username into a `HttpSession` object.
 
-```
+```c++
 extern "C" http::HttpResponse page_home(http::HttpRequest request) {
 
   if (request.get_method() == "GET") {

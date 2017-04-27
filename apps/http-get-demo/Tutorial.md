@@ -1,9 +1,9 @@
 ## Writing your first Cjango Application
 
-This tutorial teaches you how to write a simple web application that displays a html page when visiting a path. 
+This tutorial teaches you how to write a simple web application that displays a html page when visiting a path.
 
 ##Directory Structure Overview
-You will notice that this directory contains four folders: `callbacks`, `json`, `static`, and `templates`. `callbacks` directory contains our application codes and their compiled `.so`. `templates` directory contains all html files our application codes will be using. `static` contains all `.js`, `.css`, `.png`, and etc resources that our html pages reference to. `json` directory contains two files: `settings.json` and `urls.json`. `urls.json` provides a mapping from a http path to our application callback functions. `settings.json` defines environment variables that tells Cjango the location of `callbacks`, `json`, `static`, and `templates` directories. 
+You will notice that this directory contains four folders: `callbacks`, `json`, `static`, and `templates`. `callbacks` directory contains our application codes and their compiled `.so`. `templates` directory contains all html files our application codes will be using. `static` contains all `.js`, `.css`, `.png`, and etc resources that our html pages reference to. `json` directory contains two files: `settings.json` and `urls.json`. `urls.json` provides a mapping from a http path to our application callback functions. `settings.json` defines environment variables that tells Cjango the location of `callbacks`, `json`, `static`, and `templates` directories.
 
 ## Step 1: Write a callback
 Inside `callbacks` directory, create a file called `cjango-welcome.cpp` and write our first callback function:
@@ -18,7 +18,7 @@ extern "C" http::HttpResponse render_official_site(http::HttpRequest request) {
 This callback function will return a html page in `apps/http-get-demo/templates/official.html` as a http response to the client's browser. Notice that we only specified `official.html` and somehow Cjango will be able to figure out the location of `official.html`.
 
 ## Step 2: Define url mapping
-We now need to tell Cjango the http path `render_official_site` corresponds to so that when a client visits a path, we can serve `official.html` page to the client. This is done by modifying `json/urls.json`. Inside `json/urls.json`, 
+We now need to tell Cjango the http path `render_official_site` corresponds to so that when a client visits a path, we can serve `official.html` page to the client. This is done by modifying `json/urls.json`. Inside `json/urls.json`,
 
 
 ```
@@ -47,12 +47,12 @@ Cjango will look for our application codes (definitions of callback functions) i
 ## Step 4: Run
 Now, we are ready to run our simple http server. Go back to the top level directory and run:
 
-```
-python manage.py runserver 3000 --settings /home/ubuntu/synced_folder/c++/Cjango-Unchained/apps/http-get-demo/json/settings.json 
+```bash
+python manage.py runserver 3000 --settings /home/ubuntu/synced_folder/c++/Cjango-Unchained/apps/http-get-demo/json/settings.json
 ```
 
 ## Dynamic Reloading
-Cjango can dynamically reload changes made to `json/urls.json` and `json/settings.json`. Say we want to add a new path corresponding to a new callback function, but our server is already up and running! Is there anyway to deploy our new change without interruption to the service of the server? Easy: re-compile our application codes to create new `.so` file that contains your new callback function. Update our `json/urls.json` to add a new path to our new callback function. What if we want to change the location of our `templates` directory as server is running? No problem: just change the value of `TEMPLATES` in `json/settings.json`. The changes will be read instantly without any downtime. 
+Cjango can dynamically reload changes made to `json/urls.json` and `json/settings.json`. Say we want to add a new path corresponding to a new callback function, but our server is already up and running! Is there anyway to deploy our new change without interruption to the service of the server? Easy: re-compile our application codes to create a new `.so` file that contains our new callback function. Update our `json/urls.json` to add a new path to our new callback function. What if we want to change the location of our `templates` directory as server is running? No problem: just change the value of `TEMPLATES` in `json/settings.json`. The changes will be read instantly without any downtime.
 
 ## Json Response
 

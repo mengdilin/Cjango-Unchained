@@ -84,6 +84,9 @@ std::unordered_map<std::string, std::string> http::UrlEncodedFormParser::get_par
   std::unordered_map<std::string, std::string> parameters_map;
   if (content_leng != 0) {
     std::string content = this->input_stream_reader.read(input_stream, content_leng);
+    if (content.at(content.length()-1) == '\r') {
+      content = content.substr(0, content.length()-1);
+    }
     std::istringstream ss(content);
     ss >> std::ws;
     if (content.length() == 0) {
