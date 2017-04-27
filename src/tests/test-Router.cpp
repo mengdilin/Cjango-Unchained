@@ -44,7 +44,7 @@ TEST_CASE("size of URL pattern map") {
 
   /*
    * SECTION is expanded into if statement. And interestingly,
-   * each SECTION is executed from the start of this TEST_CASE statement.
+   * each SECTION is executed from the start of this test case statement.
    * In other words, the statements before each SECTION is
    * essentially common setups for all SECTIONs.
    * For more info: https://github.com/philsquared/Catch/blob/master/docs/tutorial.md#test-cases-and-sections
@@ -76,3 +76,66 @@ TEST_CASE("delete all patterns") {
   r.erase_all_patterns();
   REQUIRE( r.nr_patterns() == 0 );
 }
+
+TEST_CASE("load a shared object file (non-existed)") {
+  Router r;
+  try {
+    r.load_shared_object_file("non-existed.so");
+  } catch (const char* e) {
+    REQUIRE( strcmp(e, "no such an object file") == 0 );
+  }
+}
+
+TEST_CASE("load a shared object file (existed)") {
+  Router r;
+  try {
+    auto lib = r.load_shared_object_file("./tests/dummy-callback.so");
+    REQUIRE( 1 == 1 ); // passed
+  } catch (const char* e) {
+    REQUIRE( 1 == 0 );
+  }
+}
+
+TEST_CASE("load a callback function (non-existed)") {
+  Router r;
+  try {
+    // auto dlib = dlopen("../libhttp_request.so", RTLD_LAZY);
+    const std::string f = "./tests/non-existed.so";
+    const std::string s = "funcname";
+    r.load_callback(f, s);
+  } catch (const char* e) {
+    REQUIRE( strcmp(e, "no such an object file") == 0 );
+  }
+}
+
+TEST_CASE("load a callback function (existed)") {
+  Router r;
+  try {
+    // auto dlib = dlopen("../libhttp_request.so", RTLD_LAZY);
+    const std::string filename = "./tests/dummy-callback.so";
+    const std::string s = "dummy";
+    functor f = r.load_callback(filename, s);
+    http::HttpRequest req("dummy");
+    REQUIRE( f(req).content == s );
+  } catch (const char* e) {
+    REQUIRE( 1 == 0 );
+  }
+}
+
+TEST_CASE("load url-mapping from json file") {
+  Router r;
+  r.load_url_pattern_from_file("./tests/mock/");
+  REQUIRE( r.nr_patterns() > 0 );
+}
+
+TEST_CASE("regex precedence check") {
+  Router r;
+  std::string url_pattern("/diary/[0-9]/.*");
+  r.add_route(url_pattern, f_router_test);
+  r.add_route("/diary/[0-9]/non-selected", f_router_test);
+
+  http::HttpRequest req("/diary/3/selected");
+  REQUIRE( r.resolve(req) == url_pattern );
+  REQUIRE( r.get_http_response(req).to_string() == http::HttpResponse("test").to_string() );
+}
+
