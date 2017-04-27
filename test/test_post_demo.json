@@ -1,0 +1,192 @@
+{
+    "case1" : {
+        "NAME" : "test_case_1",
+        "DESCRIPTION" : "GET request on homepage",
+
+        "REQ_PATH" : "/home",
+        "REQ_METHOD" : "GET",
+        "REQ_PARAMS" : "",
+        "REQ_FILE" : "",
+        "REQ_HEADERS" : "",
+
+        "RESP_STATUS" : "200",
+        "RESP_REASON" : "OK",
+        "RESP_VERSION" : "HTTP/1.0",
+        "RESP_HEADERS" : {
+            "content-type" : "text/html",
+            "content-length" : "1857"
+        },
+        "RESP_VERIFY_FUNCTION" : "verify_get_home"
+    },
+
+    "case2" : {
+        "NAME" : "test_case_2",
+        "DESCRIPTION" : "GET request on homepage with specific headers",
+
+        "REQ_PATH" : "/home",
+        "REQ_METHOD" : "GET",
+        "REQ_PARAMS" : "",
+        "REQ_FILE" : "",
+        "REQ_HEADERS" : {
+            "Accept" : "text/plain",
+            "Expect" : "100-continue",
+            "X-Http-Method-Override" : "PUT"
+        },
+
+        "RESP_STATUS" : "200",
+        "RESP_REASON" : "OK",
+        "RESP_VERSION" : "HTTP/1.0",
+        "RESP_HEADERS" : {
+            "content-type" : "text/html",
+            "content-length" : "1857"
+        },
+        "RESP_VERIFY_FUNCTION" : "verify_get_home"
+    },
+
+    "case3" : {
+        "NAME" : "test_case_3",
+        "DESCRIPTION" : "POST request on homepage with specific headers",
+
+        "REQ_PATH" : "/home",
+        "REQ_METHOD" : "POST",
+        "REQ_PARAMS" : {
+            "firstname" : "tester"
+        },
+        "REQ_FILE" : "",
+        "REQ_HEADERS" : "",
+
+        "RESP_STATUS" : "200",
+        "RESP_REASON" : "OK",
+        "RESP_VERSION" : "HTTP/1.0",
+        "RESP_HEADERS" : {
+            "content-type" : "text/html",
+            "content-length" : ""
+        },
+        "RESP_VERIFY_FUNCTION" : ""
+    },
+
+    "case4" : {
+        "NAME" : "test_case_4",
+        "DESCRIPTION" : "GET request on search page",
+
+        "REQ_PATH" : "/search_blog",
+        "REQ_METHOD" : "GET",
+        "REQ_PARAMS" : "",
+        "REQ_FILE" : "",
+        "REQ_HEADERS" : "",
+
+        "RESP_STATUS" : "200",
+        "RESP_REASON" : "OK",
+        "RESP_VERSION" : "HTTP/1.0",
+        "RESP_HEADERS" : {
+            "content-type" : "text/html",
+            "content-length" : ""
+        },
+        "RESP_VERIFY_FUNCTION" : ""
+    },
+
+    "case5" : {
+        "NAME" : "test_case_5",
+        "DESCRIPTION" : "POST request on search page",
+
+        "REQ_PATH" : "/search_blog",
+        "REQ_METHOD" : "POST",
+        "REQ_PARAMS" : {
+            "search" : "abc"
+        },
+        "REQ_FILE" : "",
+        "REQ_HEADERS" : "",
+
+        "RESP_STATUS" : "200",
+        "RESP_REASON" : "OK",
+        "RESP_VERSION" : "HTTP/1.0",
+        "RESP_HEADERS" : {
+            "content-type" : "text/html",
+            "content-length" : ""
+        },
+        "RESP_VERIFY_FUNCTION" : ""
+    },
+
+    "case6" : {
+        "NAME" : "test_case_6",
+        "DESCRIPTION" : "GET request on insert page",
+
+        "REQ_PATH" : "/insert_blog",
+        "REQ_METHOD" : "GET",
+        "REQ_PARAMS" : "",
+        "REQ_FILE" : "",
+        "REQ_HEADERS" : "",
+
+        "RESP_STATUS" : "200",
+        "RESP_REASON" : "OK",
+        "RESP_VERSION" : "HTTP/1.0",
+        "RESP_HEADERS" : {
+            "content-type" : "text/html",
+            "content-length" : ""
+        },
+        "RESP_VERIFY_FUNCTION" : ""
+    },
+
+    "case7" : {
+        "NAME" : "test_case_7",
+        "DESCRIPTION" : "POST request on insert page",
+
+        "REQ_PATH" : "/insert_blog",
+        "REQ_METHOD" : "POST",
+        "REQ_PARAMS" : {
+            "blog_post" : "short version"
+        },
+        "REQ_FILE" : "",
+        "REQ_HEADERS" : "",
+
+        "RESP_STATUS" : "200",
+        "RESP_REASON" : "OK",
+        "RESP_VERSION" : "HTTP/1.0",
+        "RESP_HEADERS" : {
+            "content-type" : "text/html",
+            "content-length" : ""
+        },
+        "RESP_VERIFY_FUNCTION" : ""
+    },
+
+    "case8" : {
+        "NAME" : "test_case_8",
+        "DESCRIPTION" : "POST request on insert page",
+
+        "REQ_PATH" : "/insert_blog",
+        "REQ_METHOD" : "POST",
+        "REQ_PARAMS" : "",
+        "REQ_FILE" : "requests/blog.txt",
+        "REQ_HEADERS" : "",
+
+        "RESP_STATUS" : "200",
+        "RESP_REASON" : "OK",
+        "RESP_VERSION" : "HTTP/1.0",
+        "RESP_HEADERS" : {
+            "content-type" : "text/html",
+            "content-length" : ""
+        },
+        "RESP_VERIFY_FUNCTION" : ""
+    },
+
+    "case9" : {
+        "NAME" : "test_case_9",
+        "DESCRIPTION" : "GET request on undefined page",
+
+        "REQ_PATH" : "/unknown",
+        "REQ_METHOD" : "GET",
+        "REQ_PARAMS" : "",
+        "REQ_FILE" : "",
+        "REQ_HEADERS" : "",
+
+        "RESP_STATUS" : "200",
+        "RESP_REASON" : "OK",
+        "RESP_VERSION" : "HTTP/1.0",
+        "RESP_HEADERS" : {
+            "content-type" : "text/html",
+            "content-length" : "26"
+        },
+        "RESP_VERIFY_FUNCTION" : "verify_cjango_404"
+    }
+
+}

@@ -1,0 +1,145 @@
+{
+    "case1" : {
+        "NAME" : "test_case_1",
+        "DESCRIPTION" : "GET request on homepage",
+
+        "REQ_PATH" : "/",
+        "REQ_METHOD" : "GET",
+        "REQ_PARAMS" : "",
+        "REQ_FILE" : "",
+        "REQ_HEADERS" : "",
+
+        "RESP_STATUS" : "200",
+        "RESP_REASON" : "OK",
+        "RESP_VERSION" : "HTTP/1.0",
+        "RESP_HEADERS" : {
+            "content-type" : "text/html",
+            "content-length" : "22133"
+        },
+        "RESP_VERIFY_FUNCTION" : ""
+    },
+
+    "case2" : {
+        "NAME" : "test_case_2",
+        "DESCRIPTION" : "GET request on homepage with specific headers",
+
+        "REQ_PATH" : "/",
+        "REQ_METHOD" : "GET",
+        "REQ_PARAMS" : "",
+        "REQ_FILE" : "",
+        "REQ_HEADERS" : {
+            "Accept" : "text/plain",
+            "Expect" : "100-continue",
+            "X-Http-Method-Override" : "PUT"
+        },
+
+        "RESP_STATUS" : "200",
+        "RESP_REASON" : "OK",
+        "RESP_VERSION" : "HTTP/1.0",
+        "RESP_HEADERS" : {
+            "content-type" : "text/html",
+            "content-length" : "22133"
+        },
+        "RESP_VERIFY_FUNCTION" : "verify_cjango_homepage"
+    },
+
+    "case3" : {
+        "NAME" : "test_case_3",
+        "DESCRIPTION" : "GET request on official-site page",
+
+        "REQ_PATH" : "/cjango",
+        "REQ_METHOD" : "GET",
+        "REQ_PARAMS" : "",
+        "REQ_FILE" : "",
+        "REQ_HEADERS" : "",
+
+        "RESP_STATUS" : "200",
+        "RESP_REASON" : "OK",
+        "RESP_VERSION" : "HTTP/1.0",
+        "RESP_HEADERS" : {
+            "content-type" : "text/html",
+            "content-length" : "3581"
+        },
+        "RESP_VERIFY_FUNCTION" : "verify_cjango_official_site"
+    },
+
+    "case4" : {
+        "NAME" : "test_case_4",
+        "DESCRIPTION" : "GET request on json page",
+
+        "REQ_PATH" : "/json",
+        "REQ_METHOD" : "GET",
+        "REQ_PARAMS" : "",
+        "REQ_FILE" : "",
+        "REQ_HEADERS" : "",
+
+        "RESP_STATUS" : "200",
+        "RESP_REASON" : "OK",
+        "RESP_VERSION" : "HTTP/1.0",
+        "RESP_HEADERS" : {
+            "content-type" : "application/json",
+            "content-length" : "670"
+        },
+        "RESP_VERIFY_FUNCTION" : "verify_cjango_json"
+    },
+
+    "case5" : {
+        "NAME" : "test_case_5",
+        "DESCRIPTION" : "GET request on undefined page",
+
+        "REQ_PATH" : "/unknown/",
+        "REQ_METHOD" : "GET",
+        "REQ_PARAMS" : "",
+        "REQ_FILE" : "",
+        "REQ_HEADERS" : "",
+
+        "RESP_STATUS" : "200",
+        "RESP_REASON" : "OK",
+        "RESP_VERSION" : "HTTP/1.0",
+        "RESP_HEADERS" : {
+            "content-type" : "text/html",
+            "content-length" : "26"
+        },
+        "RESP_VERIFY_FUNCTION" : "verify_cjango_404"
+    },
+
+    "case6" : {
+        "NAME" : "test_case_6",
+        "DESCRIPTION" : "GET request on regex of defined page",
+
+        "REQ_PATH" : "/2017/03",
+        "REQ_METHOD" : "GET",
+        "REQ_PARAMS" : "",
+        "REQ_FILE" : "",
+        "REQ_HEADERS" : "",
+
+        "RESP_STATUS" : "200",
+        "RESP_REASON" : "OK",
+        "RESP_VERSION" : "HTTP/1.0",
+        "RESP_HEADERS" : {
+            "content-type" : "text/html",
+            "content-length" : ""
+        },
+        "RESP_VERIFY_FUNCTION" : ""
+    },
+
+    "case7" : {
+        "NAME" : "test_case_7",
+        "DESCRIPTION" : "GET request on regex of undefined page",
+
+        "REQ_PATH" : "/unknown",
+        "REQ_METHOD" : "GET",
+        "REQ_PARAMS" : "",
+        "REQ_FILE" : "",
+        "REQ_HEADERS" : "",
+
+        "RESP_STATUS" : "200",
+        "RESP_REASON" : "OK",
+        "RESP_VERSION" : "HTTP/1.0",
+        "RESP_HEADERS" : {
+            "content-type" : "text/html",
+            "content-length" : "26"
+        },
+        "RESP_VERIFY_FUNCTION" : "verify_cjango_404"
+    }
+}
