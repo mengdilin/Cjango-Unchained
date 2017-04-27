@@ -8,6 +8,11 @@
 #include <exception>
 #include <vector>
 #include <sstream>
+
+/** @file url_encoded_form_parser.hpp
+ * \ingroup http
+ * @brief UrlEncodedFormParser class declaration
+ */
 namespace http {
 
 class UrlEncodedFormParser {

@@ -9,7 +9,7 @@
 #include <pthread.h>
 /** @file http_session.hpp
  * \ingroup http
- * @brief HttpSession class declaration. This class is thread-safe
+ * @brief HttpSession class declaration. This class is thread-safe.
  */
 
 namespace http {

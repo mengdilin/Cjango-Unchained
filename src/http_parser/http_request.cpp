@@ -3,6 +3,10 @@
 #include <stdlib.h>     /* strtoul */
 #include "../app/externs.hpp"
 
+/** @file http_request.cpp
+ * \ingroup http
+ * @brief HttpRequest class implementation
+ */
 std::string http_logger_name = "http_request"; // FIXME refactor
   unsigned long http::HttpRequest::x=123456789; //FIXME: just use a static counter rather than generating this
   unsigned long http::HttpRequest::y=362436069;
@@ -13,8 +17,14 @@ std::string http_logger_name = "http_request"; // FIXME refactor
   static pthread_rwlock_t lock = PTHREAD_RWLOCK_INITIALIZER;
 
 /**
-** @brief HttpRequest Constructor
-** @return void
+* @brief HttpRequest Constructor that represents one HTTP request that can be received by a server
+* @param method: http request method
+* @param path: http request path
+* @param scheme: http request version
+* @param meta: a map containing the key value pairs of http headers
+* @param params: a map containing the key value pairs of http parameters
+* @param cookie: a map containing the key value pairs of http header's cookie entries
+* @return HttpRequest
 */
 http::HttpRequest::HttpRequest(
   std::string method,
@@ -36,8 +46,8 @@ http::HttpRequest::~HttpRequest() {
 }
 
 /**
-** @brief HttpRequest toString method used for debug purposes
-** @return void
+** @brief overloading << for HttpRequest object that enables HttpRequest to be written to a output stream
+** @return std::ostream& enabling HttpRequest to be written to a output stream
 */
 std::ostream& http::operator<<(std::ostream& Str, const http::HttpRequest& v) {
   std::string result = "method: " + v.get_method() + "\n"
@@ -58,7 +68,7 @@ std::ostream& http::operator<<(std::ostream& Str, const http::HttpRequest& v) {
 
 /**
 ** @brief Marsaglia's xorshf generator
-** @return a pseudo random number
+** @return a pseudo random unsigned long
 */
 unsigned long http::HttpRequest::xorshf96() {          //period 2^96-1
   unsigned long t;
@@ -75,6 +85,7 @@ unsigned long http::HttpRequest::xorshf96() {          //period 2^96-1
 
 /**
 ** @brief getter for http request's method. Ex: GET
+** @return a string indicating http request's method
 */
 std::string http::HttpRequest::get_method() const {
   return this->method;
@@ -82,6 +93,7 @@ std::string http::HttpRequest::get_method() const {
 
 /**
 ** @brief getter for http request's path. Ex: /abc.html
+** @return a path string
 */
 std::string http::HttpRequest::get_path() const {
   return this->path;
@@ -89,6 +101,7 @@ std::string http::HttpRequest::get_path() const {
 
 /**
 ** @brief getter for http request's scheme. Ex: HTTP/1.0
+** @return a string indicating the current http protocol version of the request
 */
 std::string http::HttpRequest::get_scheme() const {
   return this->scheme;
@@ -96,6 +109,7 @@ std::string http::HttpRequest::get_scheme() const {
 
 /**
 ** @brief getter for http request's meta variables in the request header.
+** @return a map of key value pairs for http request header
 */
 std::unordered_map<std::string, std::string> const & http::HttpRequest::get_meta() const {
   return this->meta;
@@ -103,6 +117,7 @@ std::unordered_map<std::string, std::string> const & http::HttpRequest::get_meta
 
 /**
 ** @brief getter for http request's get/post parameters
+** @return a map of key value pairs for http request parameters
 */
 std::unordered_map<std::string, std::string> const & http::HttpRequest::get_parameters() const {
   return this->parameters;
@@ -110,6 +125,7 @@ std::unordered_map<std::string, std::string> const & http::HttpRequest::get_para
 
 /**
 ** @brief getter for http request's cookie map
+** @return a map of key value pairs for http request cookie
 */
 std::unordered_map<std::string, std::string> const & http::HttpRequest::get_cookie() const {
   return this->cookie;
@@ -131,8 +147,10 @@ bool http::HttpRequest::has_session_id() {
 }
 
 /**
-** @brief getter for a session object pointer associated with the
-** current http request
+** @brief getter for a session object pointer associated with the current http request
+** If there is no HttpSession object associated with the http request, a new HttpSession
+** object will be created for the request.
+** @return a shared_ptr of HttpSession object
 */
 std::shared_ptr<http::HttpSession> http::HttpRequest::get_session() {
 

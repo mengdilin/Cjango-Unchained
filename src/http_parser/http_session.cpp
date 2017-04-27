@@ -1,17 +1,26 @@
 #include "http_session.hpp"
 
+/** @file http_session.cpp
+ * \ingroup http
+ * @brief HttpSession class implementation
+ */
+
+
 http::HttpSession::~HttpSession() {
 
 }
 
-
+/**
+* @brief HttpSession constructor that initializes a reader-writer lock
+*/
 http::HttpSession::HttpSession() {
   //initializes rw lock
   pthread_rwlock_init(&lock, NULL);
 }
 
 /**
-** @brief exception class in case HttpSession::get wants to hard-fail when key is not present
+** @brief custom exception class in case
+** HttpSession::get wants to hard-fail when key is not present
 */
 class http_session_get_exception: public std::exception {
   virtual const char* what() const throw()
@@ -22,7 +31,11 @@ class http_session_get_exception: public std::exception {
 
 
 /**
-** @brief a key in a session map, return its value. Returns an empty string if key not found
+** @brief given a key, return its value from the session map.
+** This method is thread safe
+** @param key: key used to retrieve value stored in the session map
+** @return if key is found, the value corresponding to the key.
+** If key is not found, an empty string
 */
 std::string http::HttpSession::get(std::string key) {
 
@@ -41,7 +54,8 @@ std::string http::HttpSession::get(std::string key) {
 }
 
 /**
-** @brief a (key, value pair), insert it to session map
+** @brief given a (key, value pair), insert it to the session map.
+** This method is thread safe
 */
 void http::HttpSession::set(std::string key, std::string value) {
   //get exclusive access for write lock

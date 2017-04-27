@@ -4,6 +4,11 @@
 #include <string>
 #include "http_request.hpp"
 
+/** @file http_response.hpp
+ * \ingroup http
+ * @brief HttpResponse class declaration
+ */
+
 namespace http {
   class HttpResponse {
 

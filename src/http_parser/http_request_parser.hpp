@@ -8,6 +8,10 @@
 #include <iostream>
 #include <fstream>
 
+/** @file http_request_parser.hpp
+ * \ingroup http
+ * @brief HttpRequestParser class declaration
+ */
 namespace http {
   class HttpRequestParser {
   public:

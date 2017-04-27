@@ -20,13 +20,13 @@ namespace http {
     std::string path;
     std::string scheme;
   private:
-    static unsigned long x, y, z; /*!< helper variables used to set session id */
+    static unsigned long x, y, z; /**< helper variables used to set session id */
     mutable unsigned long session_id;
     mutable bool has_set_session_id = false;
-    std::unordered_map<std::string, std::string> meta; /*!< map that stores http request's header parameters */
-    std::unordered_map<std::string, std::string> parameters; /*!< map that stores http request's get/post parameters */
-    std::unordered_map<std::string, std::string> cookie;  /*!< map that stores http request's cookies */
-    static std::unordered_map<std::string, std::shared_ptr<HttpSession> > sessions; /*!< static map that keeps track of all session objects for all http requests */
+    std::unordered_map<std::string, std::string> meta; /**< map that stores http request's header parameters */
+    std::unordered_map<std::string, std::string> parameters; /**< map that stores http request's get/post parameters */
+    std::unordered_map<std::string, std::string> cookie;  /**< map that stores http request's cookies */
+    static std::unordered_map<std::string, std::shared_ptr<HttpSession> > sessions; /**< static map that keeps track of all session objects for all http requests */
   public:
     static std::string session_cookie_key;
   public:

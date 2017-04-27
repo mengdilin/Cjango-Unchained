@@ -4,6 +4,12 @@
 #include <fstream>
 #include <sstream>      // std::stringbuf
 #include <string>
+
+/** @file http_stream_reader.hpp
+ * \ingroup http
+ * @brief HttpStreamReader class declaration
+ */
+
 namespace http {
 class HttpStreamReader {
   public:

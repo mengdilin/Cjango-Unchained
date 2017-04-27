@@ -3,6 +3,12 @@
 #include <algorithm>
 #include <string>
 #include <iostream>
+
+/** @file http_request_parser.cpp
+ * \ingroup http
+ * @brief HttpRequestParser class implementation
+ */
+
 http::HttpRequestParser::HttpRequestParser() {}
 
 
@@ -13,7 +19,8 @@ http::HttpRequestParser::HttpRequestParser(
 
 /**
 ** @brief given an input_stream containing a http request, parses the request line and headers
-** @return a http request with populated headers and an empty body
+** @param input_stream: a stream containing a http request string
+** @return HttpRequest with populated http request headers and an empty body
 */
 http::HttpRequest http::HttpRequestParser::parse_request_line_and_headers(std::istream& input_stream) {
   HttpRequestLine request_line = parse_line(input_stream); //line_parser
@@ -24,6 +31,7 @@ http::HttpRequest http::HttpRequestParser::parse_request_line_and_headers(std::i
 
 /**
 ** @brief given an input_stream containing a http request, parses the request line, headers, and body
+** @param input_stream: a stream containing a http request string
 ** @return a http request object representing the data from the input_stream
 */
 http::HttpRequest http::HttpRequestParser::parse(std::istream& input_stream) {
@@ -67,7 +75,10 @@ http::HttpRequest http::HttpRequestParser::parse(std::istream& input_stream) {
 }
 
 /**
-** @brief helper method that given a string of encoded cookie key value pairs from parameters map, creates a cookie map,
+** @brief helper method that given a string of encoded cookie key value pairs
+** from parameters map, creates a cookie map
+** @param params: a map containing parameters of a http request
+** @return a map containing key value pairs of the http request's cookie
 */
 std::unordered_map<std::string, std::string> http::HttpRequestParser::get_http_cookie(std::unordered_map<std::string, std::string>& params) {
   std::unordered_map<std::string, std::string> cookies;
@@ -93,12 +104,22 @@ std::unordered_map<std::string, std::string> http::HttpRequestParser::get_http_c
 
 }
 
+
+/**
+** @brief helper method that parses a http request's body
+** @param input_stream: a stream containing http request's body
+** @param content_type: the content type of the http request as specified in its headers
+** @param content_leng: the content length of the http request as specified in its headers
+** @return a map containing key value pairs of the http request's cookie
+*/
 std::unordered_map<std::string, std::string> http::HttpRequestParser::parse_body(std::istream& input_stream, std::string content_type, int content_leng) {
   return body_parser.parse(input_stream, content_type, content_leng);
 }
 
 /**
 ** @brief helper method that parses the first line of a http request
+** @param input_stream: a stream containing http request's body
+** @return HttpRequestLine
 */
 http::HttpRequestLine http::HttpRequestParser::parse_line(std::istream& input_stream) {
   std::string request_line = this->reader.get_next_line(input_stream);
@@ -117,6 +138,8 @@ http::HttpRequestLine http::HttpRequestParser::parse_line(std::istream& input_st
 
 /**
 ** @brief helper method that parses get paramters in the first line of a http request
+** @param: request_line_fields is a vector with 3 fields representing the first line of a http request
+** @return: HttpRequestLine with parameters populated
 */
 http::HttpRequestLine http::HttpRequestParser::get_http_request_line(std::vector<std::string> request_line_fields) {
   std::string uri = request_line_fields[1];
@@ -147,6 +170,8 @@ http::HttpRequestLine http::HttpRequestParser::get_http_request_line(std::vector
 }
 /**
 ** @brief helper method that parses a http request's headers
+** @param input_stream: a stream containing http request's body
+** @return: a map representing a http request's headers
 */
 std::unordered_map<std::string, std::string> http::HttpRequestParser::parse_head(std::istream& input_stream) {
   std::unordered_map<std::string, std::string> request_headers;

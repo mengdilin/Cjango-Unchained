@@ -1,6 +1,11 @@
 #include <unordered_map>
 #include <string>
 
+/** @file http_request_line.hpp
+ * \ingroup http
+ * @brief HttpRequestLine class declaration
+ */
+
 namespace http {
 class HttpRequestLine {
   public:

@@ -5,10 +5,15 @@
 #include <iostream>
 #include <fstream>
 #include "url_encoded_form_parser.hpp"
+
+/** @file http_request_body_parser.hpp
+ * \ingroup http
+ * @brief HttpRequestBodyParser class declaration
+ */
 namespace http {
   class HttpRequestBodyParser {
   public:
-    std::vector<UrlEncodedFormParser> url_encoded_form_parsers; /*!< parser that parses application/x-www-form-urlencoded */
+    std::vector<UrlEncodedFormParser> url_encoded_form_parsers; /**< parser that parses application/x-www-form-urlencoded */
 
   public:
     HttpRequestBodyParser();

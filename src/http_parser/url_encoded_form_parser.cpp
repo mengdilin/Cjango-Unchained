@@ -3,8 +3,18 @@
 #include <ctype.h>
 #include <stdlib.h>
 
+/** @file url_encoded_form_parser.cpp
+ * \ingroup http
+ * @brief UrlEncodedFormParser class implementation
+ */
 
 http::UrlEncodedFormParser::UrlEncodedFormParser() {}
+
+/**
+ * @brief checks if cotent_type in question can be parsed by the current parser
+ * @param content_type: a string representing the content type of a http request
+ * @return: a boolean indicating whether content_type is supported
+ */
 bool http::UrlEncodedFormParser::can_parse_content_type(std::string content_type) {
   return content_type == supported_content_type;
 }
@@ -78,7 +88,11 @@ std::string http::UrlEncodedFormParser::urlDecode(const std::string &str)
 }
 
 /**
-** @brief given current input stream containing get or post params encoded as a single string, parses it into a map
+** @brief given current input stream which contains get or post params
+** encoded as a single string, parses the stream into a map
+** @param input_stream is the input stream we are currently processing which contains get or post params
+** @param content_leng: length of the input_stream
+** @return a map containing http request's parameters
 */
 std::unordered_map<std::string, std::string> http::UrlEncodedFormParser::get_parameter(std::istream& input_stream, int content_leng) {
   std::unordered_map<std::string, std::string> parameters_map;
@@ -117,6 +131,9 @@ std::unordered_map<std::string, std::string> http::UrlEncodedFormParser::get_par
 
 /**
 ** @brief splits a string by a character delimiter and returns the result as a vector
+** @param str: string to be split
+** @param delimiter: a character delimiter to split the string by
+** @return the split string in a vector
 */
 std::vector<std::string> http::UrlEncodedFormParser::split(std::string str, char delimiter) {
   std::vector<std::string> result;
