@@ -26,7 +26,7 @@ namespace http {
     std::unordered_map<std::string, std::string> meta; /*!< map that stores http request's header parameters */
     std::unordered_map<std::string, std::string> parameters; /*!< map that stores http request's get/post parameters */
     std::unordered_map<std::string, std::string> cookie;  /*!< map that stores http request's cookies */
-    static std::unordered_map<std::string, std::shared_ptr<HttpSession>> sessions; /*!< static map that keeps track of all session objects for all http requests */
+    static std::unordered_map<std::string, std::shared_ptr<HttpSession> > sessions; /*!< static map that keeps track of all session objects for all http requests */
   public:
     static std::string session_cookie_key;
   public:

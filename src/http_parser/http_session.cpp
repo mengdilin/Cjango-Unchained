@@ -50,7 +50,7 @@ void http::HttpSession::set(std::string key, std::string value) {
   if (result != single_session.end()) {
     result->second = value;
   } else {
-    single_session.insert({key, value});
+    single_session.insert(std::pair<std::string, std::string>(key, value));
   }
   pthread_rwlock_unlock(&lock);
 }
