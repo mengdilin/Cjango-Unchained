@@ -32,8 +32,8 @@ TESTOBJS = app/app.o routing/router.o app/logger.o \
   $(SFCDIR)/FileWatcherLinux.o
 
 UNITTESTDIR=tests
-UNITTESTS= $(UNITTESTDIR)/test-Router.o
-UNITTESTS= $(UNITTESTDIR)/test-http-request-parser.o
+UNITTESTS  = $(UNITTESTDIR)/test-Router.o
+UNITTESTS += $(UNITTESTDIR)/test-http-request-parser.o
 UNITTESTEXE=$(UNITTESTDIR)/tests
 
 HTTPPARSEROBJ = http_parser/http_request_parser.o\
@@ -92,7 +92,7 @@ test: $(UNITTESTS) $(TESTOBJS) $(HTTPPARSERLIB)
 	$(CC) $(UNITTESTDIR)/test-main.cpp -c -o $(UNITTESTDIR)/test-main.o $(OVERALLCPP)
 	$(CC) $(UNITTESTDIR)/test-main.o $(UNITTESTS) $(TESTOBJS) -o $(UNITTESTEXE) $(OVERALLCPP)
 test-run:
-	$(UNITTESTEXE) -r compact
+	LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:./http_parser $(UNITTESTEXE) -r compact
 
 clean:
 	rm -f app/*.o routing/*.o http_parser/*.o http_parser/*.so lib/simplefilewatcher/build/intermediate/Debug/*.o

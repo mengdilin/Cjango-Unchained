@@ -64,7 +64,8 @@ constexpr const char* file_name(const char* str) {
     return str_slant(str) ? r_slant(str_end(str)) : str;
 }
 // https://github.com/gabime/spdlog/issues/340#issuecomment-287583891
-#define _SPDLOG(logger_name, level, ...) if( ((cjango_loggers)).isVisible( (logger_name)) ) { (((cjango_loggers))[logger_name]->level("[" + fmt::format(file_name(__FILE__)) + ":" + std::to_string(__LINE__) + ":" + string(__FUNCTION__) + "] " + fmt::format(__VA_ARGS__))); }
+// #define _SPDLOG(logger_name, level, ...) if( ((cjango_loggers)).isVisible( (logger_name)) ) { (((cjango_loggers))[logger_name]->level("[" + fmt::format(file_name(__FILE__)) + ":" + std::to_string(__LINE__) + ":" + string(__FUNCTION__) + "] " + fmt::format(__VA_ARGS__))); }
+#define _SPDLOG(logger_name, level, ...) _DEBUG("[" + fmt::format(file_name(__FILE__)) + ":" + std::to_string(__LINE__) + ":" + string(__FUNCTION__) + "] " + fmt::format(__VA_ARGS__));
 
 inline void _log() {}
 template<typename Head, typename ...Rest>
