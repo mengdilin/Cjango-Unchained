@@ -66,6 +66,8 @@ app.o : app/app.cpp
 	$(CC) $(CPPFLAGS) -c $^
 router.o : routing/router.cpp
 	$(CC) $(CPPFLAGS) -c $^
+app/logger.o: app/logger.cpp
+	$(CC) $(CPPFLAGS) -fPIC -o $@ -c $^
 
 lib/simplefilewatcher/build/intermediate/Debug/FileWatcher.o:
 	make -C lib/simplefilewatcher/build/gmake

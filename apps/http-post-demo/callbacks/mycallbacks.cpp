@@ -8,7 +8,7 @@
 #include <fstream>
 #include <streambuf>
 #include <vector>
-#include "../mstch/include/mstch/mstch.hpp"
+//#include "../mstch/include/mstch/mstch.hpp"
 
 std::string logger_name = "session"; // use both in page_index() and page_home()
 
@@ -21,18 +21,26 @@ inline int sql_callback_insert(void *NotUsed, int argc, char **argv, char **azCo
    return 0;
 }
 
+bool replace(std::string& str, const std::string& from, const std::string& to) {
+    size_t start_pos = str.find(from);
+    if(start_pos == std::string::npos)
+        return false;
+    str.replace(start_pos, from.length(), to);
+    return true;
+}
+
 inline int sql_callback_select(void *data, int argc, char **argv, char **azColName){
    int i;
-   std::vector<std::string> *pvect = static_cast<std::vector<std::string> *>(data);
-   std::string row_data = "";
+   std::string *pvect = static_cast<std::string *>(data);
+   *(pvect) += "<tr>";
    for(i=0; i<argc; i++){
 
-      row_data  += "<td>";
-      row_data += argv[i];
-      row_data += "</td>";
+      *(pvect)  += "<td>";
+      *(pvect) += argv[i];
+      *(pvect) += "</td>";
       //printf("%s = %s\n", azColName[i], argv[i] ? argv[i] : "NULL");
    }
-   pvect->push_back(row_data);
+   *(pvect) += "</tr>";
    //printf("\n");
    return 0;
 }
@@ -72,11 +80,9 @@ int database_open(sqlite3** db) {
   return 0;
 }
 
-std::vector<std::string> database_select_blog(std::string sql, sqlite3 *db) {
-  std::vector<std::string> data1;
-
+std::string database_select_blog(std::string sql, sqlite3 *db) {
   char *zErrMsg = 0;
-  std::vector<std::string> data;
+  std::string data;
 
   int rc = sqlite3_exec(db, sql.c_str(), sql_callback_select, (void *)&data, &zErrMsg);
   if( rc != SQLITE_OK ){
@@ -90,37 +96,45 @@ std::vector<std::string> database_select_blog(std::string sql, sqlite3 *db) {
 
 std::string get_error_template(std::string error_msg) {
   std::ifstream error_s("error_template.html");
-  mstch::map errorcontext {{"error_message", error_msg}};
+  //mstch::map errorcontext {{"error_message", error_msg}};
   std::string errorview((std::istreambuf_iterator<char>(error_s)),
             std::istreambuf_iterator<char>());
-  return mstch::render(errorview, errorcontext);
+   replace(errorview, "{{error_message}}", error_msg);
+   return errorview;
+  //return mstch::render(errorview, errorcontext);
 }
 
 std::string get_success_template(std::string success_msg) {
   std::ifstream success_s("success_template.html");
-  mstch::map successcontext {{"success_message", success_msg}};
+  //mstch::map successcontext {{"success_message", success_msg}};
   std::string successview((std::istreambuf_iterator<char>(success_s)),
             std::istreambuf_iterator<char>());
-  return mstch::render(successview, successcontext);
+  replace(successview, "{{success_message}}",success_msg);
+  return successview;
+  //return mstch::render(successview, successcontext);
 }
 
 extern "C" http::HttpResponse page_insert(http::HttpRequest request) {
 
   //turn off html tag escaping from mstch
+  /*
   mstch::config::escape = [](const std::string& str) -> std::string {
     return str;
   };
+  */
   std::string view = http::HttpResponse::get_template("index.html");
 
-  mstch::array data_rows;
-  mstch::map context;
+  //mstch::array data_rows;
+  //mstch::map context;
   auto session_map = request.get_session();
   std::string username = session_map->get("username");
   if (username != "") {
-    context.insert({"user", "Hello, " + username});
+    replace(view, "{{user}}", "Hello, "+username);
+    //context.insert({"user", "Hello, " + username});
   }
   if (request.get_method() == "GET") {
-    return http::HttpResponse(mstch::render(view, context), request);
+    //return http::HttpResponse(mstch::render(view, context), request);
+    return http::HttpResponse(view, request);
   }
 
   auto wrote_blog = request.get_parameters().find("blog_post");
@@ -132,13 +146,17 @@ extern "C" http::HttpResponse page_insert(http::HttpRequest request) {
     sqlite3 *db = nullptr;
     if (database_open(&db) == -1) {
       sqlite3_close(db);
-      context.insert({"error", get_error_template("failed to open database")});
-      return http::HttpResponse(mstch::render(view, context), request);
+      replace(view, "{{error}}", get_error_template("failed to open database"));
+      return http::HttpResponse(view, request);
+      //context.insert({"error", get_error_template("failed to open database")});
+      //return http::HttpResponse(mstch::render(view, context), request);
     }
     if (database_insert_blog(blog, db) == -1) {
       sqlite3_close(db);
-      context.insert({"error", get_error_template("failed to insert blog to database")});
-      return http::HttpResponse(mstch::render(view, context), request);
+      replace(view, "{{error}}", get_error_template("failed to insert blog to database"));
+      return http::HttpResponse(view, request);
+      //context.insert({"error", get_error_template("failed to insert blog to database")});
+      //return http::HttpResponse(mstch::render(view, context), request);
     }
 
     /*
@@ -151,27 +169,33 @@ extern "C" http::HttpResponse page_insert(http::HttpRequest request) {
       sqlite3_close(db);
       return http::HttpResponse(mstch::render(view, context), request);
       */
-    context.insert({"error", get_success_template("successfully inserted into database")});
-    return http::HttpResponse(mstch::render(view, context), request);
+    replace(view, "{{error}}", get_success_template("successfully inserted into database"));
+    return http::HttpResponse(view, request);
+    //context.insert({"error", get_success_template("successfully inserted into database")});
+    //return http::HttpResponse(mstch::render(view, context), request);
     }
-  return http::HttpResponse(mstch::render(view, context), request);
+    return http::HttpResponse(view, request);
+  //return http::HttpResponse(mstch::render(view, context), request);
 }
 
 
 extern "C" http::HttpResponse page_index(http::HttpRequest request) {
+  /*
   mstch::config::escape = [](const std::string& str) -> std::string {
   return str;
 };
+  */
   std::string view = http::HttpResponse::get_template("index.html");
-  mstch::array data_rows;
-  mstch::map context;
+  //mstch::array data_rows;
+  //mstch::map context;
   _SPDLOG(logger_name, error, "callback root: {}", http::HttpResponse::templates_root);
   _SPDLOG(logger_name, info, "index session id: {}", std::to_string(request.get_session_id()));
 
   auto session_map = request.get_session();
   std::string username = session_map->get("username");
   if (username != "") {
-      context.insert({"user", "Hello, " + username});
+      replace(view, "{{user}}", "Hello, "+username);
+      //context.insert({"user", "Hello, " + username});
 
   }
 
@@ -183,20 +207,29 @@ extern "C" http::HttpResponse page_index(http::HttpRequest request) {
     sqlite3 *db = nullptr;
     if (database_open(&db) == -1) {
       sqlite3_close(db);
-      context.insert({"error", get_error_template("failed to open database")});
-      return http::HttpResponse(mstch::render(view, context), request);
+      replace(view, "{{error}}", get_error_template("failed to open database"));
+      return http::HttpResponse(view, request);
+      //context.insert({"error", get_error_template("failed to open database")});
+      //return http::HttpResponse(mstch::render(view, context), request);
     }
     std::string sql = "select * from blogs where blog like \"%" + query_string + "%\";";
-    std::vector<std::string> data = database_select_blog(sql, db);
+    std::string data = database_select_blog(sql, db);
+    replace(view, "{{data}}", data);
+    /*
     for (int i = 0; i < data.size(); i++) {
       data_rows.push_back( mstch::map{{"data", data.at(i)}});
     }
+
       context.insert({"data_rows", data_rows});
+      */
+
 
       sqlite3_close(db);
-      return http::HttpResponse(mstch::render(view, context), request);
+      return http::HttpResponse(view, request);
+      //return http::HttpResponse(mstch::render(view, context), request);
     }
-  return http::HttpResponse(mstch::render(view, context), request);
+return http::HttpResponse(view, request);
+  //return http::HttpResponse(mstch::render(view, context), request);
 }
 
 extern "C" http::HttpResponse page_home(http::HttpRequest request) {

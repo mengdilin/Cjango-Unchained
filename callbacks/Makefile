@@ -1,9 +1,9 @@
 CC = g++
 CPPFLAGS = -std=c++1z -Wall -Wno-return-type-c-linkage
 CPPFLAGS += -DDEBUG -DCJANGO_DYNLOAD
-CPPFLAGS += -I../src/app/ -I../src/lib/
-#CPPFLAGS += -ferror-limit=5   # doesn't work on Linux
-LDFLAGS = -L../src/http_parser/ -lhttp_response -lhttp_request -lsqlite3
+CPPFLAGS += -I./../../../src/app/ -I./../../../src/lib/
+LDFLAGS = -L./../../../src/http_parser/ -lhttp_response -lhttp_request
+
 #LDFLAGS += -L./../Jinja2CppLight/build -lJinja2CppLight
 # read callbacks/*.cpp files into a variable SOURCES
 SOURCES = $(wildcard *.cpp)
@@ -13,11 +13,7 @@ OBJDIRS = $(SOURCES:.cpp=.so.dSYM)
 
 # When you execute "make" (i.e. make with no arugment),
 # this "all" target or all *.so files will be built.
-all: packages $(OBJS)
-
-packages:
-	sudo apt-get install sqlite3 libsqlite3-dev
-.PHONY: packages
+all: $(OBJS)
 
 # Suffixes to apply Make's Suffix Rules
 .SUFFIXES: .cpp .o .so
