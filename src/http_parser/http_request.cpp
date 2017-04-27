@@ -1,7 +1,7 @@
 #include "http_request.hpp"
 #include <stdio.h>      /* printf, NULL */
 #include <stdlib.h>     /* strtoul */
-//#include "../app/externs.hpp"
+#include "../app/externs.hpp"
 
 std::string http_logger_name = "http_request"; // FIXME refactor
   unsigned long http::HttpRequest::x=123456789; //FIXME: just use a static counter rather than generating this

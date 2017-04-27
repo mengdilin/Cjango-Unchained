@@ -14,8 +14,11 @@ OBJDIRS = $(SOURCES:.cpp=.so.dSYM)
 
 # When you execute "make" (i.e. make with no arugment),
 # this "all" target or all *.so files will be built.
-all: $(OBJS)
+all: packages $(OBJS)
 
+packages:
+	sudo apt-get install sqlite3 libsqlite3-dev
+.PHONY: packages
 # Suffixes to apply Make's Suffix Rules
 .SUFFIXES: .cpp .o .so
 

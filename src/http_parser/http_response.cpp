@@ -1,7 +1,7 @@
 #include "http_response.hpp"
 #include <fstream>
 #include <streambuf>
-//#include "../app/externs.hpp"
+#include "../app/externs.hpp"
 std::string http::HttpResponse::templates_root;
 
 /**

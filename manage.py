@@ -4,6 +4,13 @@ import os
 import sys
 
 if __name__ == "__main__":
+
+  # If you don't install our libhttp_response.so and libhttp_request.so
+  # in the place where linker can reference at runtime of ./manage,
+  # it will cause error (checked on Ubuntu 16.10)
+  libhttp_path = os.path.dirname(os.path.abspath(__file__)) + "/src/http_parser/"
+  os.environ['LD_LIBRARY_PATH'] =  libhttp_path
+
   if len(sys.argv) > 1 and sys.argv[1] == 'runserver':
     port_number = sys.argv[2] if len(sys.argv) > 2 else '8000'
     for i in range(len(sys.argv)):

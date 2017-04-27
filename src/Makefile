@@ -57,7 +57,7 @@ DEPENDS   = $(TESTOBJS:.o=.d)
 # -ldl is needed for Linux
 $(PROG) : $(TESTOBJS) app/manage.cpp
 	make -C http_parser
-	$(CC) $(OVERALLCPP) -o $@ $^ -ldl
+	$(CC) -o $@ $^ -ldl $(OVERALLCPP)
 # main.o : app/main.cpp
 # 	$(CC) $(CPPFLAGS) -c $^
 msocket.o : app/msocket.cpp
@@ -66,23 +66,6 @@ app.o : app/app.cpp
 	$(CC) $(CPPFLAGS) -c $^
 router.o : routing/router.cpp
 	$(CC) $(CPPFLAGS) -c $^
-app/logger.o: app/logger.cpp
-	$(CC) $(CPPFLAGS) -fPIC -o $@ -c $^
-
-# Needed for Linux (/usr/bin/ld: http_parser/http_response.o: relocation R_X86_64_32 against `__pthread_key_create' can not be used when making a shared object; recompile with -fPIC)
-http_parser/http_request.o: http_parser/http_request.cpp http_parser/http_session.cpp
-	$(CC) $(CPPFLAGS) -fPIC -c http_parser/http_request.cpp -o $@
-http_parser/http_response.o: http_parser/http_response.cpp
-	$(CC) $(CPPFLAGS) -fPIC -c http_parser/http_response.cpp -o $@
-http_parser/http_session.o: http_parser/http_session.cpp
-	$(CC) $(CPPFLAGS) -fPIC -c http_parser/http_session.cpp -o $@
-
-# http_request.cpp uses _SPDLOG which calls cjango_logger global variable
-# Without defining that variable, linker returns error. Thus app/logger.o
-app/libhttp_response.so: http_parser/http_request.o http_parser/http_session.o http_parser/http_response.o app/logger.o
-	$(CC) $(CPPFLAGS) -shared -o $@ $^
-app/libhttp_request.so: http_parser/http_request.o http_parser/http_session.o app/logger.o
-	$(CC) $(CPPFLAGS) -shared -o $@ $^
 
 lib/simplefilewatcher/build/intermediate/Debug/FileWatcher.o:
 	make -C lib/simplefilewatcher/build/gmake
