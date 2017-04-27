@@ -178,12 +178,14 @@ extern "C" http::HttpResponse page_home(http::HttpRequest request) {
     //_SPDLOG(logger_name, info, "home session id: {}", std::to_string(request.get_session_id()));
     auto session_map = request.get_session();
     auto params = request.get_parameters();
+    std::string username ="";
     auto first_name_result = params.find("firstname");
     if (first_name_result != params.end()) {
+      username = first_name_result->second;
       session_map->set("username", first_name_result->second);
     }
     std::string view = http::HttpResponse::get_template("index.html");
-    replace(view, "{{user}}", first_name_result->second);
+    replace(view, "{{user}}", username);
     replace(view, "{{error}}","");
     replace(view, "{{data}}","");
     return http::HttpResponse(view, request);
