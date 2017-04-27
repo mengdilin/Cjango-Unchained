@@ -56,7 +56,7 @@ DEPENDS   = $(TESTOBJS:.o=.d)
 
 # -ldl is needed for Linux
 $(PROG) : $(TESTOBJS) $(HTTPPARSERLIB) app/manage.cpp
-	$(CC) $(OVERALLCPP) -o $@ $^ -ldl
+	$(CC) -o $@ $^ -ldl $(OVERALLCPP)
 # main.o : app/main.cpp
 # 	$(CC) $(CPPFLAGS) -c $^
 msocket.o : app/msocket.cpp
