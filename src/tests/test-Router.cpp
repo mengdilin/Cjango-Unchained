@@ -127,3 +127,15 @@ TEST_CASE("load url-mapping from json file") {
   r.load_url_pattern_from_file("./tests/mock/");
   REQUIRE( r.nr_patterns() > 0 );
 }
+
+TEST_CASE("regex precedence check") {
+  Router r;
+  std::string url_pattern("/diary/[0-9]/.*");
+  r.add_route(url_pattern, f_router_test);
+  r.add_route("/diary/[0-9]/non-selected", f_router_test);
+
+  http::HttpRequest req("/diary/3/selected");
+  REQUIRE( r.resolve(req) == url_pattern );
+  REQUIRE( r.get_http_response(req).to_string() == http::HttpResponse("test").to_string() );
+}
+
