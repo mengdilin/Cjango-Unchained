@@ -15,6 +15,7 @@ sudo make install
 
 ## To Run
 ```
+cd ../
 make -C demo/http-post-demo/callbacks
 python manage.py runserver 8000 --setting apps/http-post-demo/json/settings.json
 
