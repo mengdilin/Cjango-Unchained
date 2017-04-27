@@ -1,4 +1,4 @@
-# Dependencies
+## Dependencies
 This application uses sqlite3 as its backend database. To install sqlite3,
 
 ```
@@ -8,7 +8,14 @@ Alternatively, for your convenience, a snapshot of sqlite3 is included in this d
 
 ```
 cd sqlite-snapshot-201704181120/
-./configure --prefix=/usr/local 
-make 
+./configure --prefix=/usr/local
+make
 sudo make install
+```
+
+## To Run
+```
+make -C demo/http-post-demo/callbacks
+python manage.py runserver 8000 --setting apps/http-post-demo/json/settings.json
+
 ```
