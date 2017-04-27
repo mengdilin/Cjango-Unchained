@@ -14,7 +14,7 @@ logs
 src/doc/html
 src/doc/latex
 .Rhistory
-tests
+tests-exe
 *.pyc
 manage
 Doxyfile.bak

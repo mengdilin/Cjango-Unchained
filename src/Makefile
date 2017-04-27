@@ -33,7 +33,7 @@ TESTOBJS = app/app.o routing/router.o app/logger.o \
 
 UNITTESTDIR=tests
 UNITTESTS  = $(UNITTESTDIR)/test-Router.o $(UNITTESTDIR)/test-http-request-parser.o
-UNITTESTEXE=$(UNITTESTDIR)/tests
+UNITTESTEXE=$(UNITTESTDIR)/tests-exe
 
 HTTPPARSEROBJ = http_parser/http_request_parser.o\
 	http_parser/http_request_body_parser.o \
