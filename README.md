@@ -52,6 +52,7 @@ python manage.py runserver 8000 --setting apps/http-get-demo/json/settings.json
 ```
 or
 ```
+sudo apt-get install libsqlite3-dev           # On Ubuntu for no <sqlite3.h> error
 make -C demo/http-get-demo/callbacks
 python manage.py runserver 8000 --setting apps/http-post-demo/json/settings.json
 

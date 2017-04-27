@@ -2,10 +2,10 @@
 
 PROG = manage
 CC = g++
-CPPFLAGS = -std=c++1z -Wall -pthread -MMD -MP
+CPPFLAGS = -std=c++1z -Wall -pthread -MMD -MP -fPIC
 CPPFLAGS += -I./app/ -I./lib/
 OVERALLCPP = $(CPPFLAGS)
-OVERALLCPP += -L./app/ -lhttp_response -lhttp_request
+OVERALLCPP += -L./http_parser/ -lhttp_response -lhttp_request -ldl
 
 #CPPFLAGS += -ferror-limit=5   # doesn't work on Linux
 DEBUG ?= 1
@@ -41,9 +41,11 @@ HTTPPARSEROBJ = http_parser/http_request_parser.o\
 	http_parser/url_encoded_form_parser.o \
 	http_parser/http_request_line.o \
 	http_parser/http_stream_reader.o
-HTTPPARSERLIB = app/libhttp_response.so \
-	app/libhttp_request.so
-
+LIB_HTTP_RESPONSE = http_parser/libhttp_response.so
+LIB_HTTP_REQUEST = http_parser/libhttp_request.so
+HTTPPARSERLIB = $(LIB_HTTP_RESPONSE) $(LIB_HTTP_REQUEST)
+REQ_SESSION=http_parser/http_request.o http_parser/http_session.o
+RESPONSEOBJ=http_parser/http_response.o
 
 TESTOBJS += $(HTTPPARSEROBJ)
 OBJS += $(HTTPPARSEROBJ)
@@ -55,8 +57,9 @@ DEPENDS   = $(TESTOBJS:.o=.d)
 # Note: $< is only the first source file
 
 # -ldl is needed for Linux
-$(PROG) : $(TESTOBJS) $(HTTPPARSERLIB) app/manage.cpp
-	$(CC) -o $@ $^ -ldl $(OVERALLCPP)
+$(PROG) : $(TESTOBJS) app/manage.cpp $(HTTPPARSERLIB)
+	$(CC) -o $@ $^ $(OVERALLCPP)
+
 # main.o : app/main.cpp
 # 	$(CC) $(CPPFLAGS) -c $^
 msocket.o : app/msocket.cpp
@@ -65,23 +68,18 @@ app.o : app/app.cpp
 	$(CC) $(CPPFLAGS) -c $^
 router.o : routing/router.cpp
 	$(CC) $(CPPFLAGS) -c $^
-app/logger.o: app/logger.cpp
-	$(CC) $(CPPFLAGS) -fPIC -o $@ -c $^
 
-# Needed for Linux (/usr/bin/ld: http_parser/http_response.o: relocation R_X86_64_32 against `__pthread_key_create' can not be used when making a shared object; recompile with -fPIC)
-http_parser/http_request.o: http_parser/http_request.cpp http_parser/http_session.cpp
-	$(CC) $(CPPFLAGS) -fPIC -c http_parser/http_request.cpp -o $@
-http_parser/http_response.o: http_parser/http_response.cpp
-	$(CC) $(CPPFLAGS) -fPIC -c http_parser/http_response.cpp -o $@
-http_parser/http_session.o: http_parser/http_session.cpp
-	$(CC) $(CPPFLAGS) -fPIC -c http_parser/http_session.cpp -o $@
+#app/logger.o: app/logger.cpp
+#	$(CC) $(CPPFLAGS) -fPIC -o $@ -c $^
+http_parser/libhttp_response.so:  $(REQ_SESSION) $(RESPONSEOBJ) app/logger.o
+	$(CC) $(CPPFLAGS) -shared -o $@ $^
+http_parser/libhttp_request.so: $(REQ_SESSION) app/logger.o
+	$(CC) $(CPPFLAGS) -shared -o $@ $^
 
-# http_request.cpp uses _SPDLOG which calls cjango_logger global variable
-# Without defining that variable, linker returns error. Thus app/logger.o
-app/libhttp_response.so: http_parser/http_request.o http_parser/http_session.o http_parser/http_response.o app/logger.o
-	$(CC) $(CPPFLAGS) -shared -o $@ $^
-app/libhttp_request.so: http_parser/http_request.o http_parser/http_session.o app/logger.o
-	$(CC) $(CPPFLAGS) -shared -o $@ $^
+# Causes g++: fatal error: cannot specify -o with -c, -S or -E with multiple files
+# On ubuntu with g++ 6.2.0
+#app/logger.o: app/logger.cpp
+#	$(CC) $(CPPFLAGS) -fPIC -o $@ -c $^
 
 lib/simplefilewatcher/build/intermediate/Debug/FileWatcher.o:
 	make -C lib/simplefilewatcher/build/gmake
@@ -91,13 +89,15 @@ lib/simplefilewatcher/build/intermediate/Debug/FileWatcherLinux.o:
 	make -C lib/simplefilewatcher/build/gmake
 
 test: $(UNITTESTS) $(TESTOBJS) $(HTTPPARSERLIB)
-	$(CC) $(OVERALLCPP) $(UNITTESTDIR)/test-main.cpp -c -o $(UNITTESTDIR)/test-main.o
-	$(CC) $(OVERALLCPP) $(UNITTESTDIR)/test-main.o $(UNITTESTS) $(TESTOBJS) -o $(UNITTESTEXE)
+	$(CC) $(UNITTESTDIR)/test-main.cpp -c -o $(UNITTESTDIR)/test-main.o $(OVERALLCPP)
+	$(CC) $(UNITTESTDIR)/test-main.o $(UNITTESTS) $(TESTOBJS) -o $(UNITTESTEXE) $(OVERALLCPP)
 test-run:
 	$(UNITTESTEXE) -r compact
 
 clean:
-	rm -f core $(PROG) $(OBJS) $(HTTPPARSEROBJ) $(HTTPPARSEROBJ:.o=.d) $(DEPENDS) $(UNITTESTS) $(UNITTESTEXE)
+	rm -f app/*.o routing/*.o http_parser/*.o http_parser/*.so lib/simplefilewatcher/build/intermediate/Debug/*.o
+	rm -f core $(PROG) $(OBJS) $(HTTPPARSEROBJ) $(HTTPPARSEROBJ:.o=.d) $(DEPENDS) $(UNITTESTS) $(UNITTESTEXE) $(REQ_SESSION) $(REQ_SESSION:.o=.d) $(RESPONSEOBJ:.o=.d) $(LIB_HTTP_REQUEST) $(LIB_HTTP_RESPONSE)
+
 
 # By -MMD -MP flags, dependency between source files are written in *.d files
 # These *.d files are included here in order to auto-recompile when header files change

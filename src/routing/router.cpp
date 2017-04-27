@@ -87,7 +87,7 @@ void *Router::load_shared_object_file(const std::string& path) {
   return lib;
 }
 
-callback_type Router::load_callback(const std::string& path, const std::string& func_name) {
+functor Router::load_callback(const std::string& path, const std::string& func_name) {
   auto lib = (dlib_handler) load_shared_object_file(path);
   _SPDLOG(route_logger_name, debug, "dlopen() finished for {}", path);
   bool found = std::find(dlib_handlers.begin(), dlib_handlers.end(), lib) != dlib_handlers.end();
@@ -113,7 +113,9 @@ callback_type Router::load_callback(const std::string& path, const std::string& 
     throw "no such an object file";
   }
    // FIXME where should we invoke dlclise()?
-  return reinterpret_cast<callback_type>(func);
+  callback_type call = reinterpret_cast<callback_type>(func);
+  functor f = static_cast<functor>(call);
+  return f;
 }
 
 #include "../lib/json.hpp"
@@ -149,7 +151,7 @@ void Router::load_url_pattern_from_file(const std::string url_json_dir) {
       // 'functor' (aka 'function<http::HttpResponse (http::HttpRequest)>')" error,
       // here we first cast to callback_type, and then the callback_type is
       // implicitly casted into std::function<callback_type>
-      callback = static_cast<functor>(load_callback(cinfo["file"], cinfo["funcname"]));
+      callback = load_callback(cinfo["file"], cinfo["funcname"]);
     } catch (const char *e) {
       callback = [](http::HttpRequest h){ return http::HttpResponse("<h1>500 Internal Server Error</h1>"); };
       _SPDLOG(route_logger_name, info, "Invalid callback");

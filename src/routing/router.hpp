@@ -53,7 +53,7 @@ class Router {
     void add_route(std::string url_pattern, functor f);
 #ifdef CJANGO_DYNLOAD
     void *load_shared_object_file(const std::string& path);
-    callback_type load_callback(const std::string& path, const std::string& func_name);
+    functor load_callback(const std::string& path, const std::string& func_name);
     void load_url_pattern_from_file(const std::string url_json_dir);
 #endif
     void set_static_dir(const std::string dir) { static_root_dir = dir; };

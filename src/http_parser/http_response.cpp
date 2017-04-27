@@ -10,12 +10,12 @@ std::string http::HttpResponse::templates_root;
 void http::HttpResponse::set_cookie(std::string key, std::string value) {
   auto result = headers.find("Set-Cookie");
   if (result != headers.end()) {
-    _DEBUG("inside first");
+    //_DEBUG("inside first");
     result->second += "; "+key+"="+value;
-    headers.insert({"Set-Cookie", result->second});
+    headers.insert(std::pair<std::string, std::string>("Set-Cookie", result->second));
 
   } else {
-    headers.insert({"Set-Cookie", key+"="+value});
+    headers.insert(std::pair<std::string, std::string>("Set-Cookie", key+"="+value));
   }
 
 }
@@ -76,22 +76,22 @@ http::HttpResponse http::HttpResponse::render_to_response(std::string path, std:
 http::HttpResponse::HttpResponse(std::string content, std::string content_type) {
   this->content = content;
   this->content_type = content_type;
-  headers.insert({"Content-Type", content_type});
-  headers.insert({"Content-Length", std::to_string(content.length())});
+  headers.insert(std::pair<std::string, std::string>("Content-Type", content_type));
+  headers.insert(std::pair<std::string, std::string>("Content-Length", std::to_string(content.length())));
 }
 
 //default good http response
 http::HttpResponse::HttpResponse(std::string content) {
   this->content = content;
-  headers.insert({"Content-Type", content_type});
-  headers.insert({"Content-Length", std::to_string(content.length())});
+  headers.insert(std::pair<std::string, std::string>("Content-Type", content_type));
+  headers.insert(std::pair<std::string, std::string>("Content-Length", std::to_string(content.length())));
 }
 
 //default good http response
 http::HttpResponse::HttpResponse(std::string content, http::HttpRequest& request) {
   this->content = content;
-  headers.insert({"Content-Type", content_type});
-  headers.insert({"Content-Length", std::to_string(content.length())});
+  headers.insert(std::pair<std::string, std::string>("Content-Type", content_type));
+  headers.insert(std::pair<std::string, std::string>("Content-Length", std::to_string(content.length())));
   if (request.has_session_id()) {
     this->set_cookie(HttpRequest::session_cookie_key, std::to_string(request.get_session_id()));
   }
@@ -141,8 +141,8 @@ std::string get_reason_phrase(int status_code) {
 http::HttpResponse::HttpResponse(int status_code) {
   this->status_code = status_code;
   get_reason_phrase(status_code);
-  headers.insert({"Content-Type", content_type});
-  headers.insert({"Content-Length", std::to_string(content.length())});
+  headers.insert(std::pair<std::string, std::string>("Content-Type", content_type));
+  headers.insert(std::pair<std::string, std::string>("Content-Length", std::to_string(content.length())));
 }
 
 /**
