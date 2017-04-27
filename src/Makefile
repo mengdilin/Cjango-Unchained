@@ -1,11 +1,11 @@
 #Makefile for our library
 
 PROG = manage
-CC = g++ -v
+CC = g++
 CPPFLAGS = -std=c++1z -Wall -pthread -MMD -MP
 CPPFLAGS += -I./app/ -I./lib/
 OVERALLCPP = $(CPPFLAGS)
-OVERALLCPP += -L./http_parser/ -lhttp_response -lhttp_request
+OVERALLCPP += -L./http_parser/ -lhttp_response -lhttp_request -ldl
 
 #CPPFLAGS += -ferror-limit=5   # doesn't work on Linux
 DEBUG ?= 1
@@ -57,7 +57,7 @@ DEPENDS   = $(TESTOBJS:.o=.d)
 # -ldl is needed for Linux
 $(PROG) : $(TESTOBJS) app/manage.cpp
 	make -C http_parser
-	$(CC) -o $@ $^ -ldl $(OVERALLCPP)
+	$(CC) -o $@ $^ $(OVERALLCPP)
 # main.o : app/main.cpp
 # 	$(CC) $(CPPFLAGS) -c $^
 msocket.o : app/msocket.cpp
@@ -66,6 +66,13 @@ app.o : app/app.cpp
 	$(CC) $(CPPFLAGS) -c $^
 router.o : routing/router.cpp
 	$(CC) $(CPPFLAGS) -c $^
+
+app/logger.o: app/logger.cpp
+	$(CC) $(CPPFLAGS) -fPIC -o $@ -c $^
+app/libhttp_response.so: http_parser/http_request.o http_parser/http_session.o http_parser/http_response.o app/logger.o
+	$(CC) $(CPPFLAGS) -shared -o $@ $^
+app/libhttp_request.so: http_parser/http_request.o http_parser/http_session.o app/logger.o
+	$(CC) $(CPPFLAGS) -shared -o $@ $^
 
 # Causes g++: fatal error: cannot specify -o with -c, -S or -E with multiple files
 # On ubuntu with g++ 6.2.0
@@ -80,8 +87,8 @@ lib/simplefilewatcher/build/intermediate/Debug/FileWatcherLinux.o:
 	make -C lib/simplefilewatcher/build/gmake
 
 test: $(UNITTESTS) $(TESTOBJS) $(HTTPPARSERLIB)
-	$(CC) $(OVERALLCPP) $(UNITTESTDIR)/test-main.cpp -c -o $(UNITTESTDIR)/test-main.o
-	$(CC) $(OVERALLCPP) $(UNITTESTDIR)/test-main.o $(UNITTESTS) $(TESTOBJS) -o $(UNITTESTEXE)
+	$(CC) $(UNITTESTDIR)/test-main.cpp -c -o $(UNITTESTDIR)/test-main.o $(OVERALLCPP)
+	$(CC) $(UNITTESTDIR)/test-main.o $(UNITTESTS) $(TESTOBJS) -o $(UNITTESTEXE) $(OVERALLCPP)
 test-run:
 	$(UNITTESTEXE) -r compact
 
