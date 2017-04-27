@@ -1,11 +1,11 @@
 #Makefile for our library
 
 PROG = manage
-CC = g++
+CC = g++ -v
 CPPFLAGS = -std=c++1z -Wall -pthread -MMD -MP
 CPPFLAGS += -I./app/ -I./lib/
 OVERALLCPP = $(CPPFLAGS)
-OVERALLCPP += -L./app/ -lhttp_response -lhttp_request
+OVERALLCPP += -L./http_parser/ -lhttp_response -lhttp_request
 
 #CPPFLAGS += -ferror-limit=5   # doesn't work on Linux
 DEBUG ?= 1
@@ -55,7 +55,8 @@ DEPENDS   = $(TESTOBJS:.o=.d)
 # Note: $< is only the first source file
 
 # -ldl is needed for Linux
-$(PROG) : $(TESTOBJS) $(HTTPPARSERLIB) app/manage.cpp
+$(PROG) : $(TESTOBJS) app/manage.cpp
+	make -C http_parser
 	$(CC) $(OVERALLCPP) -o $@ $^ -ldl
 # main.o : app/main.cpp
 # 	$(CC) $(CPPFLAGS) -c $^
@@ -97,6 +98,7 @@ test-run:
 	$(UNITTESTEXE) -r compact
 
 clean:
+	make clean -C http_parser
 	rm -f core $(PROG) $(OBJS) $(HTTPPARSEROBJ) $(HTTPPARSEROBJ:.o=.d) $(DEPENDS) $(UNITTESTS) $(UNITTESTEXE)
 
 # By -MMD -MP flags, dependency between source files are written in *.d files

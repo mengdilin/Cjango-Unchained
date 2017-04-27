@@ -1,14 +1,14 @@
 #include "http_request.hpp"
 #include <stdio.h>      /* printf, NULL */
 #include <stdlib.h>     /* strtoul */
-#include "../app/externs.hpp"
+//#include "../app/externs.hpp"
 
 std::string http_logger_name = "http_request"; // FIXME refactor
   unsigned long http::HttpRequest::x=123456789; //FIXME: just use a static counter rather than generating this
   unsigned long http::HttpRequest::y=362436069;
   unsigned long http::HttpRequest::z=521288629;
   std::string http::HttpRequest::session_cookie_key="session";
-  std::unordered_map<std::string, std::shared_ptr<http::HttpSession>> http::HttpRequest::sessions;
+  std::unordered_map<std::string, std::shared_ptr<http::HttpSession> > http::HttpRequest::sessions;
 
   static pthread_rwlock_t lock = PTHREAD_RWLOCK_INITIALIZER;
 
@@ -138,12 +138,12 @@ std::shared_ptr<http::HttpSession> http::HttpRequest::get_session() {
 
   auto result = this->cookie.find(HttpRequest::session_cookie_key);
   for (auto it=this->cookie.begin(); it!=this->cookie.end(); ++it) {
-    _SPDLOG(http_logger_name, info, "cookie:  {}, {}", it->first, it->second);
+    //_SPDLOG(http_logger_name, info, "cookie:  {}, {}", it->first, it->second);
   }
   if (result != this->cookie.end()) {
 
     auto key = result->second;
-    _SPDLOG(http_logger_name, info, "found session key: {}", key);
+    //_SPDLOG(http_logger_name, info, "found session key: {}", key);
 
     auto session_result = HttpRequest::sessions.find(key);
     if (session_result != HttpRequest::sessions.end()) {
@@ -158,13 +158,13 @@ std::shared_ptr<http::HttpSession> http::HttpRequest::get_session() {
           pthread_rwlock_unlock(&lock);
           return session_result->second;
         } else {
-          _SPDLOG(http_logger_name, info, "cannot find session id: {}", key);
+          //_SPDLOG(http_logger_name, info, "cannot find session id: {}", key);
           unsigned long ul;
           ul = strtoul (key.c_str(), NULL, 0);
           this->has_set_session_id = true;
           this->session_id = ul;
           std::shared_ptr<HttpSession> new_session = std::make_shared<HttpSession>();
-          HttpRequest::sessions.insert({key, new_session});
+          HttpRequest::sessions.insert(std::pair<std::string, std::shared_ptr<HttpSession> >(key, new_session));
           pthread_rwlock_unlock(&lock);
           return new_session;
         }
@@ -177,10 +177,10 @@ std::shared_ptr<http::HttpSession> http::HttpRequest::get_session() {
     //for the current key right after obtaining the lock
       this->session_id = HttpRequest::xorshf96();
       this->has_set_session_id = true;
-      _SPDLOG(http_logger_name, info, "set session id to {}", std::to_string(this->session_id));
+      //_SPDLOG(http_logger_name, info, "set session id to {}", std::to_string(this->session_id));
       std::shared_ptr<HttpSession> new_session = std::make_shared<HttpSession>();
 
-      HttpRequest::sessions.insert({std::to_string(this->session_id), new_session});
+      HttpRequest::sessions.insert(std::pair<std::string, std::shared_ptr<HttpSession> >(std::to_string(this->session_id), new_session));
       pthread_rwlock_unlock(&lock);
       return new_session;
     }
