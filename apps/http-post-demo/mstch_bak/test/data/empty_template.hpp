@@ -1,1 +1,0 @@
-const auto empty_template_data = mstch::map{};

@@ -3,7 +3,7 @@ CPPFLAGS = -std=c++1z -Wall -Wno-return-type-c-linkage
 CPPFLAGS += -DDEBUG -DCJANGO_DYNLOAD
 CPPFLAGS += -I./../../../src/app/ -I./../../../src/lib/
 #CPPFLAGS += -ferror-limit=5   # doesn't work on Linux
-LDFLAGS = -L./../../../src/http_parser/ -lhttp_response -lhttp_request -l sqlite3
+LDFLAGS = -L./../../../src/http_parser/ -lhttp_response -lhttp_request -lsqlite3
 #LDFLAGS += -L./../Jinja2CppLight/build -lJinja2CppLight
 #LDFLAGS += -L./../mstch/build/src -lmstch
 # read callbacks/*.cpp files into a variable SOURCES
@@ -29,7 +29,7 @@ packages:
 
 # Suffix Rule 2: create a shared object *.so from the corresponding *.o object file
 .o.so:
-	$(CC) $(CPPFLAGS) $(LDFLAGS) -shared -o $@ $^
+	$(CC) $(CPPFLAGS) -shared -o $@ $^ $(LDFLAGS)
 
 clean:
 	rm -f $(OBJS)

@@ -1,1 +1,0 @@
-const auto zero_view_data = mstch::map{{"nums", mstch::array{0, 1, 2}}};

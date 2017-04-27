@@ -8,7 +8,6 @@
 #include <fstream>
 #include <streambuf>
 #include <vector>
-//#include "../mstch/include/mstch/mstch.hpp"
 
 std::string logger_name = "session"; // use both in page_index() and page_home()
 
@@ -38,10 +37,8 @@ inline int sql_callback_select(void *data, int argc, char **argv, char **azColNa
       *(pvect)  += "<td>";
       *(pvect) += argv[i];
       *(pvect) += "</td>";
-      //printf("%s = %s\n", azColName[i], argv[i] ? argv[i] : "NULL");
    }
    *(pvect) += "</tr>";
-   //printf("\n");
    return 0;
 }
 
@@ -59,10 +56,7 @@ int database_insert_blog(std::string blog, sqlite3 *db) {
   char *zErrMsg = 0;
   int rc = sqlite3_exec(db, sql.c_str(), sql_callback_insert, 0, &zErrMsg);
   if( rc != SQLITE_OK ){
-    _SPDLOG(logger_name, info, "insert into db failed: {} with sql: {}", "demoDb.db", sql);
-    _SPDLOG(logger_name, info, "sql {}: ", sql);
     if (zErrMsg != 0) {
-      _SPDLOG(logger_name, info, "error {}: ", zErrMsg);
       sqlite3_free(zErrMsg);
     }
 
@@ -74,7 +68,6 @@ int database_insert_blog(std::string blog, sqlite3 *db) {
 int database_open(sqlite3** db) {
   int rc = sqlite3_open("./demoDb.db", db);
   if (rc) {
-    _SPDLOG(logger_name, info, "cannot open db: {}", "demoDB.db");
     return -1; //error
   }
   return 0;
@@ -86,54 +79,37 @@ std::string database_select_blog(std::string sql, sqlite3 *db) {
 
   int rc = sqlite3_exec(db, sql.c_str(), sql_callback_select, (void *)&data, &zErrMsg);
   if( rc != SQLITE_OK ){
-    _SPDLOG(logger_name, info, "select from db failed: {} with sql: {}", "demoDb.db", sql);
-    _SPDLOG(logger_name, info, "sql {}: ", sql);
-    _SPDLOG(logger_name, info, "error {}: ", zErrMsg);
     sqlite3_free(zErrMsg);
   }
   return data;
 }
 
 std::string get_error_template(std::string error_msg) {
-  std::ifstream error_s("error_template.html");
-  //mstch::map errorcontext {{"error_message", error_msg}};
-  std::string errorview((std::istreambuf_iterator<char>(error_s)),
-            std::istreambuf_iterator<char>());
+
+  std::string errorview = http::HttpResponse::get_template("error_template.html");
    replace(errorview, "{{error_message}}", error_msg);
    return errorview;
-  //return mstch::render(errorview, errorcontext);
 }
 
 std::string get_success_template(std::string success_msg) {
-  std::ifstream success_s("success_template.html");
-  //mstch::map successcontext {{"success_message", success_msg}};
-  std::string successview((std::istreambuf_iterator<char>(success_s)),
-            std::istreambuf_iterator<char>());
+
+  std::string successview = http::HttpResponse::get_template("success_template.html");
   replace(successview, "{{success_message}}",success_msg);
   return successview;
-  //return mstch::render(successview, successcontext);
 }
 
 extern "C" http::HttpResponse page_insert(http::HttpRequest request) {
-
-  //turn off html tag escaping from mstch
-  /*
-  mstch::config::escape = [](const std::string& str) -> std::string {
-    return str;
-  };
-  */
   std::string view = http::HttpResponse::get_template("index.html");
-
-  //mstch::array data_rows;
-  //mstch::map context;
+  replace(view, "{{data}}","");
   auto session_map = request.get_session();
   std::string username = session_map->get("username");
   if (username != "") {
     replace(view, "{{user}}", "Hello, "+username);
-    //context.insert({"user", "Hello, " + username});
+  } else {
+    replace(view, "{{user}}","");
   }
   if (request.get_method() == "GET") {
-    //return http::HttpResponse(mstch::render(view, context), request);
+    replace(view, "{{error}}","");
     return http::HttpResponse(view, request);
   }
 
@@ -142,63 +118,36 @@ extern "C" http::HttpResponse page_insert(http::HttpRequest request) {
   std::string blog;
   if (wrote_blog != request.get_parameters().end()) {
     blog = wrote_blog->second;
-    _SPDLOG(logger_name, info, "found param: {}", blog);
+    //_SPDLOG(logger_name, info, "found param: {}", blog);
     sqlite3 *db = nullptr;
     if (database_open(&db) == -1) {
       sqlite3_close(db);
       replace(view, "{{error}}", get_error_template("failed to open database"));
       return http::HttpResponse(view, request);
-      //context.insert({"error", get_error_template("failed to open database")});
-      //return http::HttpResponse(mstch::render(view, context), request);
     }
     if (database_insert_blog(blog, db) == -1) {
       sqlite3_close(db);
       replace(view, "{{error}}", get_error_template("failed to insert blog to database"));
       return http::HttpResponse(view, request);
-      //context.insert({"error", get_error_template("failed to insert blog to database")});
-      //return http::HttpResponse(mstch::render(view, context), request);
     }
-
-    /*
-    std::string sql = "select * from blogs;";
-    std::vector<std::string> data = database_select_blog(sql, db);
-    for (int i = 0; i < data.size(); i++) {
-      data_rows.push_back( mstch::map{{"data", data.at(i)}});
-    }
-      context.insert({"data_rows", data_rows});
-      sqlite3_close(db);
-      return http::HttpResponse(mstch::render(view, context), request);
-      */
     replace(view, "{{error}}", get_success_template("successfully inserted into database"));
     return http::HttpResponse(view, request);
-    //context.insert({"error", get_success_template("successfully inserted into database")});
-    //return http::HttpResponse(mstch::render(view, context), request);
     }
+    replace(view, "{{error}}", get_success_template("successfully inserted into database"));
     return http::HttpResponse(view, request);
-  //return http::HttpResponse(mstch::render(view, context), request);
 }
 
 
 extern "C" http::HttpResponse page_index(http::HttpRequest request) {
-  /*
-  mstch::config::escape = [](const std::string& str) -> std::string {
-  return str;
-};
-  */
   std::string view = http::HttpResponse::get_template("index.html");
-  //mstch::array data_rows;
-  //mstch::map context;
-  _SPDLOG(logger_name, error, "callback root: {}", http::HttpResponse::templates_root);
-  _SPDLOG(logger_name, info, "index session id: {}", std::to_string(request.get_session_id()));
-
   auto session_map = request.get_session();
   std::string username = session_map->get("username");
   if (username != "") {
       replace(view, "{{user}}", "Hello, "+username);
-      //context.insert({"user", "Hello, " + username});
 
+  } else {
+    replace(view, "{{user}}","");
   }
-
   auto query = request.get_parameters().find("search");
   std::string query_string;
   if (query != request.get_parameters().end()) {
@@ -209,27 +158,15 @@ extern "C" http::HttpResponse page_index(http::HttpRequest request) {
       sqlite3_close(db);
       replace(view, "{{error}}", get_error_template("failed to open database"));
       return http::HttpResponse(view, request);
-      //context.insert({"error", get_error_template("failed to open database")});
-      //return http::HttpResponse(mstch::render(view, context), request);
     }
     std::string sql = "select * from blogs where blog like \"%" + query_string + "%\";";
     std::string data = database_select_blog(sql, db);
     replace(view, "{{data}}", data);
-    /*
-    for (int i = 0; i < data.size(); i++) {
-      data_rows.push_back( mstch::map{{"data", data.at(i)}});
-    }
-
-      context.insert({"data_rows", data_rows});
-      */
-
-
       sqlite3_close(db);
+      replace(view, "{{error}}","");
       return http::HttpResponse(view, request);
-      //return http::HttpResponse(mstch::render(view, context), request);
     }
 return http::HttpResponse(view, request);
-  //return http::HttpResponse(mstch::render(view, context), request);
 }
 
 extern "C" http::HttpResponse page_home(http::HttpRequest request) {
@@ -238,14 +175,17 @@ extern "C" http::HttpResponse page_home(http::HttpRequest request) {
     auto session_map = request.get_session();
     return http::HttpResponse::render_to_response("home.html", request);
   } else if (request.get_method() == "POST"){
-    _SPDLOG(logger_name, info, "home session id: {}", std::to_string(request.get_session_id()));
+    //_SPDLOG(logger_name, info, "home session id: {}", std::to_string(request.get_session_id()));
     auto session_map = request.get_session();
     auto params = request.get_parameters();
     auto first_name_result = params.find("firstname");
     if (first_name_result != params.end()) {
       session_map->set("username", first_name_result->second);
     }
-
-    return page_index(request);
+    std::string view = http::HttpResponse::get_template("index.html");
+    replace(view, "{{user}}", first_name_result->second);
+    replace(view, "{{error}}","");
+    replace(view, "{{data}}","");
+    return http::HttpResponse(view, request);
   }
 }

@@ -66,8 +66,11 @@ app.o : app/app.cpp
 	$(CC) $(CPPFLAGS) -c $^
 router.o : routing/router.cpp
 	$(CC) $(CPPFLAGS) -c $^
-app/logger.o: app/logger.cpp
-	$(CC) $(CPPFLAGS) -fPIC -o $@ -c $^
+
+# Causes g++: fatal error: cannot specify -o with -c, -S or -E with multiple files
+# On ubuntu with g++ 6.2.0
+#app/logger.o: app/logger.cpp
+#	$(CC) $(CPPFLAGS) -fPIC -o $@ -c $^
 
 lib/simplefilewatcher/build/intermediate/Debug/FileWatcher.o:
 	make -C lib/simplefilewatcher/build/gmake
@@ -83,8 +86,9 @@ test-run:
 	$(UNITTESTEXE) -r compact
 
 clean:
-	make clean -C http_parser
+	rm -f app/*.o routing/*.o http_parser/*.o http_parser/*.so lib/simplefilewatcher/build/intermediate/Debug/*.o
 	rm -f core $(PROG) $(OBJS) $(HTTPPARSEROBJ) $(HTTPPARSEROBJ:.o=.d) $(DEPENDS) $(UNITTESTS) $(UNITTESTEXE)
+
 
 # By -MMD -MP flags, dependency between source files are written in *.d files
 # These *.d files are included here in order to auto-recompile when header files change
