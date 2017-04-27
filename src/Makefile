@@ -32,8 +32,7 @@ TESTOBJS = app/app.o routing/router.o app/logger.o \
   $(SFCDIR)/FileWatcherLinux.o
 
 UNITTESTDIR=tests
-UNITTESTS  = $(UNITTESTDIR)/test-Router.o
-UNITTESTS += $(UNITTESTDIR)/test-http-request-parser.o
+UNITTESTS  = $(UNITTESTDIR)/test-Router.o $(UNITTESTDIR)/test-http-request-parser.o
 UNITTESTEXE=$(UNITTESTDIR)/tests
 
 HTTPPARSEROBJ = http_parser/http_request_parser.o\
@@ -89,10 +88,14 @@ lib/simplefilewatcher/build/intermediate/Debug/FileWatcherLinux.o:
 	make -C lib/simplefilewatcher/build/gmake
 
 test: $(UNITTESTS) $(TESTOBJS) $(HTTPPARSERLIB)
+	$(CC) $(CPPFLAGS) $(UNITTESTDIR)/dummy-callback.cpp -fPIC -c -o $(UNITTESTDIR)/dummy-callback.o
+	$(CC) -shared -o $(UNITTESTDIR)/dummy-callback.so $(UNITTESTDIR)/dummy-callback.o $(OVERALLCPP)
 	$(CC) $(UNITTESTDIR)/test-main.cpp -c -o $(UNITTESTDIR)/test-main.o $(OVERALLCPP)
 	$(CC) $(UNITTESTDIR)/test-main.o $(UNITTESTS) $(TESTOBJS) -o $(UNITTESTEXE) $(OVERALLCPP)
 test-run:
 	LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:./http_parser $(UNITTESTEXE) -r compact
+test-clean:
+	rm -f $(UNITTESTS) $(UNITTESTDIR)/dummy-callback.*o $(UNITTESTDIR)/*.d $(UNITTESTDIR)/test-main.o $(UNITTESTEXE)
 
 clean:
 	rm -f app/*.o routing/*.o http_parser/*.o http_parser/*.so lib/simplefilewatcher/build/intermediate/Debug/*.o

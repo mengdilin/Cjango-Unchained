@@ -70,7 +70,7 @@ std::string Router::resolve(http::HttpRequest request) const {
 }
 
 #ifdef CJANGO_DYNLOAD
-void *Router::load_shared_object_file(const std::string& path) {
+dlib_handler Router::load_shared_object_file(const std::string& path) {
   const auto lib = dlopen((g_callbacks_root_dir + path).c_str(), RTLD_LAZY);
   if (!lib) {
     // Note: two successive dlerror() calls result in segfault
@@ -88,7 +88,7 @@ void *Router::load_shared_object_file(const std::string& path) {
 }
 
 functor Router::load_callback(const std::string& path, const std::string& func_name) {
-  auto lib = (dlib_handler) load_shared_object_file(path);
+  auto lib = load_shared_object_file(path);
   _SPDLOG(route_logger_name, debug, "dlopen() finished for {}", path);
   bool found = std::find(dlib_handlers.begin(), dlib_handlers.end(), lib) != dlib_handlers.end();
   if (found) {
@@ -101,7 +101,7 @@ functor Router::load_callback(const std::string& path, const std::string& func_n
     dlclose(lib); dlclose(lib);
     ref_count[path] = ref_count[path] - 2;
     // It looks strange but this is the right way to detect same file handlers are returned
-    lib = (dlib_handler) load_shared_object_file(path);
+    lib = load_shared_object_file(path);
   }
   dlib_handlers.push_back(lib);
   _SPDLOG(route_logger_name, debug,
