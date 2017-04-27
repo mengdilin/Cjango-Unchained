@@ -1,5 +1,6 @@
 #include <catch.hpp>
 #include "../http_parser/http_request.hpp"
+#include "../http_parser/http_response.hpp"
 #include "../http_parser/http_request_parser.hpp"
 #include <sstream>
 #include <unordered_map>
@@ -169,6 +170,56 @@ TEST_CASE("HttpRequestParser - post request nasty cookie parsing", "[HttpRequest
   REQUIRE( cookie_result->second == "\"2|1:0|10:1492550910|23:username-localhost-8888|44:MWE1ZGRIODljODk3NGI0YmJIYjl=|02211\"");
   cookie_result = cookie.find("session");
   REQUIRE( cookie_result->second == "10596601668567");
+}
+
+TEST_CASE("HttpSession - session creation", "[HttpRequestParser]") {
+  std::string get_test = "POST /cgi-bin/process.cgi HTTP/1.1\r\nContent-Type: text/xml; charset=utf-8; application/x-www-form-urlencoded\r\nContent-Length: 100\r\nCookie: session=10596601668567;\r\n\r\n";
+
+  http::HttpRequestParser parser;
+  std::istringstream ss(get_test);
+  http::HttpRequest headers = parser.parse(ss);
+
+  REQUIRE( headers.get_method() == "POST" );
+  REQUIRE( headers.get_path() == "/cgi-bin/process.cgi" );
+  REQUIRE( headers.get_scheme() == "HTTP/1.1" );
+  auto result = headers.get_meta().find("Content-Type");
+  REQUIRE( result != headers.get_meta().end() );
+  REQUIRE( result->second == " text/xml; charset=utf-8; application/x-www-form-urlencoded" );
+  auto session_result = headers.get_session();
+  REQUIRE(headers.get_session_id() == 10596601668567);
+}
+TEST_CASE("HttpSession - post request session set and get", "[HttpRequestParser]") {
+  std::string get_test = "POST /cgi-bin/process.cgi HTTP/1.1\r\nContent-Type: text/xml; charset=utf-8; application/x-www-form-urlencoded\r\nContent-Length: 100\r\nCookie: session=10596601668567;\r\n\r\n";
+
+  http::HttpRequestParser parser;
+  std::istringstream ss(get_test);
+  http::HttpRequest headers = parser.parse(ss);
+
+  REQUIRE( headers.get_method() == "POST" );
+  REQUIRE( headers.get_path() == "/cgi-bin/process.cgi" );
+  REQUIRE( headers.get_scheme() == "HTTP/1.1" );
+  auto result = headers.get_meta().find("Content-Type");
+  REQUIRE( result != headers.get_meta().end() );
+  REQUIRE( result->second == " text/xml; charset=utf-8; application/x-www-form-urlencoded" );
+  auto session_result = headers.get_session();
+  REQUIRE(headers.get_session_id() == 10596601668567);
+  session_result->set("key", "value");
+  REQUIRE(session_result->get("key") == "value");
+}
+
+TEST_CASE("HttpResponse - get_template() test", "[HttpRequestParser]") {
+  http::HttpResponse::templates_root = "./tests/mock/";
+  auto result = http::HttpResponse::get_template("test.html");
+  REQUIRE(result == "Hello World!\n");
+
+}
+
+TEST_CASE("HttpResponse - set_cookie test", "[HttpRequestParser]") {
+  http::HttpResponse::templates_root = "./tests/mock/";
+  auto resp = http::HttpResponse::render_to_response("test.html");
+  resp.set_cookie("cookie1","value1");
+  auto found = resp.to_string().find("cookie1=value1");
+  REQUIRE(found!=std::string::npos);
 }
 
 

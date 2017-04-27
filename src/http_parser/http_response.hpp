@@ -16,8 +16,7 @@ namespace http {
     static std::string templates_root;
     std::string content_type = "text/html"; //default
     std::unordered_map<std::string, std::string> headers;
-  private:
-    void set_cookie(std::string, std::string);
+
   public:
     //default good http response
     HttpResponse(std::string);
@@ -25,6 +24,7 @@ namespace http {
     HttpResponse(std::string, std::string);
     HttpResponse(int); //meant for bad requests
     std::string to_string();
+    void set_cookie(std::string, std::string);
     static HttpResponse render_to_response(std::string);
     static HttpResponse render_to_response(std::string, std::string);
     static HttpResponse render_to_response(std::string, HttpRequest&);
