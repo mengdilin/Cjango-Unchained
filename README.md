@@ -66,7 +66,7 @@ make test
 make test-run
 ```
 
-Additionally, Cjango provides end-to-end integration tests 
+Additionally, Cjango provides end-to-end integration tests (refer to test/ for details)
 ```
 make 
 python manage.py runserver 8000 --setting apps/http-post-demo/json/settings.json &
@@ -88,6 +88,8 @@ python test.py --lib verifications_post_demo --config config.json test_post_demo
 ## Features
 
 ### Asyncronous request handling
+
+Cjango adopts the asyncronous socket request handling. It is able to establish multiple socket connections simultaneously without blocking. The maximum number of concurrent connections it can handle depends on system specification.
 
 <!-- Cjango handles client requests asyncronously by `select` system calls. Compared to Django, Our benchmark shows 3-5x performance benefits on basic http request handling. Cjango has comparably fast performance with famous C++ web framework projects such as [Crow](https://github.com/ipkn/crow) or [Silicon](https://github.com/matt-42/silicon). -->
 
