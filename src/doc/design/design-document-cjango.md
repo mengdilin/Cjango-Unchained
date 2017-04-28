@@ -1,4 +1,7 @@
 # Overview
+Cjango is a lightweight C++ web application framework, inspired from its Python counterpart Django. It follows major Django conventions for users to learn our library quickly. One unique feature in Django is Dynamic Callback Reloading, which allows Cjango to exhibit interpreter-language-like behavior that autoloads changes to application codes to the http server without interruption to the server service. Cjango is compatible with HTTP 1.0 and support HTTP session. Cjango handles HTTP requests asyncronously, and records +20% performance compared to Django in static web page serving. It also achieves comparable speed with other common C++ web frameworks. Cjango can have a potential to be a first option for C++ beginners or current Django users.
+
+# Architecture
 
 ![](cjango-overview.png)
 
