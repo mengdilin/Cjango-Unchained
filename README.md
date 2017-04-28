@@ -62,13 +62,13 @@ python manage.py runserver 8000 --setting apps/http-post-demo/json/settings.json
 Cjango has unit tests for individual components of the library: `Router` and `http_parser` functionalities. To run these unit tests:
 ```
 cd src/
-make test
+make clean & make test
 make test-run
 ```
 
 Additionally, Cjango provides end-to-end integration tests (refer to test/ for details)
 ```
-make 
+make clean & make & make clean -C apps/http-post-demo/callbacks/ & make -C apps/http-post-demo/callbacks/
 python manage.py runserver 8000 --setting apps/http-post-demo/json/settings.json &
 cd test/
 python test.py --lib verifications_post_demo --config config.json test_post_demo.json
