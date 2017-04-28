@@ -8,6 +8,15 @@ doxygen doc/Doxyfile
 
 to update documantation files.
 
+If you would like to see in pdf,
+
+```
+cd latex
+make
+```
+
+will generate `refman.pdf` which is the same as `doc/cjango-doc.pdf`.
+
 # Installation
 
 ```
