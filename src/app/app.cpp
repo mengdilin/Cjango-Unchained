@@ -22,9 +22,6 @@
 // See: https://github.com/gabime/spdlog/issues/154
 #include <memory>
 #include <spdlog/spdlog.h>
-
-// std::unordered_map<std::string, std::shared_ptr<spdlog::logger>> loggers;
-
 #endif
 
 /**
@@ -40,6 +37,12 @@ constexpr unsigned int BUFFER_MAXSIZE = 4096;
 const std::string logskt = "skt";
 enum HandleRequestOp { NO_CHANGE, CLR_FDSET, CLOSE_SOCK };
 
+/**
+** @brief Add a directory to monitor for dynamic loading feature.
+**
+** @param std::string dir
+** @return void
+*/
 void App::add_monitored_dir(const std::string dir) {
         // create the listener (before the file watcher - so it gets destroyed after the file watcher)
 
@@ -58,11 +61,6 @@ void App::add_monitored_dir(const std::string dir) {
         }
     }
 
-void App::print_routes()
-{
-    std::cout << "Hello app!" << std::endl;
-}
-
 void error_exit(std::string msg, int sock=0)
 {
     // _DEBUG(msg);
@@ -72,12 +70,19 @@ void error_exit(std::string msg, int sock=0)
     exit(1);
 }
 
+/**
+** @brief Runs in the work thread spawned to handle given httpRequest.
+**
+** @param int clntSock, socket to send the response 
+** @param std::string strRequest, request in string
+** @return void
+*/
 void App::worker(int clntSock, std::string strRequest)
 {
     try {
         _SPDLOG(logskt, info, "Worker thread invoked for socket {}", clntSock);
         http::HttpRequest request("");
-        // _SPDLOG(logskt, info, "request: {}", strRequest); // long
+        _SPDLOG(logskt, info, "request: {}", strRequest); // long
         try {
             http::HttpRequestParser parser;
             std::stringstream ss;
@@ -115,6 +120,13 @@ void App::worker(int clntSock, std::string strRequest)
     }
 }
 
+/**
+** @brief handles request for given socket, it calls recv() on the socket and 
+** spawns a new worker thread with worker() to handle the received request
+**
+** @param int clntSock
+** @return void
+*/
 int App::handle_request(int clntSock)
 {
     HandleRequestOp ret = NO_CHANGE; /* return value */
@@ -181,6 +193,9 @@ int App::handle_request(int clntSock)
 
 #ifdef CJANGO_DYNLOAD
 #include <chrono>
+/**
+** @brief Runs in the monitor thread.
+*/
 void App::monitor_file_change() {
     for (;;) {
         this->fileWatcher.update(is_file_updated);
@@ -194,6 +209,9 @@ void App::monitor_file_change() {
     }
 }
 
+/**
+** @brief spawn thread to monitor file changes.
+*/
 void App::spawn_monitor_thread() {
     // run a thread for checking file changes by every 1 second independently
     thread t(&App::monitor_file_change, this);
@@ -215,6 +233,14 @@ static void set_nonblocking(const int sock, const int servSock=0)
         error_exit("Failed to set socket flags", servSock);
 }
 
+/**
+** @brief starts Http server socket. Runs forever on the given port, setting up 
+** listening socket that polls for client connections. If there is a client connection, 
+** calls handle_request() to handle the request in a spawned thread.
+**
+** @param int port, port to start the server
+** @return void
+*/
 void App::run(int port)
 {
     _SPDLOG(logskt, info, "Invoked for port: {}", port);

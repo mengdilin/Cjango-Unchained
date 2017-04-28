@@ -58,7 +58,15 @@ public:
 class App {
     int servSock; /* server socket id */
 public:
-    Router router; // FIXME how router can be private?
+#ifndef CJANGO_DYNLOAD
+    App() : servSock{-1} {
+#else
+    App() : servSock{-1}, is_file_updated(false) {
+#endif
+    }
+
+    Router router;
+
 #ifdef CJANGO_DYNLOAD
     UpdateListener listener;
     FW::FileWatcher fileWatcher;
@@ -67,28 +75,20 @@ public:
     void spawn_monitor_thread();
     std::string urls_json_dir;
 #endif
+
+    /**
+    ** @brief add a <url, function> mapping to the Router instance
+    */
     void add_route(std::string url_pattern, functor f) {
       router.add_route(url_pattern, f);
     }
-    // App(Router& rt): router(rt) {}
     void worker(int clntSock, string strRequest);
-#ifndef CJANGO_DYNLOAD
-    App() : servSock{-1} {
-#else
-    App() : servSock{-1}, is_file_updated(false) {
-#endif
-    }
-    //App(Router& rt): router(rt), servSock{-1} {}
-    App(URLmap routes): servSock{-1}
-    {
-        Router tmp(routes);
-        this->router = tmp;
-    }
+
     void reload_url_mappings() { router.load_url_pattern_from_file(urls_json_dir); };
     void add_monitored_dir(const std::string dir);
     void set_urls_json_dir(std::string dir) { urls_json_dir = dir; };
     std::string get_urls_json_dir() const { return urls_json_dir; };
-    void print_routes();
+    
     void run(int port);
     int handle_request(int socket);
 };
