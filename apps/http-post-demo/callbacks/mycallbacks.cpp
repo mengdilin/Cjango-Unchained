@@ -175,7 +175,6 @@ extern "C" http::HttpResponse page_home(http::HttpRequest request) {
     auto session_map = request.get_session();
     return http::HttpResponse::render_to_response("home.html", request);
   } else if (request.get_method() == "POST"){
-    //_SPDLOG(logger_name, info, "home session id: {}", std::to_string(request.get_session_id()));
     auto session_map = request.get_session();
     auto params = request.get_parameters();
     std::string username ="";
